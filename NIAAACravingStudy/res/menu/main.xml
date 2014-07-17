@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+   
+    <item android:id="@+id/Enable" android:title="@string/menu_en_bt" ></item>
+    <item android:id="@+id/Disable" android:title="@string/menu_dis_bt" ></item>
+    <item android:id="@+id/manage" android:title="@string/menu_management"></item>
+    <item android:id="@+id/about" android:title="@string/menu_about"></item>
+
+</menu>

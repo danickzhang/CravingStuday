@@ -1,0 +1,61 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/activity_top_margin"
+    android:orientation="vertical"
+    >
+
+    <Button
+        android:id="@+id/section_label1"
+        style="@style/button_style"
+        android:text="@string/section_1"
+        />
+    
+    <Button
+        android:id="@+id/section_label2"
+        style="@style/button_style"
+        android:text="@string/section_2"
+        />
+        
+    <Button
+        android:id="@+id/section_label3"
+        style="@style/button_style"
+        android:text="@string/section_3"
+        />
+    
+    <Button
+        android:id="@+id/section_label4"
+        style="@style/button_style"
+        android:text="@string/section_4"
+        />
+    
+    <Button
+        android:id="@+id/section_label5"
+        style="@style/button_style"
+        android:text="@string/section_5"
+        />
+        
+    <Button
+        android:id="@+id/section_label6"
+        style="@style/button_style"
+        android:text="@string/section_6"
+        />
+    
+    <Button
+        android:id="@+id/section_label7"
+        style="@style/button_style"
+        android:text="followups"
+        />
+    <Button
+        android:id="@+id/section_label8"
+        style="@style/button_style"
+        android:text="random"
+        />
+    <Button
+        android:id="@+id/section_label9"
+        style="@style/button_style"
+        android:text="reset"
+        />
+
+</LinearLayout>

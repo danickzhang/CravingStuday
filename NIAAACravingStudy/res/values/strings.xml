@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Body Sensor Application</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
+	<string name="return_to_main">Return to main Menu</string>
+	<string name="pin_hint">4-digit PIN</string>
+    
+    
+	<!-- Menus -->
+    <string name="menu_en_bt">Enable Bluetooth</string>
+    <string name="menu_dis_bt">Disable Bluetooth</string>
+    <string name="menu_management">Management</string>
+    <string name="menu_about">About</string>
+    
+
+    <!-- Contents -->
+    <string name="section_1">Start Service</string>
+    <string name="section_2">Stop Service</string>
+    <string name="section_3">Survey Menu</string>
+    <string name="section_4">Sensor Connections</string>
+    <string name="section_5">Set Bedtime</string>
+    <string name="section_6">Suspension</string>
+    
+    
+<!-- Surveys -->
+    <string name="btn_submit">Submit</string>
+    <string name="btn_previous">Previous Question</string>
+    <string name="btn_cancel">Cancel</string>
+    
+    <!-- Morning Report -->
+    <string name="morning_report_name">Morning Report</string>
+    <string name="morning_report_title">Late for Morning Report</string>
+    <string name="morning_report_msg">Morning Report should be done before noon.</string>
+    <string name="morning_report_title2">Finished</string>
+    <string name="morning_report_msg2">You have already finished Morning Report for today.</string>
+    <string name="morning_report_set_text">Wake up time (for tomorrow):</string>
+    <string name="morning_report_set">Set wake up time</string>
+    
+    <!-- Initial Drinking -->
+    <string name="initial_drink_name">Initial Drinking</string>
+    <string name="first_drink_title">Drink Confirmation</string>
+    <string name="first_drink_msg">Are you going to report your drink(s)?</string>
+
+</resources>

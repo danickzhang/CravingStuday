@@ -1,0 +1,44 @@
+<root>
+	<category>
+		<description>Drinking Follow-up</description>
+		
+		<!-- Here we don't use number picker because 0 is allowed here, to skip drinking related questions groups -->
+		<question id="q611" type="radio">
+			<text>HOW MANY DRINKS did you consume SINCE THE LAST RECORDING?</text>
+			<answer id="0" skip="q641">0</answer>
+			<answer id="1">1</answer>
+			<answer id="2">2</answer>
+			<answer id="3">3</answer>
+			<answer id="4">4</answer>
+			<answer id="5">5</answer>
+			<answer id="6">6+</answer>
+		</question>
+	</category>
+
+	<externalsource baseid="q62" filename="DrinkingMotivation.xml"></externalsource>
+	<externalsource baseid="q63" filename="DrinkingEffects.xml"></externalsource>
+
+	<category>
+		<description>Recent Smoking</description>
+		<question id= "q641" type = "radio">
+			<text>Have you SMOKED A CIGARETTE since THE LAST RECORDING?</text>
+			<answer id = "y">Yes</answer>
+			<answer id = "n" skip="q671">No</answer>
+		</question>
+		<question id = "q642" type = "number">
+			<text>HOW MANY CIGARETTES did you smoke since THE LAST RECORDING?</text>
+			<answer id = "item">cigarette(s)</answer>
+			<answer id = "min">1</answer>
+			<answer id = "max">24</answer>
+		</question>
+	</category>
+
+	<externalsource baseid="q65" filename="SmokingMotivation.xml"></externalsource>
+	<externalsource baseid="q66" filename="SmokingEffects.xml"></externalsource>
+	
+	<externalsource baseid="q67" filename="MoodSubset.xml"></externalsource>
+	
+	<externalsource baseid="q68" filename="CravingsAndSymptomsSubset.xml"></externalsource>
+	<externalsource baseid="q69" filename="SituationAndSetting.xml"></externalsource>
+
+</root>

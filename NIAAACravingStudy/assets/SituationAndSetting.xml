@@ -1,0 +1,23 @@
+<root>
+	<category>
+		<description>Situation and setting</description>
+		<question id = "1" type = "check">
+			<text>In the past 15 minutes, WHO have you been with? (check all that apply)</text>
+			<answer id = "1" action="uncheck">No one</answer>
+			<answer id = "2">Partner/spouse</answer>
+			<answer id = "3">Other family member</answer>
+			<answer id = "4">Friend/acquaintance</answer>
+			<answer id = "5">Other</answer>
+		</question>
+		
+		<question id = "2" type = "check">
+			<text>In the past 15 minutes, WHERE is your location? (check all that apply)</text>
+			<answer id = "1">Home</answer>
+			<answer id = "2">Work</answer>
+			<answer id = "3">Bar/restaurant</answer>
+			<answer id = "4">Outside</answer>
+			<answer id = "5">Other public place</answer>
+			<answer id = "6">Other</answer>
+		</question>
+	</category>
+</root>
