@@ -153,11 +153,11 @@ public class XMLHandler extends DefaultHandler {
 			
 			if(s != null && s.equals("random")){
 				category = new RandomCategory();
-				Utilities.Log(TAG, "Random tag category");
+//				Utilities.Log(TAG, "Random tag category");
 			}
 			else{
 				category = new SurveyCategory();
-				Utilities.Log(TAG, "regular tag category");
+//				Utilities.Log(TAG, "regular tag category");
 			}
 		}
 		

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.missouri.niaaa.craving"
-    android:versionCode="104"
+    android:versionCode="171"
     android:versionName="2.2" >
 
     <uses-sdk
@@ -9,6 +9,12 @@
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+<!--     <uses-permission android:name="android.permission.DEVICE_POWER" /> -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     
     
     <application
@@ -35,6 +41,7 @@
             <intent-filter>
 				<action android:name="edu.missouri.niaaa.craving.ACTION_SCHEDULE_ALL" />
 				<action android:name="edu.missouri.niaaa.craving.REMINDER" />
+				<action android:name="edu.missouri.niaaa.craving.SUSPENSION" />
 				
 				<action android:name="edu.missouri.niaaa.craving.SCHEDULE_MORNING" />
 				<action android:name="edu.missouri.niaaa.craving.TRIGGER_MORNING" />
@@ -42,10 +49,48 @@
 				<action android:name="edu.missouri.niaaa.craving.TRIGGER_RANDOM" />
 				<action android:name="edu.missouri.niaaa.craving.SCHEDUL_FOLLOWUP" />
 				<action android:name="edu.missouri.niaaa.craving.TRIGGER_FOLLOWUP" />
+				<action android:name="edu.missouri.niaaa.craving.REMINDER_MORNING" />
+				<action android:name="edu.missouri.niaaa.craving.REMINDER_RANDOM" />
+				<action android:name="edu.missouri.niaaa.craving.REMINDER_FOLLOWUP" />
+				<action android:name="edu.missouri.niaaa.craving.REMINDER_DRINKING" />
+				<action android:name="edu.missouri.niaaa.craving.REMINDER_MOOD" />
+				<action android:name="edu.missouri.niaaa.craving.REMINDER_CRAVING" />
+				
+<!-- 				<action android:name="android.intent.action.DATE_CHANGED" /> -->
 				
                 <action android:name="sounds_alarm" />
             </intent-filter>
         </receiver>
+        
+        <receiver
+            android:name=".StartupIntentReceiver"
+            android:enabled="true"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>>
+        </receiver>
+        
+        <receiver
+            android:name=".DaemonReceiver" 
+            android:exported="false" >
+            <intent-filter >
+<!--                 <action android:name="edu.missouri.niaaa.craving.DAEMON_NOON" /> -->
+<!--                 <action android:name="edu.missouri.niaaa.craving.DAEMON_MIDN" /> -->
+<!--                 <action android:name="edu.missouri.niaaa.craving.DAEMON_THRE" /> -->
+                <action android:name="edu.missouri.niaaa.craving.DAEMON" />
+            </intent-filter>
+        </receiver>
+            
+        <activity
+            android:name=".AdminManageActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        
+        <activity
+            android:name=".SuspensionTimePicker"
+            android:screenOrientation="portrait" >
+        </activity>
         
         <activity
             android:name=".MorningScheduler"            

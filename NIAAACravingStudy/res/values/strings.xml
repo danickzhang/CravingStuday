@@ -19,10 +19,41 @@
     <string name="section_1">Start Service</string>
     <string name="section_2">Stop Service</string>
     <string name="section_3">Survey Menu</string>
-    <string name="section_4">Sensor Connections</string>
+    <string name="section_4">Sensor Connections(unavailable this version)</string>
     <string name="section_5">Set Bedtime</string>
     <string name="section_6">Suspension</string>
+    <string name="section_62">Break Suspension</string>
     
+    <!-- Bed-time -->
+    <string name="bedtime_title">Bedtime Report</string>
+    <string name="bedtime_message">Please complete the bedtime report between 9:00 P.M. and 3:00 A.M.</string>
+    <string name="bedtime_message_confirm">Please confirm that you are going to bed for the night.</string>
+    <string name="bedtime_checkbox">set as default</string>
+    
+    <!-- Suspension -->
+    <string name="suspension_title">Suspension Confirm</string>
+    <string name="suspension_msg">During the suspension you won\'t receive any random prompts, but you WILL receive drinking follow-up ones.</string>
+    <string name="suspension_break_title">Break Suspension</string>
+    <string name="suspension_break_msg">Please confirm that you want to break suspension to receive surveys.</string>
+    <string name="suspension_set_text">Select suspension time duration:</string>
+    <string name="suspension_set">Set Suspension Time</string>
+    
+    <!-- Admin  -->
+    <string name="admin_set_title">Verify Admin PIN</string>
+    <string name="admin_set_msg">Please input PIN for \nadministrator</string>
+    <string name="user_setpwd_title">Set User PIN</string>
+    <string name="user_setpwd_msg">Please input 4-digit PIN for \nUser: </string>
+    <string name="assign_confirm_title">Confirm</string>
+    <string name="assign_remove_title">Confirm Remove</string>
+    <string name="assign_btn">Assign ID</string>
+    <string name="remove_btn">Remove ID</string>
+    <string name="assign_title">Please assign an ID:</string>
+    <string name="remove_title">Current ID on device:</string>
+    
+    <string name="pin_title">Login</string>
+    <string name="pin_message">Please input your PIN number.</string>
+    <string name="pin_title_wrong">Pin Incorrect</string>
+    <string name="pin_message_wrong">Please press OK to try again.</string>
     
 <!-- Surveys -->
     <string name="btn_submit">Submit</string>
@@ -31,10 +62,12 @@
     
     <!-- Morning Report -->
     <string name="morning_report_name">Morning Report</string>
-    <string name="morning_report_title">Late for Morning Report</string>
-    <string name="morning_report_msg">Morning Report should be done before noon.</string>
-    <string name="morning_report_title2">Finished</string>
-    <string name="morning_report_msg2">You have already finished Morning Report for today.</string>
+    <string name="morning_report_title">Finished</string>
+    <string name="morning_report_msg">You have already finished Morning Report for today.</string>
+    <string name="morning_report_title2">Too Late</string>
+    <string name="morning_report_msg2">Morning Report should be done before noon.</string>
+    <string name="morning_report_title3">Too Early</string>
+    <string name="morning_report_msg3">Morning Report should be done after 3:00 a.m.</string>
     <string name="morning_report_set_text">Wake up time (for tomorrow):</string>
     <string name="morning_report_set">Set wake up time</string>
     

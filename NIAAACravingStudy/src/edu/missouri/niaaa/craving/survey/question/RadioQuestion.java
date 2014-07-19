@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.survey.XMLSurveyActivity;
 import edu.missouri.niaaa.craving.survey.category.Answer;
 import edu.missouri.niaaa.craving.survey.category.QuestionType;
 import edu.missouri.niaaa.craving.survey.category.SurveyQuestion;
@@ -28,6 +29,7 @@ public class RadioQuestion extends SurveyQuestion {
 	String skipTo;
 	Answer selectedAnswer;
 	Context broadcastContext;
+	public boolean has = false;
 	
 	public RadioQuestion(String id){
 		this.questionId = id;
@@ -86,8 +88,7 @@ public class RadioQuestion extends SurveyQuestion {
 			
 			temp.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 				
-				public void onCheckedChanged(CompoundButton buttonView,
-						boolean isChecked) {
+				public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
 					if(isChecked){
 						if(selectedAnswer != null) 
 							selectedAnswer.setSelected(false);
@@ -160,6 +161,10 @@ public class RadioQuestion extends SurveyQuestion {
 					Log.d("RadioQuestion","Time: "+time);
 //					triggerSurvey(time, triggerName, triggerFile, counter++);
 				}
+				
+				Log.d("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww", " contains trigger");
+				XMLSurveyActivity.triggerFollowup = true;
+				
 			}
 			broadcastContext = null;
 			return temp;

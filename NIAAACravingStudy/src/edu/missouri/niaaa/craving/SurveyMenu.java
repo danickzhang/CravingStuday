@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 public class SurveyMenu extends Activity {
 
+
 	String TAG = "XML SurveyMenu";
 	List<SurveyInfo> surveys;
 	HashMap<View, SurveyInfo> buttonMap;
@@ -78,23 +79,32 @@ public class SurveyMenu extends Activity {
 						Utilities.Log(TAG, temp.getDisplayName()+" "+temp.getFileName()+" "+temp.getName());
 						
 						// Morning Report
-						// 1. should be done before noon
-						// 2. only once per study day
+						// 1. only once per study day
+						// 2. should be done before noon
 						if(temp.getDisplayName().equals(getResources().getString(R.string.morning_report_name))){
+							
 							Calendar mT = Calendar.getInstance();
 							Calendar noonT = Calendar.getInstance();
 							noonT.set(Calendar.HOUR_OF_DAY, 12);
 							noonT.set(Calendar.MINUTE, 0);
 							noonT.set(Calendar.SECOND, 0);
-							if (mT.after(noonT)){
+							
+							Calendar threeT = Calendar.getInstance();
+							threeT.set(Calendar.HOUR_OF_DAY, 3);
+							threeT.set(Calendar.MINUTE, 0);
+							threeT.set(Calendar.SECOND, 0);
+							
+							if(Utilities.completedMorningToday(SurveyMenu.this)){
 								Alert(R.string.morning_report_title,R.string.morning_report_msg);
 							}
-							else if(false){//once per day
-								
+							else if(mT.after(noonT)){
 								Alert(R.string.morning_report_title2,R.string.morning_report_msg2);
 							}
+							else if(mT.before(threeT)){
+								Alert(R.string.morning_report_title3, R.string.morning_report_msg3);
+							}
 							else {
-								launchSurvey(temp.getFileName(),temp.getName());
+								launchSurvey(temp.getName());
 							}
 						}
 						
@@ -109,7 +119,7 @@ public class SurveyMenu extends Activity {
 								@Override 
 								public void onClick(DialogInterface dialog, int which) { 
 									// TODO Auto-generated method stub  
-									launchSurvey(temp.getFileName(),temp.getName());
+									launchSurvey(temp.getName());
 								} 
 							})
 							.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -125,7 +135,7 @@ public class SurveyMenu extends Activity {
 						} 
 						
 						else {
-							launchSurvey(temp.getFileName(),temp.getName());
+							launchSurvey(temp.getName());
 						}
 					}
 				});
@@ -156,18 +166,37 @@ public class SurveyMenu extends Activity {
 	}
 
 	
-	private void launchSurvey(String FileName, String Name){
-		/*Intent launchIntent = new Intent(getApplicationContext(), SurveyPinCheck.class);
-		launchIntent.putExtra("survey_file", FileName);
-		launchIntent.putExtra("survey_name", Name);
-		startActivity(launchIntent);*/
-		
+	private void launchSurvey(String Name){
 		Intent launchIntent = new Intent(getApplicationContext(), XMLSurveyActivity.class);
-		launchIntent.putExtra("survey_file", FileName);
-		launchIntent.putExtra("survey_name", Name);
+		launchIntent.putExtra(Utilities.SV_NAME, Name);
 //		if (surveyName.equalsIgnoreCase("RANDOM_ASSESSMENT"))
 //			launchIntent.putExtra("random_sequence", randomSeq);
-		startActivity(launchIntent);
+		startActivityForResult(launchIntent, 0);
+	}
+	
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		switch(requestCode){
+		case 0:
+			if(resultCode == 1){
+				Toast.makeText(this, "timeout for completing current survey.", Toast.LENGTH_LONG).show();
+			}
+			else if(resultCode == 2) {
+				Toast.makeText(this, "you may need to complete morning survey for today first", Toast.LENGTH_LONG).show();
+			}else{
+				
+			}
+			
+			break;
+		default:
+			
+			break;
+		}
+			
 	}
 	
 }

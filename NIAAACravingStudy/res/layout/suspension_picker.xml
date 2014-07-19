@@ -4,40 +4,22 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
-	<TextView
+    <TextView
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_marginLeft="10sp"
 	    android:layout_marginTop="5sp"
 	    android:textSize="20sp"
-	    android:text="@string/morning_report_set_text"
+	    android:text="@string/suspension_set_text"
 	    />
 	
-	<TextView
-	    android:id="@+id/morning_text"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:layout_marginTop="25sp"
-	    android:gravity="center"
-	    android:textSize="65sp"
-	    />
-	
-	<TimePicker
-        android:id="@+id/morning_picker"
+	<NumberPicker
+        android:id="@+id/suspension_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:layout_marginTop="15sp"
-		android:layout_marginLeft="15sp"
+		android:layout_marginLeft="45sp"
         />
-	
-	<CheckBox 
-	    android:id="@+id/morning_box"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_marginLeft="25sp"
-	    android:textSize="20sp"
-	    android:text="@string/bedtime_checkbox"
-	    />
 	
 	<LinearLayout 
 	    android:layout_width="match_parent"
@@ -46,10 +28,10 @@
 	    />
 	
 	<Button
-		android:id="@+id/btnSchedule"
+		android:id="@+id/btnSuspension"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/morning_report_set"
+        android:text="@string/suspension_set"
         />
     <Button
         android:id="@+id/btnReturn"
@@ -57,5 +39,5 @@
         android:layout_height="wrap_content"
         android:text="@string/return_to_main"
         />
-    
+
 </LinearLayout>
