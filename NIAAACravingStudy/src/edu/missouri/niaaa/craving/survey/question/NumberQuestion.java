@@ -29,9 +29,9 @@ public class NumberQuestion extends SurveyQuestion {
 	
 	
 	public LinearLayout prepareLayout(Context c) {
-		this.item = this.answers.get(0).getValue();
-		this.min = Integer.parseInt(this.answers.get(1).getValue());
-		this.max = Integer.parseInt(this.answers.get(2).getValue());
+		this.item = this.answers.get(0).getAnswerText();
+		this.min = Integer.parseInt(this.answers.get(1).getAnswerText());
+		this.max = Integer.parseInt(this.answers.get(2).getAnswerText());
 		if(result == -1)
 			result = this.min;
 		
@@ -75,6 +75,7 @@ public class NumberQuestion extends SurveyQuestion {
 			public void onValueChange(NumberPicker picker, int oldVal,
 					int newVal) {
 				// TODO Auto-generated method stub
+				Log.d("_________", "number picker");
 				result = newVal;
 				np.setValue(result);
 				counterText.setText(result + " " + item);
@@ -125,8 +126,13 @@ public class NumberQuestion extends SurveyQuestion {
 	
 	
 	public ArrayList<String> getSelectedAnswers(){
+		if(!validateSubmit()){
+			ArrayList<String> temp = new ArrayList<String>();
+			temp.add(Integer.valueOf(-1).toString());
+			return temp;
+		}
 		ArrayList<String> temp = new ArrayList<String>();
-		temp.add(new Integer(result).toString());
+		temp.add(Integer.valueOf(result).toString());
 		return temp;
 	}
 }

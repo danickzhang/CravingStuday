@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    android:layout_marginLeft="20dip"
+	    android:layout_marginTop="10dip"
+	    android:layout_marginRight="20dip"
+	    android:layout_marginBottom="10dip"
+	    >
+	    
+	    <TextView
+	        android:layout_width="0dip"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        android:text="Sensor Status : "
+	        />
+	    
+	    <TextView
+	        android:id="@+id/sensor_status_text"
+	        android:layout_width="0dip"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:textAppearance="?android:attr/textAppearanceMedium"
+	        android:textColor="#A9A9A9"
+	        android:text="Not connected"
+	        />
+	    
+	</LinearLayout>
+	
+	<Button
+	    android:id="@+id/btnSensorConnect"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:text="Connect to Sensor"
+	    />
+	
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    android:layout_marginLeft="20dip"
+	    android:layout_marginTop="10dip"
+	    android:layout_marginRight="20dip"
+	    android:layout_marginBottom="10dip"
+	    >
+	    
+	    <TextView
+	        android:layout_width="0dip"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        android:text="Bluetooth :"
+	        />
+	    
+	    <ToggleButton
+           android:id="@+id/btnBluetooth"
+           android:layout_width="0dip"
+           android:layout_height="wrap_content"
+           android:layout_weight="1"
+           android:textOff="Disable"
+           android:textOn="Enable"
+            />
+	    
+	</LinearLayout>
+	
+	<Button
+	    android:id="@+id/btnSensorReset"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:text="Hard Reset"
+	    />
+
+</LinearLayout>

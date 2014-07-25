@@ -64,7 +64,7 @@ public class SurveyBroadcast extends BroadcastReceiver {
 	        v.vibrate(500);
         }
         
-/*      schedule survey*/
+/*      reschedule survey*/
         else if(action.equals(Utilities.BD_ACTION_SCHEDULE_ALL)){
         	Utilities.LogB(TAG, "boot upppppppppppppppp!");
         	

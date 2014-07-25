@@ -75,7 +75,7 @@ public class RadioInputQuestion extends SurveyQuestion{
 		
 		for(Answer ans: this.answers){
 			RadioButton temp = new RadioButton(c);
-			temp.setText(ans.getValue());
+			temp.setText(ans.getAnswerText());
 			temp.setTextSize(TypedValue.COMPLEX_UNIT_DIP,15);
 
 			
@@ -124,6 +124,10 @@ public class RadioInputQuestion extends SurveyQuestion{
 	}
 
 	
+	public String getSkip() {
+		return skipTo;
+	}
+	
 	public boolean validateSubmit() {
 		if(selectedAnswer == null) return false;
 		boolean extraInput = selectedAnswer.getExtraInput();
@@ -133,9 +137,5 @@ public class RadioInputQuestion extends SurveyQuestion{
 		return false;
 	}
 
-	
-	public String getSkip() {
-		return skipTo;
-	}
 
 }

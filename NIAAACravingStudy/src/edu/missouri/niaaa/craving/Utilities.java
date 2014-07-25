@@ -3,6 +3,13 @@ package edu.missouri.niaaa.craving;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.math.BigInteger;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.RSAPublicKeySpec;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,6 +18,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.TimeZone;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -21,6 +34,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import com.google.android.gms.location.DetectedActivity;
+
+import edu.missouri.niaaa.craving.location.ActivityRecognitionService;
+import edu.missouri.niaaa.craving.location.LocationUtilities;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -29,9 +46,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -80,10 +99,12 @@ public class Utilities {
 	public final static int MAX_TRIGGER_MORNING = 1;//1
 	public final static int MAX_TRIGGER_RANDOM = 6;//6
 	public final static int MAX_TRIGGER_FOLLOWUP = 3;//3
-	public final static int VOLUME = 10;//10
+	public final static int VOLUME = 8;//10
 	public final static String PHONE_BASE_PATH = "sdcard/TestResult_craving/";
 	public final static int CODE_SUSPENSION = 7;
 	public final static int CODE_BEDTIME = 8;
+	public final static int CODE_SENSOR_CONN = 9;
+	public final static boolean DEBUG = true;
 	
 	
 	public final static HashMap<String, Integer> MAX_TRIGGER_MAP = new HashMap<String, Integer>(){
@@ -100,13 +121,14 @@ public class Utilities {
 	public final static int REMINDER_IN_SECONDS = 5*60;
 	public final static int COMPLETE_SURVEY_IN_SECONDS = 7*60;
 	public final static int FOLLOWUP_IN_SECONDS = 30*60;
+	public final static int SUSPENSION_INTERVAL_IN_SECOND = 15*60;
 	public final static String TIME_NONE = "none";
 	public final static int defHour = 12;
 	public final static int defMinute = 0;
 	
 	public final static String[] SUSPENSION_DISPLAY = {"  15 minutes  ","  30 minutes  ","  45 minutes  ","  60 minutes  ",
 		"  1 hour & 15 minutes  ","  1 & half hour  ","  1 hour & 45 minutes  ","  2 hours  "};
-	public final static int SUSPENSION_INTERVAL_IN_SECOND = 15*60;
+	
 	
 /*	shared preferences*/
 	/*bed time info*/
@@ -165,6 +187,7 @@ public class Utilities {
 	public final static String SP_KEY_LOGIN_USERPWD = "USER_PWD";
 
 	public final static String SP_KEY_SUSPENSION_TS = "SUSPENSION_TS";
+	public final static String SP_KEY_SENSOR_CONN_TS = "SENSOR_CONN_TS";
 	
 	
 	
@@ -230,14 +253,22 @@ public class Utilities {
 	
 
 /*	validate*/
-	public final static String VALIDATE_ADDRESS = "http://dslsrv8.cs.missouri.edu/~rs79c/Server/Crt/validateUser.php";
-	public final static String UPLOAD_ADDRESS = "http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFile.php";
+	public final static String VALIDATE_ADDRESS = 			"http://dslsrv8.cs.missouri.edu/~rs79c/Server/Crt/validateUser.php";
+	public final static String WRITE_ARRAY_TO_FILE = 		"http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFile.php";
+	public final static String WRITE_ARRAY_TO_FILE_DEC = 	"http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFileDec.php";
+//	public final static String UPLOAD_ADDRESS = WRITE_ARRAY_TO_FILE;
+	public final static String UPLOAD_ADDRESS = WRITE_ARRAY_TO_FILE_DEC;
 	public final static SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+	public final static boolean WRITE_RAW = true;
 	
 	
 	static boolean debug_system = true;
 	static boolean debug = true;
 	static boolean debugB = true;
+	
+	
+	//shared values
+	public static PublicKey publicKey = null;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//static Functions()                                                                                          //
@@ -397,12 +428,14 @@ public class Utilities {
 			}
 		}
 		
-		//before previous set morning time
+		//before previous set morning time & before noon
 		else if(c.before(m)){
 			
-			Intent scheduleIntent = new Intent(Utilities.BD_ACTION_SCHEDULE_MORNING);
-			scheduleIntent.putExtra(Utilities.SV_NAME, Utilities.SV_NAME_MORNING);
-			context.sendBroadcast(scheduleIntent);
+			scheduleMorningSurvey(context, m.get(Calendar.HOUR_OF_DAY), m.get(Calendar.MINUTE));
+			
+//			Intent scheduleIntent = new Intent(Utilities.BD_ACTION_SCHEDULE_MORNING);
+//			scheduleIntent.putExtra(Utilities.SV_NAME, Utilities.SV_NAME_MORNING);
+//			context.sendBroadcast(scheduleIntent);
 		}
 		
 		//after morning time but earlier than noon
@@ -497,7 +530,7 @@ public class Utilities {
 		//set flag for bedtime, press-in survey should be blocked
 		morningReset(context);
 		
-		//cancel all the running survey
+		//reset random and survey
 		cancelSchedule(context);
 		
 		//schedule for next morning
@@ -789,9 +822,45 @@ public class Utilities {
 	
 	
 	
+	public static void writeLocationToFile(Location location) throws IOException{
+		
+		String toWrite;
+		Calendar cal=Calendar.getInstance();
+		
+		toWrite = String.valueOf(cal.getTime())+","+
+			location.getLatitude()+","+location.getLongitude()+","+
+			location.getAccuracy()+","+location.getProvider()+","+getNameFromType(ActivityRecognitionService.currentUserActivity);
+		
+		
+		//filename
+		Calendar cl=Calendar.getInstance();
+		SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd"); 
+		String dateObj =curFormater.format(cl.getTime());
+		
+		//danick
+		String toWriteArr = null;
+		try {
+			toWriteArr = encryption(toWrite);
+			if(WRITE_RAW){
+				writeToFile("Location."+"userID"+"."+dateObj+".txt", toWrite);
+			}else{
+				writeToFileEnc("Location."+"userID"+"."+dateObj+".txt", toWriteArr);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		//Ricky
+		TransmitData transmitData=new TransmitData();
+		transmitData.execute("locations."+"userID"+"."+dateObj,toWriteArr);
+		
+	}
+	
 	
 	//upload
-	public static void writeSurveyToFile(Context context, int type, String scheduleTS, String startTS, String endTS) throws IOException{
+	public static void writeEventToFile(Context context, int type, String scheduleTS, String startTS, String endTS) throws IOException{
 		
 		Calendar endCal = Calendar.getInstance();
 		
@@ -807,7 +876,7 @@ public class Utilities {
 		sb.append(",");
 		
 		sb.append(userID+","+studyDay+","+type+","+scheduleTS+","+""+","+""+","+""+","+startTS+","+endTS+",");
-		sb.append("\n");
+//		sb.append("\n");
 		
 		/************************************************************************
 		 * Chen 
@@ -815,13 +884,18 @@ public class Utilities {
 		 * Data encryption
 		 * Stringbuilder sb -> String ensb
 		 */
-//		String ensb = null;
-//		try {
-//			ensb = encryption(sb.toString());
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		String ensb = null;
+		try {
+			ensb = encryption(sb.toString());
+			if(WRITE_RAW){
+				writeToFile("Event.txt", sb.toString());
+			}else{
+				writeToFileEnc("Event.txt", ensb);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		Calendar cl=Calendar.getInstance();
@@ -829,16 +903,60 @@ public class Utilities {
 		String dateObj =curFormater.format(cl.getTime());
 		//Ricky 2013/12/09
 		TransmitData transmitData=new TransmitData();
-		transmitData.execute("Excel."+userID+"."+dateObj,sb.toString());
-		
-		
-		writeToFile("test.txt", sb.toString());
-//		writeToFile(f,sb.toString());
-		
-		
+		transmitData.execute("Excel."+userID+"."+dateObj,ensb);
 		
 	}
 
+	
+	//Chen
+	public static String encryption(String string) throws Exception {
+		// TODO Auto-generated method stub
+		
+		//generate symmetric key
+		KeyGenerator keygt = KeyGenerator.getInstance("AES");
+		keygt.init(128);
+		SecretKey symkey =keygt.generateKey(); 
+		
+		//get it encoded
+		byte[] aes_ba = symkey.getEncoded();
+		
+		//create cipher
+		SecretKeySpec skeySpec = new SecretKeySpec(aes_ba, "AES");  
+        Cipher cipher = Cipher.getInstance("AES");  
+        cipher.init(Cipher.ENCRYPT_MODE,skeySpec);
+		
+        //encryption
+        byte [] EncSymbyteArray =cipher.doFinal(string.getBytes());
+		
+        //encrypt symKey with PublicKey
+//        Key pubKey = getPublicKey();
+        Key pubKey = publicKey;
+        
+        //RSA cipher
+        Cipher cipherAsm = Cipher.getInstance("RSA", "BC");
+        cipherAsm.init(Cipher.ENCRYPT_MODE, pubKey);
+        
+        //RSA encryption
+        byte [] asymEncsymKey = cipherAsm.doFinal(aes_ba);
+        
+//	        File f3 = new File(BASE_PATH,"enc.txt");
+//	        File f3key = new File(BASE_PATH,"enckey.txt");
+//	        File f3file = new File(BASE_PATH,"encfile.txt");
+//	        writeToFile2(f3,f3key,f3file, asymEncsymKey, EncSymbyteArray);
+        
+        //byte != new String
+        //return new String(byteMerger(asymEncsymKey, EncSymbyteArray));
+        return Base64.encodeToString(byteMerger(asymEncsymKey, EncSymbyteArray),Base64.DEFAULT);
+        
+	}
+	
+	public static byte[] byteMerger(byte[] byte_1, byte[] byte_2){  
+	    byte[] byte_3 = new byte[byte_1.length+byte_2.length];  
+	    System.arraycopy(byte_1, 0, byte_3, 0, byte_1.length);  
+	    System.arraycopy(byte_2, 0, byte_3, byte_1.length, byte_2.length);  
+	    return byte_3;  
+	}  
+	
 	
 	public static void writeToFile(String fileName, String toWrite) throws IOException{
 		File dir =new File(PHONE_BASE_PATH); 
@@ -849,8 +967,41 @@ public class Utilities {
 		fw.write(toWrite+'\n');		
         fw.flush();
 		fw.close();
+		f = null;
 	}
 	
+	public static void writeToFileEnc(String fileName, String toWrite) throws IOException{
+		Utilities.Log("write to file", "enc");
+		File dir =new File(PHONE_BASE_PATH); 
+		if(!dir.exists())
+			dir.mkdirs();
+		File f = new File(PHONE_BASE_PATH,fileName);
+		FileWriter fw = new FileWriter(f, true);
+		fw.write(toWrite);		
+        fw.flush();
+		fw.close();
+		f = null;
+	}
+	
+	
+	private static String getNameFromType(int activityType) {
+        switch(activityType) {
+            case DetectedActivity.IN_VEHICLE:
+                return "in_vehicle";
+            case DetectedActivity.ON_BICYCLE:
+                return "on_bicycle";
+            case DetectedActivity.ON_FOOT:
+                return "on_foot";
+            case DetectedActivity.STILL:
+                return "still";
+            case DetectedActivity.UNKNOWN:
+                return "unknown";
+            case DetectedActivity.TILTING:
+                return "tilting";
+                
+        }
+        return "unknown";
+    }
 	
 	
 	static class TransmitData extends AsyncTask<String,Void, Boolean>
@@ -866,8 +1017,7 @@ public class Utilities {
 	 		{
 	        		 
 	        Log.d("((((((((((((((((((((((((", ""+Thread.currentThread().getId());
-	         HttpPost request = new HttpPost("http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFile.php");
-	         //HttpPost request = new HttpPost("http://dslsrv8.cs.missouri.edu/~rs79c/Server/Test/writeArrayToFile.php");
+	         HttpPost request = new HttpPost(UPLOAD_ADDRESS);
 	         List<NameValuePair> params = new ArrayList<NameValuePair>();
 	         //file_name 
 	         params.add(new BasicNameValuePair("file_name",fileName));        
@@ -900,6 +1050,9 @@ public class Utilities {
 		}
 		
 	}
+	
+	
+	
 	
 	
 }

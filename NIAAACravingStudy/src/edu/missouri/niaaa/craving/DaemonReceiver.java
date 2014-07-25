@@ -2,6 +2,7 @@ package edu.missouri.niaaa.craving;
 
 import java.util.Calendar;
 
+import edu.missouri.niaaa.craving.sensor.SensorUtilities;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -76,9 +77,10 @@ public class DaemonReceiver extends BroadcastReceiver {
 			Utilities.Log(TAG, "on receiver daemon 2");
 			
 			//close sensor
+			Intent i = new Intent(SensorUtilities.ACTION_DISCONNECT_SENSOR);
+			context.sendBroadcast(i);
 			
-			
-			//cancel all survey
+			//cancel all survey (follow-ups are allowed base on new requirement)
 			Utilities.cancelSchedule(context);
 			
 			//reset sp
@@ -98,11 +100,33 @@ public class DaemonReceiver extends BroadcastReceiver {
 		else if(fun == 3){//three oclock
 			Utilities.Log(TAG, "on receiver daemon 3");
 			
-			//next at 3 oclock
-			SharedPreferences sp = Utilities.getSP(context, Utilities.SP_BED_TIME);
-			boolean setDefault = (sp.getInt(Utilities.SP_KEY_BED_TIME_HOUR, -1) == -1?false:true); 
-			Utilities.bedtimeComplete(context, (setDefault?sp.getInt(Utilities.SP_KEY_BED_TIME_HOUR, -1):Utilities.defHour), 
-												(setDefault?sp.getInt(Utilities.SP_KEY_BED_TIME_MINUTE, -1):Utilities.defMinute));
+			//close gps
+			
+			
+			//next day at 3
+			//default
+			Calendar d = Utilities.getDefaultMorningCal(context);
+			long defTime = d.getTimeInMillis();
+			int hour = d.get(Calendar.HOUR_OF_DAY);
+			int minute = d.get(Calendar.MINUTE);
+			
+			//current
+			Calendar c = Calendar.getInstance();
+			
+			//morning
+			Calendar m = Calendar.getInstance();
+			m.setTimeInMillis(Utilities.getSP(context, Utilities.SP_BED_TIME).getLong(Utilities.SP_KEY_BED_TIME_LONG, -1));
+			
+			if(c.before(m)){
+				//set m as morning
+				hour = m.get(Calendar.HOUR_OF_DAY);
+				minute = m.get(Calendar.MINUTE);
+			}
+			
+			Utilities.bedtimeComplete(context, hour, minute);
+			
+			//cancel followup
+			Utilities.cancelTrigger(context);
 			
 			//reset sp
 //			Utilities.getSP(context, Utilities.SP_RANDOM_TIME).edit().clear().commit();
@@ -124,11 +148,11 @@ public class DaemonReceiver extends BroadcastReceiver {
 		else if(fun == -3){//cancel three oclock //useless for now
 			Utilities.Log(TAG, "on receiver daemon -3");
 			
-			Intent itTrigger3 = new Intent(Utilities.BD_ACTION_DAEMON);
-			itTrigger3.putExtra(Utilities.BD_ACTION_DAEMON_FUNC, 3);//int
-			PendingIntent piTrigger3 = PendingIntent.getBroadcast(context, 3, itTrigger3, Intent.FLAG_ACTIVITY_NEW_TASK);
-			
-			am.setExact(AlarmManager.RTC_WAKEUP, getProperTime(3, 0)+Utilities.getDayLong(), piTrigger3);
+//			Intent itTrigger3 = new Intent(Utilities.BD_ACTION_DAEMON);
+//			itTrigger3.putExtra(Utilities.BD_ACTION_DAEMON_FUNC, 3);//int
+//			PendingIntent piTrigger3 = PendingIntent.getBroadcast(context, 3, itTrigger3, Intent.FLAG_ACTIVITY_NEW_TASK);
+//			
+//			am.setExact(AlarmManager.RTC_WAKEUP, getProperTime(3, 0)+Utilities.getDayLong(), piTrigger3);
 		}
 		else{
 			

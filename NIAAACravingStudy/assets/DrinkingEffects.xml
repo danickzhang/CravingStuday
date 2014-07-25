@@ -7,7 +7,7 @@
 			<answer id = "3">3 - Somewhat</answer>
 			<answer id = "4">4 - Quite a bit</answer>
 			<answer id = "5">5 - Extremely</answer>
-			<text id="1">The DRINK was PLEASUREABLE.</text>
+			<text id="1">The DRINK was PLEASURABLE.</text>
 			<text id="2">The DRINK relieved UNPLEASANT FEELINGS or SYMPTOMS.</text>
 			<text id="3">The DRINK made me feel WORSE.</text>
 		</questionblock>

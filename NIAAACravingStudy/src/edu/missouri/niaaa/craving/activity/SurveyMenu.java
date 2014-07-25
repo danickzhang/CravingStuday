@@ -1,4 +1,4 @@
-package edu.missouri.niaaa.craving;
+package edu.missouri.niaaa.craving.activity;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.xml.sax.InputSource;
 
+import edu.missouri.niaaa.craving.R;
+import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.R.string;
 import edu.missouri.niaaa.craving.survey.SurveyInfo;
 import edu.missouri.niaaa.craving.survey.XMLConfigParser;
 import edu.missouri.niaaa.craving.survey.XMLSurveyActivity;
@@ -86,7 +89,7 @@ public class SurveyMenu extends Activity {
 							Calendar mT = Calendar.getInstance();
 							Calendar noonT = Calendar.getInstance();
 							noonT.set(Calendar.HOUR_OF_DAY, 12);
-							noonT.set(Calendar.MINUTE, 0);
+							noonT.set(Calendar.MINUTE, 20);
 							noonT.set(Calendar.SECOND, 0);
 							
 							Calendar threeT = Calendar.getInstance();

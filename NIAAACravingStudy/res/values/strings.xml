@@ -19,7 +19,7 @@
     <string name="section_1">Start Service</string>
     <string name="section_2">Stop Service</string>
     <string name="section_3">Survey Menu</string>
-    <string name="section_4">Sensor Connections(unavailable this version)</string>
+    <string name="section_4">Sensor Connections</string>
     <string name="section_5">Set Bedtime</string>
     <string name="section_6">Suspension</string>
     <string name="section_62">Break Suspension</string>

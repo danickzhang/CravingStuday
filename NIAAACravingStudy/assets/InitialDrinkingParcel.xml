@@ -28,8 +28,8 @@
 		<description>Recent Smoking</description>
 		<question id= "q241" type = "radio">
 			<text>Have you SMOKED A CIGARETTE in the PAST 15 MINUTES?</text>
-			<answer id = "y">Yes</answer>
-			<answer id = "n" skip="q271">No</answer>
+			<answer id = "1">Yes</answer>
+			<answer id = "0" skip="q271">No</answer>
 		</question>
 		<question id = "q242" type = "number">
 			<text>HOW MANY CIGARETTES did you smoke in the PAST 15 MINUTES?</text>

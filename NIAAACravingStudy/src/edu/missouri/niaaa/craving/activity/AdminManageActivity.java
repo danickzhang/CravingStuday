@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edu.missouri.niaaa.craving;
+package edu.missouri.niaaa.craving.activity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,6 +29,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import edu.missouri.niaaa.craving.R;
+import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.R.id;
+import edu.missouri.niaaa.craving.R.layout;
+import edu.missouri.niaaa.craving.R.string;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;

@@ -2,43 +2,33 @@ package edu.missouri.niaaa.craving.survey.category;
 
 public interface Answer {
 	
-	public static final String TRIGGER_NAME = "TRIGGER_NAME";
-	public static final String TRIGGER_FILE = "TRIGGER_FILE";
-	public static final String TRIGGER_TIME = "TRIGGER_TIME";
-	
-	public String getId();
-	
-	public String getValue();
-	
-	public String getAnswerText();
-	
-	public void setAnswer(String answer);
-	
-	public void setSelected(boolean selected);
-	
-	public boolean isSelected();
+	public void setAnswerText(String answerText);
 	
 	public void setClear(boolean clear);
-	
-	public boolean checkClear();
-	
-	public void setSkip(String id);
-	
-	public String getSkip();
-	
 	public void setExtraInput(boolean extraInput);
 	
+	public void setSurveyTrigger(String name);
+	public void setSelected(boolean selected);
+	public void setSkip(String id);
+	
+	public void setOption(String opt);
+	
+	public String getId();
+	public String getAnswerText();
+	public String getAnswerInput();
+	
+	public boolean checkClear();
 	public boolean getExtraInput();
 	
-	public void setSurveyTrigger(String name, String location, String times);
-	
+	public String getTriggerFile();
 	public boolean hasSurveyTrigger();
 	
-	public String getTriggerName();
+	public boolean isSelected();
+	public String getSkip();
 	
-	public String getTriggerFile();
+	public String getOption();
+	public boolean hasOption();
 	
-	public long[] getTriggerTimes();
-	
+
 	public boolean equals(Answer ans);
 }

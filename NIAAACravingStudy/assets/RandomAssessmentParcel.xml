@@ -4,7 +4,7 @@
 		<description>Recent Drinking</description>
 		<question id = "q511" type = "radio">
 			<text>Have you CONSUMED ALCOHOL since the last survey you answered?</text>
-			<answer id = "y" triggerFile="DrinkingFollowup.xml" triggerName="DRINKING_FOLLOWUP" triggerTimes="30 m, 60 m, 120 m">Yes</answer>
+			<answer id = "y" triggerFile="DrinkingFollowupParcel.xml">Yes</answer>
 			<answer id = "n">No</answer>
 		</question>
 	</category>
@@ -31,7 +31,7 @@
 
 	<category>
 		<description>Life Events/Experiences</description>
-			<questionblock type = "check">
+		<questionblock type = "check">
 			<answer id = "1">Romantic partner</answer>
 			<answer id = "2">Boss/teacher</answer>
 			<answer id = "3">Coworker</answer>
@@ -109,8 +109,10 @@
 		<description>Life Events/Experiences</description>
 		<question id="q5612" type="radio">
 			<text>Since the last prompt have you taken your medications as prescribed? (if no, log CHANGES in your paper diary)</text>
-			<answer id="y">Yes</answer>
-			<answer id="n">No</answer>
+			<answer id="1">I have taken medications as prescribed since the last prompt</answer>
+			<answer id="2">I am not prescribed any medications</answer>
+			<answer id="3">I am prescribed medications, but I was not supposed to take them since the last prompt</answer>
+			<answer id="4" option="Please note your changes in your medication log.">I was supposed to take prescribed medications since the last prompt, but I did not or did not take them as prescribed.</answer>
 		</question>	
 	 </category>
 

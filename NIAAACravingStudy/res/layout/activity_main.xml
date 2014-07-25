@@ -16,6 +16,7 @@
         android:id="@+id/section_label2"
         style="@style/button_style"
         android:text="@string/section_2"
+        android:visibility="gone"
         />
         
     <Button

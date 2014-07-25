@@ -1,8 +1,12 @@
-package edu.missouri.niaaa.craving;
+package edu.missouri.niaaa.craving.activity;
 
 import java.text.NumberFormat;
 import java.util.Calendar;
 
+import edu.missouri.niaaa.craving.R;
+import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.R.id;
+import edu.missouri.niaaa.craving.R.layout;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -30,7 +34,7 @@ public class SuspensionTimePicker extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.suspension_picker);
+		setContentView(R.layout.activity_suspension_picker);
 		SharedPreferences sp = getSharedPreferences(Utilities.SP_LOGIN, Context.MODE_PRIVATE);
 		if(!sp.contains(Utilities.SP_KEY_SUSPENSION_TS)){
 			sp.edit().putLong(Utilities.SP_KEY_SUSPENSION_TS, Calendar.getInstance().getTimeInMillis()).commit();

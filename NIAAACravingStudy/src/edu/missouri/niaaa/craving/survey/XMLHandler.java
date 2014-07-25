@@ -8,7 +8,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import edu.missouri.niaaa.craving.Utilities;
 import edu.missouri.niaaa.craving.survey.category.Answer;
 import edu.missouri.niaaa.craving.survey.category.Category;
 import edu.missouri.niaaa.craving.survey.category.Question;
@@ -197,7 +196,7 @@ public class XMLHandler extends DefaultHandler {
 			else if(s.equals("number")){
 				question = new NumberQuestion(id);
 			}
-			else if(s.equals("text")){
+			else if(s.equals("input")){
 				question = new TextQuestion(id);
 			}
 			else if(s.equals("radioinput")){
@@ -268,17 +267,26 @@ public class XMLHandler extends DefaultHandler {
 			 * later time.
 			 */
 			String triggerFile = attr.getValue("triggerFile");
-			String triggerName = attr.getValue("triggerName");
-			String triggerTimes = attr.getValue("triggerTimes");
 
 			//If answer will trigger another survey, add info
-			if(triggerFile != null && triggerName != null && triggerTimes != null){
-				answer = new SurveyAnswer(id, triggerName, triggerFile, triggerTimes);
+			if(triggerFile != null){
+				answer = new SurveyAnswer(id, triggerFile);
 			}
 			//Otherwise create a standard answer object
 			else{
 				answer = new SurveyAnswer(id);
 			}
+			
+			/*
+			 * Some questions (currently only radio buttons)
+			 * can be used to open up an alert showing certain  
+			 * words.
+			 */
+			String option = attr.getValue("option");
+			if(option != null){
+				answer.setOption(option);
+			}
+			
 			
 			//Set the answer to skip to a given question
 			answer.setSkip(skip);
@@ -311,7 +319,7 @@ public class XMLHandler extends DefaultHandler {
 			else if(type.equals("number")){
 				questionType = QuestionType.NUMBER;
 			}
-			else if(type.equals("text")){
+			else if(type.equals("input")){
 				questionType = QuestionType.TEXT;
 			}
 			else if(type.equals("radioinput")){
@@ -376,7 +384,16 @@ public class XMLHandler extends DefaultHandler {
 			question.setQuestion(buffer.toString());
 			
 			if(listAnswerBlock != null){
-				question.addAnswers(listAnswerBlock);
+				ArrayList<Answer> temp = new ArrayList<Answer>();
+				for(Answer a: listAnswerBlock){
+					try {
+						temp.add((SurveyAnswer)((SurveyAnswer)a).clone());
+					} catch (CloneNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				question.addAnswers(temp);
 				category.addQuestion(question);
 				question = null;
 			}
@@ -384,7 +401,7 @@ public class XMLHandler extends DefaultHandler {
 		
 		//Finished with an answer
 		else if(localName.equals("answer")){
-			answer.setAnswer(buffer.toString());
+			answer.setAnswerText(buffer.toString());
 			//in a question
 			if(listAnswerBlock == null)
 				question.addAnswer(answer);
@@ -393,6 +410,7 @@ public class XMLHandler extends DefaultHandler {
 				listAnswerBlock.add(answer);
 			}
 		}
+		
 		else if(localName.equals("questionblock")){
 			listAnswerBlock = null;
 		}

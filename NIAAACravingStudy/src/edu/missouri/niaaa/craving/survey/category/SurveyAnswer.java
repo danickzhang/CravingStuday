@@ -2,142 +2,151 @@ package edu.missouri.niaaa.craving.survey.category;
 
 import android.util.Log;
 
-public class SurveyAnswer implements Answer {
-	
+public class SurveyAnswer implements Answer, Cloneable {
+
+	//constructor param
 	protected String answerId;
-	protected String value;
 	protected String answerText;
-	protected boolean selected = false;
-	protected boolean clearOthers = false;
-	protected String skipId;
-	protected boolean extraInput = false;
-	protected boolean hasTrigger = false;
-	protected String triggerName = null;
-	protected String triggerFile = null;
-	protected long[] triggerTimes = null;
+	protected String answerInput;
 	
+	//action param
+	protected boolean clearOthers = false;
+	protected boolean extraInput = false;
+	
+	//trigger param
+	protected String triggerFile = null;
+	protected boolean hasTrigger = false;
+	
+	// param
+	protected boolean selected = false;
+	protected String skipId;
+	protected String option;
+	protected boolean hasOption = false;
+	
+	
+/*	constructor*/
 	public SurveyAnswer(String id){
 		this.answerId = id;
 	}
 	
-	public SurveyAnswer(String id, String triggerName, String triggerFile, String triggerTimes){
+	public SurveyAnswer(String id, String triggerFile){
 		this(id);
 		this.triggerFile = triggerFile;
-		this.triggerName = triggerName;
 		this.hasTrigger = true;
-		String[] splitTimes = triggerTimes.split(",");
-		this.triggerTimes = new long[splitTimes.length];
 		
-		for(int i = 0; i < splitTimes.length; i++){
-			long tempLong;
-			try{
-				tempLong = Integer.parseInt(splitTimes[i].replaceAll("[^0-9]", ""));
-				Log.d("Answer","Trigger times: "+splitTimes[i].replaceAll("[^0-9]",""));
-				if(splitTimes[i].contains("m")){
-					tempLong *= (1000 * 60);
-				}
-				else if(splitTimes[i].contains("h")){
-					tempLong *= (1000 * 60 * 60);
-				}
-				else if(splitTimes[i].contains("s")){
-					tempLong *= (1000);
-				}
-				this.triggerTimes[i] = tempLong;
-			} catch(NumberFormatException e){e.printStackTrace();}
-		}
 	}
 	
 	public SurveyAnswer(String id, String value, String answerText){
 		this.answerId = id;
-		this.value = value;
+		this.answerText = value;
+		this.answerInput = answerText;
+	}
+	
+	
+	
+/*	setter*/
+	public void setAnswerText(String answerText){
+		//this.answerText = answerText;
 		this.answerText = answerText;
 	}
 	
-	public void setAnswer(String answerText){
-		//this.answerText = answerText;
-		this.value = answerText;
+	//action
+	public void setClear(boolean clear){
+		this.clearOthers = clear;
 	}
 	
+	public void setExtraInput(boolean extraInput){
+		this.extraInput = extraInput;
+	}
+	
+	//trigger
+	public void setSurveyTrigger(String name) {
+		this.triggerFile = name;
+	}
+	
+
+	//
+	public void setSelected(boolean selected){
+		this.selected = selected;
+	}
+	
+	public void setSkip(String id) {
+		this.skipId = id;
+	}
+	
+	public void setOption(String opt){
+		this.option = opt;
+		hasOption = true;
+	}
+	
+	
+	
+/*	getter*/
 	public String getId(){
 		return this.answerId;
-	}
-	
-	public String getValue(){
-		return this.value;
 	}
 	
 	public String getAnswerText(){
 		return this.answerText;
 	}
 	
-	public void setSelected(boolean selected){
-		this.selected = selected;
+	public String getAnswerInput(){
+		return this.answerInput;
 	}
 	
-	public boolean isSelected(){
-		return selected;
-	}
-	
-	public void setClear(boolean clear){
-		this.clearOthers = clear;
-	}
-	
+	//action
 	public boolean checkClear(){
 		return clearOthers;
 	}
-
-	public void setSkip(String id) {
-		this.skipId = id;
-	}
-
-	
-	public String getSkip() {
-		return skipId;
-	}
-	
-
-	public void setExtraInput(boolean extraInput){
-		this.extraInput = extraInput;
-	}
-	
 	
 	public boolean getExtraInput(){
 		return this.extraInput;
 	}
-
-
-	//times are not used
-	public void setSurveyTrigger(String name, String location, String times) {
-		this.triggerFile = location;
-		this.triggerName = name;
-	}
-
 	
-	public String getTriggerName() {
-		return this.triggerName;
-	}
-
 	
+	//trigger
 	public String getTriggerFile() {
 		return this.triggerFile;
 	}
-	
-	
-	public long[] getTriggerTimes(){
-		return this.triggerTimes;
-	}
-	
 	
 	public boolean hasSurveyTrigger(){
 		return hasTrigger;
 	}
 	
 	
+	//
+	public boolean isSelected(){
+		return selected;
+	}
+	
+	public String getSkip() {
+		return skipId;
+	}
+	
+	public String getOption(){
+		return option;
+	}
+	
+	public boolean hasOption(){
+		return hasOption;
+	}
+	
+
+	
+/*	function*/
 	public boolean equals(Answer answer){
 		if(answer == null) return false;
 		if(this.getId().equals(answer.getId()) &&
-				this.getValue().equals(answer.getValue()))
+				this.getAnswerText().equals(answer.getAnswerText()))
 			return true;
 		return false;		
 	}
+	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		// TODO Auto-generated method stub
+		return super.clone();
+	}
+
+	
 }

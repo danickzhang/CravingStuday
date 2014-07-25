@@ -6,12 +6,12 @@
 		<question id="q611" type="radio">
 			<text>HOW MANY DRINKS did you consume SINCE THE LAST RECORDING?</text>
 			<answer id="0" skip="q641">0</answer>
-			<answer id="1" triggerFile="DrinkingFollowup.xml" triggerName="DRINKING_FOLLOWUP" triggerTimes="30 m, 60 m, 120 m">1</answer>
-			<answer id="2" triggerFile="DrinkingFollowup.xml" triggerName="DRINKING_FOLLOWUP" triggerTimes="30 m, 60 m, 120 m">2</answer>
-			<answer id="3" triggerFile="DrinkingFollowup.xml" triggerName="DRINKING_FOLLOWUP" triggerTimes="30 m, 60 m, 120 m">3</answer>
-			<answer id="4" triggerFile="DrinkingFollowup.xml" triggerName="DRINKING_FOLLOWUP" triggerTimes="30 m, 60 m, 120 m">4</answer>
-			<answer id="5" triggerFile="DrinkingFollowup.xml" triggerName="DRINKING_FOLLOWUP" triggerTimes="30 m, 60 m, 120 m">5</answer>
-			<answer id="6" triggerFile="DrinkingFollowup.xml" triggerName="DRINKING_FOLLOWUP" triggerTimes="30 m, 60 m, 120 m">6+</answer>
+			<answer id="1" triggerFile="DrinkingFollowupParcel.xml">1</answer>
+			<answer id="2" triggerFile="DrinkingFollowupParcel.xml">2</answer>
+			<answer id="3" triggerFile="DrinkingFollowupParcel.xml">3</answer>
+			<answer id="4" triggerFile="DrinkingFollowupParcel.xml">4</answer>
+			<answer id="5" triggerFile="DrinkingFollowupParcel.xml">5</answer>
+			<answer id="6" triggerFile="DrinkingFollowupParcel.xml">6+</answer>
 		</question>
 	</category>
 

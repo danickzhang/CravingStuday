@@ -1,9 +1,13 @@
-package edu.missouri.niaaa.craving;
+package edu.missouri.niaaa.craving.activity;
 
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Calendar;
 
+import edu.missouri.niaaa.craving.R;
+import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.R.id;
+import edu.missouri.niaaa.craving.R.layout;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,7 +46,7 @@ public class MorningScheduler extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.morning_scheduler_layout);
+		setContentView(R.layout.activity_morning_scheduler);
 		startBedReportCal = Calendar.getInstance();
 		
 		sp = getSharedPreferences(Utilities.SP_BED_TIME, MODE_PRIVATE);
@@ -105,7 +109,7 @@ public class MorningScheduler extends Activity {
 				if(hour >= 3 && hour <12 || (hour == 12 && minute == 0)){
 //				if(true){
 					
-					save();
+					setAsDefault();
 					Utilities.bedtimeComplete(MorningScheduler.this, hour, minute);//as following
 					
 //					//set flag for bedtime, press-in survey should be blocked
@@ -116,10 +120,10 @@ public class MorningScheduler extends Activity {
 //					
 //					//schedule for next morning
 //					Utilities.scheduleMorningSurvey(MorningScheduler.this, hour, minute);
-					
-					//next midnight
+//					
+//					//next midnight
 //					Intent i = new Intent(Utilities.BD_ACTION_DAEMON);
-//					i.putExtra(Utilities.BD_ACTION_DAEMON_FUN, -3);
+//					i.putExtra(Utilities.BD_ACTION_DAEMON_FUNC, -3);
 //					sendBroadcast(i);
 					
 					NumberFormat nf = NumberFormat.getInstance();
@@ -129,7 +133,7 @@ public class MorningScheduler extends Activity {
 					nf = null;
 					
 					try {
-						Utilities.writeSurveyToFile(MorningScheduler.this, Utilities.CODE_BEDTIME, 
+						Utilities.writeEventToFile(MorningScheduler.this, Utilities.CODE_BEDTIME, 
 								Utilities.sdf.format(Utilities.getMorningCal(hour, minute).getTime()), 
 								Utilities.sdf.format(startBedReportCal.getTime()), 
 								Utilities.sdf.format(Calendar.getInstance().getTime()));
@@ -154,7 +158,7 @@ public class MorningScheduler extends Activity {
 			}});
 	}
 
-	private void save(){
+	private void setAsDefault(){
 		if(timeBox.isChecked()){
 			sp.edit().putInt(Utilities.SP_KEY_BED_TIME_HOUR, hour).commit();
 			sp.edit().putInt(Utilities.SP_KEY_BED_TIME_MINUTE, minute).commit();

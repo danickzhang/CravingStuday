@@ -43,7 +43,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.os.Vibrator;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,7 +67,7 @@ public class XMLSurveyActivity extends Activity {
   	//Tell the parser which survey to use
     String surveyName;
     String surveyFile;
-    boolean auto = false;
+    boolean autoTriggered = false;
     //Button used to submit each question
     Button submitButton;
     Button backButton;
@@ -78,7 +80,7 @@ public class XMLSurveyActivity extends Activity {
   	//Current question
   	Question currentQuestion;
   	//Will be set if a question needs to skip others
-    boolean skipTo = false;
+    boolean hasSkip = false;
     String skipFrom = null;
     //Category position in arraylist
   	int categoryNum;
@@ -96,9 +98,10 @@ public class XMLSurveyActivity extends Activity {
 	SharedPreferences shp;
 	boolean underManuallyGoing = false;
 	
-	public static boolean triggerFollowup = false;
-	
 	Calendar startCal;
+//	WakeLock wl;
+	
+	static Context context;
 	
 
 	@Override
@@ -107,10 +110,16 @@ public class XMLSurveyActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Utilities.Log_sys(TAG, "onCreate");
 		
+		context = this;
+		
 		shp = Utilities.getSP(this, Utilities.SP_SURVEY);
 		surveyTitle = surveyName = getIntent().getStringExtra(Utilities.SV_NAME);
 		dialogTitle = getString(R.string.pin_title);
-		auto = getIntent().getBooleanExtra(Utilities.SV_AUTO_TRIGGERED, false);
+		autoTriggered = getIntent().getBooleanExtra(Utilities.SV_AUTO_TRIGGERED, false);
+		
+//		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);  
+//        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Gank");  
+        
 		
 		soundp = new SoundPool(2, AudioManager.STREAM_MUSIC, 100);
 		soundsMap = new HashMap<Integer, Integer>();
@@ -126,9 +135,11 @@ public class XMLSurveyActivity extends Activity {
 			setResult(1);
 			finish();
 		}
-		else if(auto){
+		else if(autoTriggered){
 			AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 			am.setStreamVolume(AudioManager.STREAM_MUSIC, Utilities.VOLUME, AudioManager.FLAG_PLAY_SOUND);
+			
+			acquireLock();
 			
 			prepareSound();
 			
@@ -201,7 +212,6 @@ public class XMLSurveyActivity extends Activity {
 			
 		}
 
-		Log.d("!!!!!!!!!!!!!!!!3", ""+surveyTitle);
       	setTitle(surveyTitle);
 		
 		
@@ -232,13 +242,17 @@ public class XMLSurveyActivity extends Activity {
 			e.printStackTrace();
 		}
 		
-//		for(Category ca :cats){
-//			Utilities.Log(TAG, "category is "+ca.getQuestionDesc());
-//			Utilities.Log(TAG, "category contains questions "+ca.totalQuestions());
-//			for(Question q: ca.getQuestions()){
-//				Utilities.Log(TAG, "question id "+q.getId());
-//			}
-//		}
+		Log.d("---------------^^^^^^^^______________", "start");
+		for(Category ca :cats){
+			Utilities.Log(TAG, "category is "+ca.getQuestionDesc());
+			Utilities.Log(TAG, "category contains questions "+ca.totalQuestions());
+			for(Question q: ca.getQuestions()){
+				Utilities.Log(TAG, "question id "+q.getId());
+				for(Answer a: q.getAnswers()){
+					Utilities.Log(TAG, "contains trigger "+a.hasSurveyTrigger()+" is selected "+a.isSelected()+" answer skipto "+a.getSkip());
+				}
+			}
+		}
 			
 		
 		//Survey doesn't contain any categories
@@ -263,6 +277,12 @@ public class XMLSurveyActivity extends Activity {
 	}
 	
 	
+	private void acquireLock() {
+		// TODO Auto-generated method stub
+//		wl.acquire();
+	}
+
+
 	private String getDialogTitle(){
 		return getString(R.string.pin_title) + " for reminder "+shp.getInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, 0);
 	}
@@ -283,6 +303,8 @@ public class XMLSurveyActivity extends Activity {
 		}
 		
 		else{
+			acquireLock();
+			
 			playSound();
 			
 			shp = Utilities.getSP(this, Utilities.SP_SURVEY);
@@ -361,7 +383,7 @@ public class XMLSurveyActivity extends Activity {
 					
 					startCal = Calendar.getInstance();
 					
-					if(auto){
+					if(autoTriggered){
 						//undergoing
 						shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, true).commit();
 						
@@ -421,6 +443,7 @@ public class XMLSurveyActivity extends Activity {
     	public void run(){ 
     		
     		streamID = soundp.play(soundsMap.get(1), 1, 1, 1, 0, 1);
+    		Log.d("jladks;ga", "soundp is "+streamID);
     	}
     }
 	
@@ -532,34 +555,41 @@ public class XMLSurveyActivity extends Activity {
 	
 	//Get the next question to be displayed
     protected LinearLayout nextQuestion(){
-//    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~n", "");
+//    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~next", "");
     	Question temp = null;
     	boolean done = false;
     	boolean allowSkip = false;
-    	if(currentQuestion != null && !skipTo)
+    	
+    	if(currentQuestion != null && !hasSkip)
     		skipFrom = currentQuestion.getId();
+    	
+    	
     	do{
     		if(temp != null)
     			answerMap.put(temp.getId(), null);
+    		
     		//Simplest case: category has the next question
     		temp = currentCategory.followingQuestion();
 
+    		
     		//Category is out of questions, try to move to next category
     		if(temp == null && (++categoryNum < cats.size())){
     			/* Advance the category.  Loop will get the question
     			 * on next iteration.
     			 */
     			currentCategory = cats.get(categoryNum);
-    			if(currentCategory instanceof RandomCategory &&
-    					currentQuestion.getSkip() != null){
+    			if(currentCategory instanceof RandomCategory && currentQuestion.getSkip() != null){
     				//Check if skip is in category
     				RandomCategory tempCat = (RandomCategory) currentCategory;
     				if(tempCat.containsQuestion(currentQuestion.getSkip())){
-    					allowSkip = skipTo = true;
+    					allowSkip = true;
     				}
     				
     			}
     		}
+    		
+    		
+    		
     		//Out of categories, survey must be done
     		else if(temp == null){
     			//Log.d("XMLActivity","Should be done...");
@@ -567,12 +597,14 @@ public class XMLSurveyActivity extends Activity {
     			break;
     			//surveyComplete();
     		}
+    		
     	}while(temp == null ||
-    			(currentQuestion != null && currentQuestion.getSkip() != null &&
-    			!(currentQuestion.getSkip().equals(temp.getId()) || allowSkip))	);
+    			(currentQuestion != null && currentQuestion.getSkip() != null && !(currentQuestion.getSkip().equals(temp.getId()) || allowSkip))
+    		  );
 		/*if(currentQuestion != null){
 			answerMap.put(currentQuestion.getId(), currentQuestion.getSelectedAnswers());
 		}*/
+    	
     	if(done){
     		//surveyComplete();
     		return null;
@@ -582,6 +614,7 @@ public class XMLSurveyActivity extends Activity {
 //    		Utilities.Log("~~~~~~~~~~~~~~~~~~~~n", currentQuestion.getId());
     		return currentQuestion.prepareLayout(this);
     	}
+    	
     }
     
     protected LinearLayout lastQuestion(){
@@ -622,19 +655,20 @@ public class XMLSurveyActivity extends Activity {
     			temp = null;
     		}
     		
-    		if(temp != null && skipTo && !temp.getId().equals(skipFrom)){
+    		if(temp != null && hasSkip && !temp.getId().equals(skipFrom)){
 //    			Utilities.Log("~~~~~~~~~", "3 skipfrom"+skipFrom);
     			temp = null;
     		}
-    		else if(temp != null && skipTo){
+    		else if(temp != null && hasSkip){
 //    			Utilities.Log("~~~~~~~~~", "4");
-    			skipTo = false;
+    			hasSkip = false;
     			skipFrom = null;
     		}
     		//Else: valid question, it will be returned.
     	}
     	currentQuestion = temp;
 //    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~l", currentQuestion.getId());
+    	
     	return currentQuestion.prepareLayout(this);
     }
 	
@@ -679,6 +713,10 @@ public class XMLSurveyActivity extends Activity {
 				ViewGroup vg = setupLayout(lastQuestion());
 				if(vg != null)
 					setContentView(vg);
+				
+				if(backButton.getText().equals(XMLSurveyActivity.this.getString(R.string.btn_cancel))){
+					onBackPressed();
+				}
 				
 			}
 		});
@@ -744,24 +782,28 @@ public class XMLSurveyActivity extends Activity {
 		boolean hasTrigger = false;
     	//Fill answer map for when it is passed to service
     	for(Category cat: cats){
+//    		Utilities.Log(TAG, "category is "+cat.getQuestionDesc());
+//    		Utilities.Log(TAG, "category contains questions "+cat.totalQuestions());
     		for(Question question: cat.getQuestions()){
+//    			Utilities.Log(TAG, "question id "+question.getId());
     			answerMap.put(question.getId(), question.getSelectedAnswers());
     			//Here to target the first question of Drinking Follow-up
     			for(Answer answer: question.getAnswers()){
-    				Log.d("_________________________________","answer "+answer.getAnswerText()+" "+answer.getId()+" "+answer.hasSurveyTrigger());
+//    				Log.d("_________________________________","answer "+answer.getAnswerText()+" "+answer.getId()+" "+answer.hasSurveyTrigger());
+//    				Utilities.Log(TAG, "contains trigger "+answer.hasSurveyTrigger()+" is selected "+answer.isSelected());
     				if(answer.isSelected() && answer.hasSurveyTrigger()){
     					hasTrigger = true;
-    					Log.d("_________________________________","has trigger");
+//    					Log.d("_________________________________","has trigger");
     				}
+    			}
+    			
+    			for(String answer: question.getSelectedAnswers()){
+    				Log.d("+++++++++++++++++++++++++++++","answer string "+answer);
     			}
     		}
     	}
 		//answerMap.put(currentQuestion.getId(), currentQuestion.getSelectedAnswers());
 
-    	
-    	
-    	Log.d("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww3", " contains trigger " + triggerFollowup);
-    	
     	if(surveyName.equals(Utilities.SV_NAME_MORNING)){
     		
     		//notify to set next day at noon (cancel today's Noon)
@@ -825,18 +867,18 @@ public class XMLSurveyActivity extends Activity {
 		long scheduleTimeStamp = 0;
 		String scheduleTS = "";
 		
+		//default time to 12:00 at noon
+//		Calendar d = Utilities.getMorningCal(Utilities.defHour, Utilities.defMinute);
+		Calendar d = Utilities.getDefaultMorningCal(this);
+    	long defTime = d.getTimeInMillis(); 
+		
 		//schedule timestamp for morning, random and followups
-		if(auto){
+		if(autoTriggered){
 			
 			//sequence
 			String triggerSeq = Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surveyName);
 			int seq = shp.getInt(triggerSeq, 1);
-			
-			//default time to 12:00 at noon
-//			Calendar c = Utilities.getMorningCal(Utilities.defHour, Utilities.defMinute);
-			Calendar c = Utilities.getDefaultMorningCal(this);
 
-        	long defTime = c.getTimeInMillis(); 
 			
 			//for morning survey
         	if(surveyName.equals(Utilities.SV_NAME_MORNING)){
@@ -857,7 +899,8 @@ public class XMLSurveyActivity extends Activity {
 		}else{
 			if(surveyName.equals(Utilities.SV_NAME_MORNING)){
 				
-				return Utilities.sdf.format(Utilities.getDefaultMorningCal(this).getTimeInMillis());
+//				return Utilities.sdf.format(Utilities.getDefaultMorningCal(this).getTimeInMillis());
+				return Utilities.sdf.format(Utilities.getSP(this, Utilities.SP_BED_TIME).getLong(Utilities.SP_KEY_BED_TIME_LONG, defTime));
 			}
 			else
 				return scheduleTS;
@@ -873,7 +916,7 @@ public class XMLSurveyActivity extends Activity {
 	private String getReminderTimeStamp(){
 		String reminderTS = "";
 		
-		if(auto){}
+		if(autoTriggered){}
 		
 		else
 			return ""+","+""+","+""+",";
@@ -898,7 +941,7 @@ public class XMLSurveyActivity extends Activity {
 		String startTS = Utilities.sdf.format(startCal.getTime());
 		String endTS = Utilities.sdf.format(endCal.getTime());
 		
-		
+
 		
 		
 		
@@ -918,8 +961,9 @@ public class XMLSurveyActivity extends Activity {
 			String key = sorted.get(i);
 			List<String> data = surveyData.get(key);
 			sb.append(key+":");
-			if(data == null)
+			if(data == null || data.isEmpty()){
 				sb.append("-1");
+			}
 			else{
 				for(int j = 0; j < data.size(); j++){
 					sb.append(data.get(j));
@@ -936,53 +980,49 @@ public class XMLSurveyActivity extends Activity {
 			int i = shp.getInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_RANDOM, -1);
 			sb.append(",seq:"+ (i==0? Utilities.MAX_TRIGGER_MAP.get(surveyName): i));
 		}
-		sb.append("\n");
+//		sb.append("\n");
 		
+		
+		
+		//filenema
+			Calendar c=Calendar.getInstance();
+			SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd"); 
+			String dateObj =curFormater.format(c.getTime()); 		
+			String file_name=surveyName+"."+userID+"."+dateObj+".txt";
 		/************************************************************************
 		 * Chen 
 		 * 
 		 * Data encryption
 		 * Stringbuilder sb -> String ensb
 		 */
-//		String ensb = null;
-//		try {
-//			ensb = encryption(sb.toString());
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		String ensb = null;
+		try {
+			ensb = Utilities.encryption(sb.toString());
+			
+			if(Utilities.WRITE_RAW) 
+				Utilities.writeToFile(file_name, sb.toString());
+       	 	else{
+       	 		Utilities.writeToFileEnc(file_name, ensb);
+       	 	}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
-		Calendar cl=Calendar.getInstance();
-		SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd"); 
-		String dateObj =curFormater.format(cl.getTime());
 		//Ricky 2013/12/09
 		TransmitData transmitData=new TransmitData();
-		transmitData.execute(surveyName+"."+userID+"."+dateObj,sb.toString());
+		transmitData.execute(surveyName+"."+userID+"."+dateObj, ensb);
 		
-		
-		writeToFile(surveyName+"."+userID+"."+dateObj+".txt", sb.toString());
-//		writeToFile(f,sb.toString());
 		
 		//for debug
 		int i = shp.getInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_RANDOM, -1);
-		writeToFile("test.txt",sb.substring(0, sb.indexOf("q"))+
+		Utilities.writeToFile("Event.txt",sb.substring(0, sb.indexOf("q"))+
 				(surveyName.equals(Utilities.SV_NAME_RANDOM) ?  "seq:"+(i==0? Utilities.MAX_TRIGGER_MAP.get(surveyName): i) : ""));
 		
 	}
 
-	
-	protected void writeToFile(String fileName, String toWrite) throws IOException{
-		File dir =new File(Utilities.PHONE_BASE_PATH); 
-		if(!dir.exists())
-			dir.mkdirs();
-		File f = new File(Utilities.PHONE_BASE_PATH,fileName);
-		FileWriter fw = new FileWriter(f, true);
-		fw.write(toWrite+'\n');		
-        fw.flush();
-		fw.close();
-	}
-	
 	
 	
 	private class TransmitData extends AsyncTask<String,Void, Boolean>
@@ -991,15 +1031,13 @@ public class XMLSurveyActivity extends Activity {
 		@Override
 		protected Boolean doInBackground(String... strings) {
 			// TODO Auto-generated method stub
-			 String fileName=strings[0];
-	         String dataToSend=strings[1];
-//	         if(checkDataConnectivity())
-	        	 if(true)
+			String fileName=strings[0];
+	        String dataToSend=strings[1];
+	        if(checkDataConnectivity())
 	 		{
 	        		 
 	        Log.d("((((((((((((((((((((((((", ""+Thread.currentThread().getId());
-	         HttpPost request = new HttpPost("http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFile.php");
-	         //HttpPost request = new HttpPost("http://dslsrv8.cs.missouri.edu/~rs79c/Server/Test/writeArrayToFile.php");
+	         HttpPost request = new HttpPost(Utilities.UPLOAD_ADDRESS);
 	         List<NameValuePair> params = new ArrayList<NameValuePair>();
 	         //file_name 
 	         params.add(new BasicNameValuePair("file_name",fileName));        
@@ -1033,20 +1071,21 @@ public class XMLSurveyActivity extends Activity {
 		}
 		
 	}
-//	 public static boolean checkDataConnectivity() {
-//	    	ConnectivityManager connectivity = (ConnectivityManager) XMLSurveyActivity.this.getSystemService(Context.CONNECTIVITY_SERVICE);
-//			if (connectivity != null) {
-//				NetworkInfo[] info = connectivity.getAllNetworkInfo();
-//				if (info != null) {
-//					for (int i = 0; i < info.length; i++) {
-//						if (info[i].getState() == NetworkInfo.State.CONNECTED) {
-//							return true;
-//						}
-//					}
-//				}
-//			}
-//			return false;
-//	}
+	
+	 public static boolean checkDataConnectivity() {
+	    	ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+			if (connectivity != null) {
+				NetworkInfo[] info = connectivity.getAllNetworkInfo();
+				if (info != null) {
+					for (int i = 0; i < info.length; i++) {
+						if (info[i].getState() == NetworkInfo.State.CONNECTED) {
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+	}
 
 
 	
@@ -1117,6 +1156,8 @@ public class XMLSurveyActivity extends Activity {
 		super.onPause();
 		Utilities.Log_sys(TAG, "onPause");
 		soundp.stop(streamID);
+//		if(wl.isHeld())
+//			wl.release();
 	}
 
 	@Override
