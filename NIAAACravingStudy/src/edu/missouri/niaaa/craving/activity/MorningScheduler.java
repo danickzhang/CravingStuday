@@ -6,8 +6,6 @@ import java.util.Calendar;
 
 import edu.missouri.niaaa.craving.R;
 import edu.missouri.niaaa.craving.Utilities;
-import edu.missouri.niaaa.craving.R.id;
-import edu.missouri.niaaa.craving.R.layout;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -129,7 +127,7 @@ public class MorningScheduler extends Activity {
 					NumberFormat nf = NumberFormat.getInstance();
 					nf.setMinimumIntegerDigits(2);
 					
-					Toast.makeText(getApplicationContext(),"Set wake-up time at "+nf.format(hour)+":"+nf.format(minute),Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), getString(R.string.bedtime_set)+nf.format(hour)+":"+nf.format(minute),Toast.LENGTH_LONG).show();
 					nf = null;
 					
 					try {
@@ -145,7 +143,7 @@ public class MorningScheduler extends Activity {
 					finish();
 				}
 				else{
-					Toast.makeText(getApplicationContext(),"Wake-up time must between 3:00 A.M. and 12:00 P.M.",Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(),R.string.bedtime_alert,Toast.LENGTH_LONG).show();
 				}
 			}});
 		

@@ -3,8 +3,6 @@ package edu.missouri.niaaa.craving.survey.question;
 import java.util.ArrayList;
 import java.util.Map;
 
-import edu.missouri.niaaa.craving.MainActivity;
-import edu.missouri.niaaa.craving.R;
 import edu.missouri.niaaa.craving.survey.category.Answer;
 import edu.missouri.niaaa.craving.survey.category.QuestionType;
 import edu.missouri.niaaa.craving.survey.category.SurveyQuestion;

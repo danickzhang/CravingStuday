@@ -1,12 +1,9 @@
 package edu.missouri.niaaa.craving.activity;
 
-import java.text.NumberFormat;
 import java.util.Calendar;
 
 import edu.missouri.niaaa.craving.R;
 import edu.missouri.niaaa.craving.Utilities;
-import edu.missouri.niaaa.craving.R.id;
-import edu.missouri.niaaa.craving.R.layout;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;

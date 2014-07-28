@@ -7,10 +7,10 @@
 			<answer id = "3">3 - Somewhat</answer>
 			<answer id = "4">4 - Quite a bit</answer>
 			<answer id = "5">5 - Extremely</answer>
-			<text id="q411">How much do you CRAVE A DRINK right now?</text>
-			<text id="q412">How likely do you think it is that you will drink alcohol soon?</text>
+			<text id="q1301">How much do you CRAVE A DRINK right now?</text>
+			<text id="q1302">How likely do you think it is that you will drink alcohol soon?</text>
 		</questionblock>
-		<question id="q413" type="check">
+		<question id="q1303" type="check">
 			<text>What TRIGGERED your craving for alcohol? (check all that apply)</text>
 			<answer id="1">Near a bar or liquor store</answer>
 			<answer id="2">Saw others drinking</answer>
@@ -22,6 +22,6 @@
 		</question>
 	</category>
 
-	<externalsource baseid="q42" filename="MoodSubset.xml"></externalsource>
-	<externalsource baseid="q43" filename="SituationAndSetting.xml"></externalsource>
+	<externalsource baseid="q1" filename="MoodSubset.xml"></externalsource>
+	<externalsource baseid="q6" filename="SituationAndSetting.xml"></externalsource>
 </root>

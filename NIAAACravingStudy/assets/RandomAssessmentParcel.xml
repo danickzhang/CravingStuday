@@ -2,21 +2,21 @@
 <root>
 	<category>
 		<description>Recent Drinking</description>
-		<question id = "q511" type = "radio">
+		<question id = "q1101" type = "radio">
 			<text>Have you CONSUMED ALCOHOL since the last survey you answered?</text>
-			<answer id = "y" triggerFile="DrinkingFollowupParcel.xml">Yes</answer>
-			<answer id = "n">No</answer>
+			<answer id = "1" triggerFile="DrinkingFollowupParcel.xml">Yes</answer>
+			<answer id = "2">No</answer>
 		</question>
 	</category>
 	
 	<category>
 		<description>Recent Smoking</description>
-		<question id= "q521" type = "radio">
+		<question id= "q1102" type = "radio">
 			<text>Have you SMOKED A CIGARETTE in the PAST 15 MINUTES?</text>
-			<answer id = "y">Yes</answer>
-			<answer id = "n" skip="q551">No</answer>
+			<answer id = "1">Yes</answer>
+			<answer id = "2" skip="q101">No</answer>
 		</question>
-		<question id = "q522" type = "number">
+		<question id = "q1103" type = "number">
 			<text>HOW MANY CIGARETTES did you smoke in the PAST 15 MINUTES?</text>
 			<answer id = "item">cigarette(s)</answer>
 			<answer id = "min">1</answer>
@@ -24,10 +24,10 @@
 		</question>
 	</category>
 
-	<externalsource baseid="q53" filename="SmokingMotivation.xml"></externalsource>
-	<externalsource baseid="q54" filename="SmokingEffects.xml"></externalsource>
+	<externalsource baseid="q3" filename="SmokingMotivation.xml"></externalsource>
+	<externalsource baseid="q4" filename="SmokingEffects.xml"></externalsource>
 
-	<externalsource baseid="q55" filename="MoodSubset.xml"></externalsource>
+	<externalsource baseid="q1" filename="MoodSubset.xml"></externalsource>
 
 	<category>
 		<description>Life Events/Experiences</description>
@@ -41,35 +41,35 @@
 			<answer id = "7">Roommate</answer>
 			<answer id = "8">Other family member</answer>
 			<answer id = "9" action="uncheck">THERE WAS NO SUCH INCIDENT/FEELING</answer>
-			<text id="q561">Since the last prompt have you had a disagreement? (if yes,with whom)</text>
-			<text id="q562">Since the last prompt have you felt rejected? (if yes,by whom)</text>
-			<text id="q563">Since the last prompt have you felt complimented or praised? (if yes,by whom)</text>
-			<text id="q564">Since the last prompt have you felt "let down" by someone you depend on? (if yes,by whom)</text>
+			<text id="q1104">Since the last prompt have you had a disagreement? (if yes,with whom)</text>
+			<text id="q1105">Since the last prompt have you felt rejected? (if yes,by whom)</text>
+			<text id="q1106">Since the last prompt have you felt complimented or praised? (if yes,by whom)</text>
+			<text id="q1107">Since the last prompt have you felt "let down" by someone you depend on? (if yes,by whom)</text>
 		</questionblock>
 	</category>
 
 	<category>
 		<description>Life Events/Experiences</description>
 		<questionblock type="radio">
-			<answer id="y">Yes</answer>
-			<answer id="n">No</answer>
-			<text id="q565">Since the last prompt have you experienced a loss?</text>
-			<text id="q566">Since the last prompt have you Received bad/good news?</text>
+			<answer id="1">Yes</answer>
+			<answer id="2">No</answer>
+			<text id="q1108">Since the last prompt have you experienced a loss?</text>
+			<text id="q1109">Since the last prompt have you Received bad/good news?</text>
 			</questionblock>
 	</category>
 
 	<category>
 		<description>Life Events/Experiences</description>
-		<question id = "q567" type = "radio">
+		<question id = "q1110" type = "radio">
 			<text>Since the last prompt have you slept?</text>
-			<answer id = "y">Yes</answer>
-			<answer id = "n" skip="q569">No</answer>
+			<answer id = "1">Yes</answer>
+			<answer id = "2" skip="q1112">No</answer>
 		</question>
 	 </category>
 
 	<category>
 		<description>Life Events/Experiences</description>
-		<question id = "q568" type = "number">
+		<question id = "q1111" type = "number">
 			<text>How many Hour(s)?</text>
 			<answer id = "item">hour(s)</answer>
 			<answer id = "min">1</answer>
@@ -79,16 +79,16 @@
 	 
 	 <category>
 		<description>Life Events/Experiences</description>
-		<question id = "q569" type = "radio">
+		<question id = "q1112" type = "radio">
 			<text>Since the last prompt have you used caffeine?</text>
-			<answer id = "y">Yes</answer>
-			<answer id = "n" skip="q5611">No</answer>
+			<answer id = "1">Yes</answer>
+			<answer id = "2" skip="q1114">No</answer>
 		</question>
 	 </category>
 
 	<category>
 		<description>Life Events/Experiences</description>
-		<question id = "q5610" type = "number">
+		<question id = "q1113" type = "number">
 			<text>How many Cup(s)?</text>
 			<answer id = "item">cup(s)</answer>
 			<answer id = "min">1</answer>
@@ -98,16 +98,16 @@
 
 	<category>
 		<description>Life Events/Experiences</description>
-		<question id = "q5611" type = "radio">
+		<question id = "q1114" type = "radio">
 			<text>Since the last prompt have you used over the counter-medications? (if yes, log MEDICATIONS in your paper diary)</text>
-			<answer id = "y">Yes</answer>
-			<answer id = "n">No</answer>
+			<answer id = "1">Yes</answer>
+			<answer id = "2">No</answer>
 		</question>
 	</category>
 
 	<category>
 		<description>Life Events/Experiences</description>
-		<question id="q5612" type="radio">
+		<question id="q1115" type="radio">
 			<text>Since the last prompt have you taken your medications as prescribed? (if no, log CHANGES in your paper diary)</text>
 			<answer id="1">I have taken medications as prescribed since the last prompt</answer>
 			<answer id="2">I am not prescribed any medications</answer>
@@ -116,6 +116,6 @@
 		</question>	
 	 </category>
 
-	<externalsource baseid="q57" filename="CravingsAndSymptomsSubset.xml"></externalsource>
-	<externalsource baseid="q58" filename="SituationAndSetting.xml"></externalsource>
+	<externalsource baseid="q5" filename="CravingsAndSymptomsSubset.xml"></externalsource>
+	<externalsource baseid="q6" filename="SituationAndSetting.xml"></externalsource>
 </root>

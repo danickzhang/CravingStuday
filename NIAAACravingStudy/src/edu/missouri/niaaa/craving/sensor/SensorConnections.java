@@ -79,7 +79,7 @@ public class SensorConnections extends Activity {
 		            startActivityForResult(serverIntent, SensorUtilities.INTENT_CONNECT_SENSOR);	            
 	            }
 				else{
-					Toast.makeText(getApplicationContext(),"Enable Bluetooth before connecting",Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), R.string.bluetooth_needed, Toast.LENGTH_LONG).show();
 				}
 			}
         });
@@ -125,7 +125,7 @@ public class SensorConnections extends Activity {
 				Log.d(TAG,"device name "+device.getName());
 				if(device.getName() != null && device.getName().startsWith("EQ")){
 					Log.d(TAG,"device name "+address);
-					Toast.makeText(getApplicationContext(), "Entered the loop",Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), R.string.bluetooth_loop, Toast.LENGTH_LONG).show();
 					
 					Intent connectSensor = new Intent(SensorUtilities.ACTION_CONNECT_SENSOR);	
 					connectSensor.putExtra(SensorUtilities.KEY_ADDRESS,address);
@@ -133,11 +133,11 @@ public class SensorConnections extends Activity {
 					this.sendBroadcast(connectSensor);
 				}
 				else{					
-					Toast.makeText(getApplicationContext(),"Please select the devices with 'EQ' Prefix",Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), R.string.bluetooth_wrong_select, Toast.LENGTH_LONG).show();
 				}
 			}
 			else{
-				Toast.makeText(getApplicationContext(), "No device is selected",Toast.LENGTH_LONG).show();				
+				Toast.makeText(getApplicationContext(), R.string.bluetooth_no_select, Toast.LENGTH_LONG).show();				
 			}
 			
 		   break;

@@ -10,10 +10,7 @@ import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -28,11 +25,11 @@ import edu.missouri.niaaa.craving.activity.AdminManageActivity;
 import edu.missouri.niaaa.craving.activity.MorningScheduler;
 import edu.missouri.niaaa.craving.activity.SurveyMenu;
 import edu.missouri.niaaa.craving.activity.SuspensionTimePicker;
+import edu.missouri.niaaa.craving.location.LocationBroadcast;
 import edu.missouri.niaaa.craving.location.LocationUtilities;
 import edu.missouri.niaaa.craving.sensor.SensorConnections;
 import edu.missouri.niaaa.craving.services.SensorLocationService;
 import edu.missouri.niaaa.craving.services.SensorLocationService.MyBinder;
-import edu.missouri.niaaa.craving.survey.XMLSurveyActivity;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -51,19 +48,11 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.os.StrictMode;
 import android.os.Vibrator;
-import android.os.PowerManager.WakeLock;
-import android.os.SystemClock;
-import android.provider.AlarmClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -101,6 +90,8 @@ public class MainActivity extends Activity {
 	String ID;
 	String PWD;
 	private BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+	
+//	static LocationManager locationM;
 	
 	ServiceConnection conn = new ServiceConnection() {
         
@@ -164,6 +155,11 @@ public class MainActivity extends Activity {
         	
         	//set fun to 0
 //        	sendBroadcast(new Intent(Utilities.BD_ACTION_DAEMON));
+        	
+        	//restart gps
+        	if(Utilities.completedMorningToday(this) || Calendar.getInstance().get(Calendar.HOUR_OF_DAY) < 3){
+        		sendBroadcast(new Intent(LocationUtilities.ACTION_START_LOCATION));
+        	}
         }
 	}
 
@@ -176,12 +172,13 @@ public class MainActivity extends Activity {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			Toast.makeText(getApplicationContext(), "Public Key missing, exiting...", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), R.string.public_key_lost, Toast.LENGTH_SHORT).show();
 			finish();
 		}
 		
 		//ID
 		
+//		locationM = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	}
 	
 	
@@ -241,7 +238,7 @@ public class MainActivity extends Activity {
  		        			//imm.toggleSoftInput(0, InputMethodManager.RESULT_SHOWN);
  		        			//imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
- 		        			Toast.makeText(getApplicationContext(), "Set PIN failed. Please try again.", Toast.LENGTH_SHORT).show();
+ 		        			Toast.makeText(getApplicationContext(), R.string.set_upin_failed, Toast.LENGTH_SHORT).show();
  		        			//set return code
     	
  		        			finish();
@@ -253,7 +250,7 @@ public class MainActivity extends Activity {
  		        	imm.toggleSoftInput(0, InputMethodManager.RESULT_SHOWN);
  		        	imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
- 		        	Toast.makeText(getApplicationContext(), "Set PIN failed. Please try again.", Toast.LENGTH_SHORT).show();
+ 		        	Toast.makeText(getApplicationContext(), R.string.set_upin_error, Toast.LENGTH_SHORT).show();
  		        	//set return code
 
  		        	finish();
@@ -336,7 +333,7 @@ public class MainActivity extends Activity {
 				Utilities.Log(TAG, "section 3 on click listener");
 				
 				if(!getSuspension()){
-					startActivity(new Intent(MainActivity.this,SurveyMenu.class));
+					startActivity(new Intent(MainActivity.this, SurveyMenu.class));
 				}else{
 					suspensionAlert();
 				}
@@ -451,13 +448,13 @@ public class MainActivity extends Activity {
 				    			
 				            	Vibrator v = (Vibrator) MainActivity.this.getSystemService(Context.VIBRATOR_SERVICE);
 				    	        v.vibrate(500);
-				    	        Toast.makeText(getApplicationContext(), "Suspension ends", Toast.LENGTH_LONG).show();
+				    	        Toast.makeText(getApplicationContext(), R.string.suspension_end, Toast.LENGTH_LONG).show();
 						    }
 						}).create().show();
 					}
 				}
 				else{
-					Toast.makeText(MainActivity.this, "you may need to complete morning survey for today first", Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, R.string.morning_report_unfinished, Toast.LENGTH_LONG).show();
 				}
 			}
 		});
@@ -485,13 +482,15 @@ public class MainActivity extends Activity {
 				// TODO Auto-generated method stub
 				Utilities.Log(TAG, "section 8 on click listener ");
 				
-				startService(new Intent(getApplicationContext(), SensorLocationService.class));
+//				startService(new Intent(getApplicationContext(), SensorLocationService.class));
 //				bindService(new Intent(getApplicationContext(), SensorLocationService.class), conn, Context.BIND_AUTO_CREATE);
 				
-				LocationManager locationM = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//				LocationManager locationM = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 //				LocationUtilities.startGPS(MainActivity.this, locationM);
 				
-				LocationUtilities.requestLocation(locationM);
+//				LocationUtilities.requestLocation(SensorLocationService.locationM);
+				
+				sendBroadcast(new Intent(LocationUtilities.ACTION_START_LOCATION));
 				
 				//Utilities.scheduleRandomSurvey(MainActivity.this);
 //				Utilities.reScheduleRandom(MainActivity.this);
@@ -513,13 +512,15 @@ public class MainActivity extends Activity {
 				Utilities.getSP(MainActivity.this, Utilities.SP_SURVEY).getBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, false) + " "+
 				Utilities.getSP(MainActivity.this, Utilities.SP_SURVEY).getString(Utilities.SP_KEY_SURVEY_UNDERREMINDERING, "nothing"));
 				
-				stopService(new Intent(getApplicationContext(), SensorLocationService.class));
+//				stopService(new Intent(getApplicationContext(), SensorLocationService.class));
 //				unbindService(conn);
 				
-				LocationManager locationM = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//				LocationManager locationM = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 //				LocationUtilities.stopGPS(getApplicationContext(), locationM);
 				
-				LocationUtilities.removeLocation(locationM);
+//				LocationUtilities.removeLocation(SensorLocationService.locationM);
+				
+				sendBroadcast(new Intent(LocationUtilities.ACTION_STOP_LOCATION));
 				
 //				Utilities.cancelReminder(MainActivity.this);
 //				Utilities.cancelTrigger(MainActivity.this);
@@ -563,7 +564,7 @@ public class MainActivity extends Activity {
 		startService(i);
 		
 		section_1.setText(getString(R.string.section_2));
-		Toast.makeText(getApplicationContext(), "Service started!", Toast.LENGTH_LONG).show();
+		Toast.makeText(getApplicationContext(), R.string.service_start, Toast.LENGTH_LONG).show();
 	}
 	
 	private void StopSensorLocationService(){
@@ -571,14 +572,14 @@ public class MainActivity extends Activity {
 		stopService(i);
 		
 		section_1.setText(getString(R.string.section_1));
-		Toast.makeText(getApplicationContext(), "Service stopped!", Toast.LENGTH_LONG).show();
+		Toast.makeText(getApplicationContext(), R.string.service_stop, Toast.LENGTH_LONG).show();
 	}
 	
 	private void confirmStopService(){
 		Dialog alertDialog = new AlertDialog.Builder(MainActivity.this)
 		.setCancelable(false)
-		.setTitle("Confirm Stop Service")
-		.setMessage("This will shutdown the background service and stop collecting any data from your application. \nDo you really want to do so?")
+		.setTitle(R.string.service_stop_title)
+		.setMessage(R.string.service_stop_msg)
 		.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() { 
 
 			@Override 
@@ -605,7 +606,7 @@ public class MainActivity extends Activity {
 	}
 	
 	private void suspensionAlert(){
-		Toast.makeText(getApplicationContext(), "Under suspension", Toast.LENGTH_LONG).show();
+		Toast.makeText(getApplicationContext(), R.string.suspension_under, Toast.LENGTH_LONG).show();
 	}
 	
 	private void bedTimeCheckDialog(){		
@@ -747,7 +748,7 @@ public class MainActivity extends Activity {
 		//ENABLE BLUETOOTH
 		if (item.getItemId() == R.id.Enable){
 			if(btAdapter.isEnabled())			{
-				Toast.makeText(getApplicationContext(),"Bluetooth is already enabled!",Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), R.string.bluetooth_enabled ,Toast.LENGTH_LONG).show();
 			}
 			else{
 				turnOnBt();				
@@ -760,7 +761,7 @@ public class MainActivity extends Activity {
 		//DISABLE BLUETOOTH
 		else if (item.getItemId() == R.id.Disable){
 			btAdapter.disable();
-			Toast.makeText(getApplicationContext(),"Bluetooth is disabled!",Toast.LENGTH_LONG).show();			
+			Toast.makeText(getApplicationContext(), R.string.bluetooth_disabled, Toast.LENGTH_LONG).show();			
             return true;
 		}
 		
@@ -790,7 +791,7 @@ public class MainActivity extends Activity {
 			.setCancelable(false)
 			.setTitle(getString(R.string.menu_about)+"  ver."+versionName+"."+versionCode)
 			.setMessage("User ID: "+ID+"\n"+Utilities.getScheduleForToady(MainActivity.this))
-			.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
+			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() { 
 
 				@Override 
 				public void onClick(DialogInterface dialog, int which) { 
@@ -837,7 +838,7 @@ public class MainActivity extends Activity {
 			}
 			sp.edit().remove(Utilities.SP_KEY_SUSPENSION_TS).commit();
 			
-			Toast.makeText(getApplicationContext(), "Suspension ends", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), R.string.suspension_end, Toast.LENGTH_LONG).show();
 		}
 	};
 	

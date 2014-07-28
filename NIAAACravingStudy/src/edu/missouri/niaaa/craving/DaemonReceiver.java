@@ -2,6 +2,7 @@ package edu.missouri.niaaa.craving;
 
 import java.util.Calendar;
 
+import edu.missouri.niaaa.craving.location.LocationUtilities;
 import edu.missouri.niaaa.craving.sensor.SensorUtilities;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -100,8 +101,8 @@ public class DaemonReceiver extends BroadcastReceiver {
 		else if(fun == 3){//three oclock
 			Utilities.Log(TAG, "on receiver daemon 3");
 			
-			//close gps
-			
+			//close location
+			context.sendBroadcast(new Intent(LocationUtilities.ACTION_STOP_LOCATION));
 			
 			//next day at 3
 			//default

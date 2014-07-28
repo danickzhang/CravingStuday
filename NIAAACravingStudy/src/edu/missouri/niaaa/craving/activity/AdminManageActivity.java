@@ -31,9 +31,6 @@ import org.apache.http.util.EntityUtils;
 
 import edu.missouri.niaaa.craving.R;
 import edu.missouri.niaaa.craving.Utilities;
-import edu.missouri.niaaa.craving.R.id;
-import edu.missouri.niaaa.craving.R.layout;
-import edu.missouri.niaaa.craving.R.string;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -178,19 +175,19 @@ public class AdminManageActivity extends TabActivity {
 							imm.toggleSoftInput(0, InputMethodManager.RESULT_SHOWN);
 							imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
-							Toast.makeText(getApplicationContext(), "Admin PIN is wrong, exit! Please try again.", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getApplicationContext(), R.string.input_apin_failed, Toast.LENGTH_SHORT).show();
 							finish();
 						}else{
 	
 							imm.toggleSoftInput(0, InputMethodManager.RESULT_SHOWN);
 							imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 	
-							Toast.makeText(getApplicationContext(), "Verify failed. Please try again.", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getApplicationContext(), R.string.input_apin_error, Toast.LENGTH_SHORT).show();
 							finish();
 						}
 					}
 					else{
-						Toast.makeText(getApplicationContext(), "Return code incorrect. Please try again.", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getApplicationContext(), R.string.input_apin_return, Toast.LENGTH_SHORT).show();
 						finish();
 					}
 					
@@ -201,7 +198,7 @@ public class AdminManageActivity extends TabActivity {
  		        	imm.toggleSoftInput(0, InputMethodManager.RESULT_SHOWN);
  		        	imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 	 					
- 		        	Toast.makeText(getApplicationContext(), "Failed. Please try again, with network connection.", Toast.LENGTH_SHORT).show();;
+ 		        	Toast.makeText(getApplicationContext(), R.string.input_apin_net_error, Toast.LENGTH_SHORT).show();;
 	            	finish();
 				}
 	         		        
@@ -229,8 +226,8 @@ public class AdminManageActivity extends TabActivity {
 		currentAssID = shp.getString(Utilities.SP_KEY_LOGIN_USERID, "");
 		Log.d(TAG, "set Hints is "+shp.getString(Utilities.SP_KEY_LOGIN_USERID,""));
         if(currentAssID.equals("")){
-        	AsIdHint = "Four-digit ID goes here";
-        	RmIdHint = "Not set yet";		        	
+        	AsIdHint = getString(R.string.assign_hint);
+        	RmIdHint = getString(R.string.remove_hint);		        	
         }
         else{
         	AsIdHint = "Current " + shp.getString(Utilities.SP_KEY_LOGIN_USERID, "");
@@ -321,20 +318,20 @@ public class AdminManageActivity extends TabActivity {
 	 		            if(result.equals("UserIDIsNotSet")){
 	 		            	//add in web page first
 	 		            	
-	 		            	String s1 = "This ID is not in Database, please double check or add it via web page by administrator first.";
+	 		            	String s1 = getString(R.string.assign_id_null);
 	 		            	buildDialog1(ctx, s1).show();
 	 		            	
 	 		            }else if(result.equals("UserIDIsUsed")){
-	 		            	String s2 = "This ID has been used before. \nDo you really want to assign this ID: "+asedID;
+	 		            	String s2 = getString(R.string.assing_id_exist)+asedID;
 	 		                buildDialog2(ctx, s2).show();
 	 		            	 		            	
 	 		            }else if(result.equals("UserIDIsNotActive")){
 	 		            	//assign
-	 		            	String s3 = "Do you want to assign this ID: "+asedID;
+	 		            	String s3 = getString(R.string.assign_id_new)+asedID;
 	 		            	buildDialog2(ctx, s3).show();
 	 		            	
 	 		            }else{
-	 		            	String s4 = "The ID format seems not applicable, please try again.";
+	 		            	String s4 = getString(R.string.assign_id_wrong);
 	 		            	buildDialog1(ctx, s4).show();
 	 		            	
 	 		            }
@@ -343,7 +340,7 @@ public class AdminManageActivity extends TabActivity {
  		        } catch (Exception e) {
  					// TODO Auto-generated catch block
  		        	e.printStackTrace();
- 					String s4 = "The ID format seems not applicable, please try again.";
+ 					String s4 = getString(R.string.assign_id_net_error);
 		            buildDialog1(ctx, s4).show();
  		        }
  			}
@@ -367,7 +364,7 @@ public class AdminManageActivity extends TabActivity {
  					Dialog alertDialog = new AlertDialog.Builder(ctx)
  					.setCancelable(false)
  					.setTitle(R.string.assign_remove_title)
- 					.setMessage("Do you really want to remove this ID and all related data from the device? ")
+ 					.setMessage(R.string.remove_msg)
  					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() { 
  	                     
  	                    @Override 

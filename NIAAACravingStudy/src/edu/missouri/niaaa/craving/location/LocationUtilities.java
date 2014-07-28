@@ -22,6 +22,8 @@ public class LocationUtilities {
 	public final static int DISTENCE_ACCURACY_IN_METER = 30;//30;
 	
 	public final static String BD_ACTION_SCHEDULE_LOCATION = "edu.missouri.niaaa.craving.SCHEDULE_LOCATION";
+	public final static String ACTION_START_LOCATION = "edu.missouri.niaaa.craving.START_LOCATION";
+	public final static String ACTION_STOP_LOCATION = "edu.missouri.niaaa.craving.STOP_LOCATION";
 	
 	
 	public static Location mCurrentLocation = null;
@@ -31,7 +33,7 @@ public class LocationUtilities {
 
 //	LocationManager locationM = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	
-	
+	 
 	public static void startGPS(Context context, LocationManager locationM){
 		activityRecognition = new ActivityRecognitionScan(context);
 		activityRecognition.startActivityRecognitionScan();

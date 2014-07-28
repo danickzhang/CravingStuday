@@ -1,7 +1,5 @@
 package edu.missouri.niaaa.craving.survey;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,7 +21,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.xml.sax.InputSource;
 
-import edu.missouri.niaaa.craving.MainActivity;
 import edu.missouri.niaaa.craving.R;
 import edu.missouri.niaaa.craving.Utilities;
 import edu.missouri.niaaa.craving.survey.category.Answer;
@@ -37,6 +34,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.net.ConnectivityManager;
@@ -99,7 +97,7 @@ public class XMLSurveyActivity extends Activity {
 	boolean underManuallyGoing = false;
 	
 	Calendar startCal;
-//	WakeLock wl;
+	WakeLock wl;
 	
 	static Context context;
 	
@@ -117,8 +115,8 @@ public class XMLSurveyActivity extends Activity {
 		dialogTitle = getString(R.string.pin_title);
 		autoTriggered = getIntent().getBooleanExtra(Utilities.SV_AUTO_TRIGGERED, false);
 		
-//		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);  
-//        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Gank");  
+		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);  
+        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Gank");  
         
 		
 		soundp = new SoundPool(2, AudioManager.STREAM_MUSIC, 100);
@@ -129,7 +127,7 @@ public class XMLSurveyActivity extends Activity {
 		
 		Log.d("ssssssssss", "reminder last is "+getIntent().getBooleanExtra(Utilities.SV_REMINDER_LAST, false));
 		if(getIntent().getBooleanExtra(Utilities.SV_REMINDER_LAST, false)){
-			Toast.makeText(getApplicationContext(), "Timeout for current survey!", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), R.string.survey_timeout, Toast.LENGTH_LONG).show();
 			
 			//set result
 			setResult(1);
@@ -160,6 +158,7 @@ public class XMLSurveyActivity extends Activity {
 				Log.d("!!!!!!!!!!!!!!!!2", ""+surveyTitle);
 				dialogTitle = getDialogTitle();
 			}
+	        
 	        
 		}else{
 			//manually click in
@@ -212,7 +211,7 @@ public class XMLSurveyActivity extends Activity {
 			
 		}
 
-      	setTitle(surveyTitle);
+      	setTitle(Utilities.RELEASE? surveyName: surveyTitle);
 		
 		
         
@@ -279,12 +278,32 @@ public class XMLSurveyActivity extends Activity {
 	
 	private void acquireLock() {
 		// TODO Auto-generated method stub
-//		wl.acquire();
+		wl.acquire();
 	}
 
 
 	private String getDialogTitle(){
-		return getString(R.string.pin_title) + " for reminder "+shp.getInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, 0);
+		
+		int seq = shp.getInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, 1);
+		Editor ed = Utilities.getSP(context, Utilities.SP_REMINDER_INFO).edit();
+		String ts = Utilities.sdf.format(Calendar.getInstance().getTime());
+		
+        //write reminder timestamp to shared preferences
+        if(seq == 3){
+        	ed.putString(Utilities.SP_KEY_REMINDER_INFO_3, ts).commit();
+        }
+        else if(seq == 2){
+        	ed.putString(Utilities.SP_KEY_REMINDER_INFO_2, ts).commit();
+        	ed.putString(Utilities.SP_KEY_REMINDER_INFO_3, "").commit();
+        }else{
+        	ed.putString(Utilities.SP_KEY_REMINDER_INFO_1, ts).commit();
+        	ed.putString(Utilities.SP_KEY_REMINDER_INFO_2, "").commit();
+        	ed.putString(Utilities.SP_KEY_REMINDER_INFO_3, "").commit();
+        }
+		
+		if(Utilities.RELEASE)
+			return getString(R.string.pin_title);
+		return getString(R.string.pin_title) + " for reminder "+ seq;
 	}
 	
 	@Override
@@ -294,7 +313,7 @@ public class XMLSurveyActivity extends Activity {
 		Utilities.Log(TAG, "on new intent");
 		
 		if(intent.getBooleanExtra(Utilities.SV_REMINDER_LAST, false)){
-			Toast.makeText(getApplicationContext(), "Timeout for current survey!", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), R.string.survey_timeout, Toast.LENGTH_LONG).show();
 			finish();
 		}
 		else if(underManuallyGoing){
@@ -302,7 +321,7 @@ public class XMLSurveyActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "manually one block the auto one!", Toast.LENGTH_LONG).show();
 		}
 		
-		else{
+		else{//auto triggered
 			acquireLock();
 			
 			playSound();
@@ -353,7 +372,7 @@ public class XMLSurveyActivity extends Activity {
 				
 				Log.d("fffffffffffff", ""+Utilities.getSP(XMLSurveyActivity.this, Utilities.SP_SURVEY).getBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, false) + " "+
 						Utilities.getSP(XMLSurveyActivity.this, Utilities.SP_SURVEY).getString(Utilities.SP_KEY_SURVEY_UNDERREMINDERING, "nothing")+ " "+
-						Utilities.getSP(XMLSurveyActivity.this, Utilities.SP_SURVEY).getInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, 0)
+						Utilities.getSP(XMLSurveyActivity.this, Utilities.SP_SURVEY).getInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, -1)
 						);
 			} 
 		})
@@ -443,7 +462,6 @@ public class XMLSurveyActivity extends Activity {
     	public void run(){ 
     		
     		streamID = soundp.play(soundsMap.get(1), 1, 1, 1, 0, 1);
-    		Log.d("jladks;ga", "soundp is "+streamID);
     	}
     }
 	
@@ -834,12 +852,15 @@ public class XMLSurveyActivity extends Activity {
 		//recording
     	try {
 			writeSurveyToFile(answerMap);
+			
+			if(autoTriggered)
+				Utilities.getSP(this, Utilities.SP_REMINDER_INFO).edit().clear().commit();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-    	Toast.makeText(this, "Survey Complete.", Toast.LENGTH_LONG).show();
+    	Toast.makeText(this, R.string.survey_completed, Toast.LENGTH_LONG).show();
     	finish();
     }
 
@@ -878,6 +899,8 @@ public class XMLSurveyActivity extends Activity {
 			//sequence
 			String triggerSeq = Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surveyName);
 			int seq = shp.getInt(triggerSeq, 1);
+			if(seq == 0)
+				seq = Utilities.MAX_TRIGGER_MAP.get(surveyName);
 
 			
 			//for morning survey
@@ -888,7 +911,7 @@ public class XMLSurveyActivity extends Activity {
     		//for random survey
         	else if(surveyName.equals(Utilities.SV_NAME_RANDOM)){
 //		        		time = Calendar.getInstance().getTimeInMillis();
-        		scheduleTimeStamp = Long.parseLong(Utilities.getSP(this, Utilities.SP_RANDOM_TIME).getString(Utilities.SP_KEY_RANDOM_TIME_SET, ""+scheduleTimeStamp).split(",")[seq]);
+        		scheduleTimeStamp = Long.parseLong(Utilities.getSP(this, Utilities.SP_RANDOM_TIME).getString(Utilities.SP_KEY_RANDOM_TIME_SET, ""+scheduleTimeStamp).split(",")[seq-1]);
         	}
         	
     		//for followup survey
@@ -913,15 +936,15 @@ public class XMLSurveyActivity extends Activity {
 		return Utilities.sdf.format(c.getTime());
 	}
 
-	private String getReminderTimeStamp(){
-		String reminderTS = "";
+	private String getReminderTimeStamp(Context context){
 		
-		if(autoTriggered){}
-		
+		if(autoTriggered){
+			SharedPreferences sp = Utilities.getSP(context, Utilities.SP_REMINDER_INFO);
+			return sp.getString(Utilities.SP_KEY_REMINDER_INFO_1, "")+","+sp.getString(Utilities.SP_KEY_REMINDER_INFO_2, "")+","+sp.getString(Utilities.SP_KEY_REMINDER_INFO_3, "");
+		}
 		else
-			return ""+","+""+","+""+",";
+			return ""+","+""+","+"";
 		
-		return null;
 	}
 	
 	protected void writeSurveyToFile(HashMap<String, List<String>> surveyData) throws IOException{
@@ -952,7 +975,7 @@ public class XMLSurveyActivity extends Activity {
 		sb.append(endCal.getTime().toString());
 		sb.append(",");
 		
-		sb.append(userID+","+studyDay+","+type+","+scheduleTS+","+"reminder1"+","+"reminder2"+","+"reminder3"+","+startTS+","+endTS+",");
+		sb.append(userID+","+studyDay+","+type+","+scheduleTS+","+getReminderTimeStamp(context)+","+startTS+","+endTS+",");
 		
 		List<String> sorted = new ArrayList<String>(surveyData.keySet());
 		Collections.sort(sorted);
@@ -984,7 +1007,7 @@ public class XMLSurveyActivity extends Activity {
 		
 		
 		
-		//filenema
+		//file name
 			Calendar c=Calendar.getInstance();
 			SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd"); 
 			String dateObj =curFormater.format(c.getTime()); 		
@@ -1097,8 +1120,8 @@ public class XMLSurveyActivity extends Activity {
 		// TODO Auto-generated method stub
 		Utilities.Log_sys(TAG, "On back pressed");
 		new AlertDialog.Builder(this)
-		.setTitle("Are you sure you want to exit?")
-		.setMessage("This action will erase the current survey.\r\nYou should complete the survey.")
+		.setTitle(R.string.survey_cancel_title)
+		.setMessage(R.string.survey_cancel_msg)
 		.setCancelable(false)
 		.setNegativeButton(android.R.string.cancel, null)
 		.setPositiveButton(android.R.string.ok, new android.content.DialogInterface.OnClickListener() {
@@ -1146,8 +1169,9 @@ public class XMLSurveyActivity extends Activity {
 		}
 //		}
 		
-		else
-			shp.edit().putBoolean("undermangoing", false).commit();
+		else{
+//			shp.edit().putBoolean("undermangoing", false).commit();
+		}
 	}
 
 	@Override
@@ -1156,8 +1180,8 @@ public class XMLSurveyActivity extends Activity {
 		super.onPause();
 		Utilities.Log_sys(TAG, "onPause");
 		soundp.stop(streamID);
-//		if(wl.isHeld())
-//			wl.release();
+		if(wl.isHeld())
+			wl.release();
 	}
 
 	@Override

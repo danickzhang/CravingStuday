@@ -299,7 +299,7 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 // 	            transmitData.execute("chestsensor"+"."+phoneID+"."+deviceName+"."+dateObj,formattedData);
  	            transmitData.execute("chestsensor"+"."+phoneID+"."+deviceName+"."+dateObj,enformattedData);
  	            
- 	            //Log.d("Equivital","Chest Summary Data Point Sent");
+ 	            Log.d("Equivital","Chest Summary Data Point Sent "+enformattedData);
  	            subList.clear();  
  	            subList=null;
  	    } 	    	

@@ -11,6 +11,8 @@ import java.util.TimerTask;
 import edu.missouri.niaaa.craving.MainActivity;
 import edu.missouri.niaaa.craving.R;
 import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.location.LocationBroadcast;
+import edu.missouri.niaaa.craving.location.LocationUtilities;
 import edu.missouri.niaaa.craving.sensor.SensorUtilities;
 import edu.missouri.niaaa.craving.sensor.equivital.EquivitalRunnable;
 import android.app.Service;
@@ -19,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.net.ConnectivityManager;
@@ -78,6 +81,10 @@ public class SensorLocationService extends Service {
 		sensorIntent.addAction(SensorUtilities.ACTION_DISCONNECT_SENSOR);
 		sensorIntent.addAction(SensorUtilities.ACTION_LOST_CONNECTION_SOUND);
 		this.registerReceiver(SensorReceiver,sensorIntent);
+		
+		
+//		IntentFilter locationIntent = new IntentFilter();
+//		locationIntent.addAction(LocationUtilities.ACTION_START_LOCATION);
 	}
 
 	@Override
@@ -159,7 +166,7 @@ public class SensorLocationService extends Service {
 			
 			if(action.equals(SensorUtilities.ACTION_CONNECT_SENSOR)){
 
-				Toast.makeText(getApplicationContext(),"Intent Received",Toast.LENGTH_LONG).show();
+				Toast.makeText(getApplicationContext(), R.string.sensor_connect, Toast.LENGTH_LONG).show();
 				
 				String address=intent.getStringExtra(SensorUtilities.KEY_ADDRESS);
 				String deviceName=intent.getStringExtra(SensorUtilities.KEY_DEVICE_NAME);

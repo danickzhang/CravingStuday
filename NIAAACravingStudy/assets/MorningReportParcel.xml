@@ -2,32 +2,32 @@
 <root>
 	<category>
 		<description>Last Night's Drinking</description>
-		<question id = "q111" type = "radio">
+		<question id = "q201" type = "radio">
 			<text>Did you DRINK ALCOHOL last night?</text>
-			<answer id = "y">Yes</answer>
-			<answer id = "n" skip = "q121">No</answer>
+			<answer id = "1">Yes</answer>
+			<answer id = "2" skip = "q204">No</answer>
 		</question>
-		<question id = "q112" type = "number">
+		<question id = "q202" type = "number">
 			<text>HOW MANY ALCOHOLIC DRINKS did you have?</text>
 			<answer id = "item">drink(s)</answer>
 			<answer id = "min">1</answer>
 			<answer id = "max">24</answer>
 		</question>
-		<question id = "q113" type = "radio">
+		<question id = "q203" type = "radio">
 			<text>Do you have a HANGOVER from last night's drinking?</text>
-			<answer id = "y">Yes</answer>
-			<answer id = "n">No</answer>
+			<answer id = "1">Yes</answer>
+			<answer id = "2">No</answer>
 		</question>
 	</category>
 
 	<category>
 		<description>Recent Smoking</description>
-		<question id= "q121" type = "radio">
+		<question id= "q204" type = "radio">
 			<text>Have you SMOKED a CIGARETTE since WAKE UP?</text>
-			<answer id = "y">Yes</answer>
-			<answer id = "n" skip="q151">No</answer>
+			<answer id = "1">Yes</answer>
+			<answer id = "2" skip="q101">No</answer>
 		</question>
-		<question id = "q122" type = "number">
+		<question id = "q205" type = "number">
 			<text>HOW MANY CIGARETTES did you smoke since WAKE UP?</text>
 			<answer id = "item">cigarette(s)</answer>
 			<answer id = "min">1</answer>
@@ -35,12 +35,12 @@
 		</question>
 	</category>
 
-	<externalsource baseid="q13" filename="SmokingMotivation.xml"></externalsource>
-	<externalsource baseid="q14" filename="SmokingEffects.xml"></externalsource>
+	<externalsource baseid="q3" filename="SmokingMotivation.xml"></externalsource>
+	<externalsource baseid="q4" filename="SmokingEffects.xml"></externalsource>
 	
-	<externalsource baseid="q15" filename="MoodSubset.xml"></externalsource>
+	<externalsource baseid="q1" filename="MoodSubset.xml"></externalsource>
 
-	<externalsource baseid="q16" filename="CravingsAndSymptomsSubset.xml"></externalsource>
-	<externalsource baseid="q17" filename="SituationAndSetting.xml"></externalsource>
+	<externalsource baseid="q5" filename="CravingsAndSymptomsSubset.xml"></externalsource>
+	<externalsource baseid="q6" filename="SituationAndSetting.xml"></externalsource>
 
 </root>

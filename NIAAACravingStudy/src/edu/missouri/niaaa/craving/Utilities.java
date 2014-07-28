@@ -37,6 +37,7 @@ import org.apache.http.util.EntityUtils;
 import com.google.android.gms.location.DetectedActivity;
 
 import edu.missouri.niaaa.craving.location.ActivityRecognitionService;
+import edu.missouri.niaaa.craving.location.LocationBroadcast;
 import edu.missouri.niaaa.craving.location.LocationUtilities;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -104,7 +105,7 @@ public class Utilities {
 	public final static int CODE_SUSPENSION = 7;
 	public final static int CODE_BEDTIME = 8;
 	public final static int CODE_SENSOR_CONN = 9;
-	public final static boolean DEBUG = true;
+	public final static boolean RELEASE = true;
 	
 	
 	public final static HashMap<String, Integer> MAX_TRIGGER_MAP = new HashMap<String, Integer>(){
@@ -189,7 +190,12 @@ public class Utilities {
 	public final static String SP_KEY_SUSPENSION_TS = "SUSPENSION_TS";
 	public final static String SP_KEY_SENSOR_CONN_TS = "SENSOR_CONN_TS";
 	
+	/*reminder into*/
+	public final static String SP_REMINDER_INFO = "edu.missouri.niaaa.craving.REMINDER_INFO";
 	
+	public final static String SP_KEY_REMINDER_INFO_1 = "REMINDER_INFO_1";
+	public final static String SP_KEY_REMINDER_INFO_2 = "REMINDER_INFO_2";
+	public final static String SP_KEY_REMINDER_INFO_3 = "REMINDER_INFO_3";
 	
 	
 /*	broadcast*/
@@ -254,8 +260,9 @@ public class Utilities {
 
 /*	validate*/
 	public final static String VALIDATE_ADDRESS = 			"http://dslsrv8.cs.missouri.edu/~rs79c/Server/Crt/validateUser.php";
-	public final static String WRITE_ARRAY_TO_FILE = 		"http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFile.php";
-	public final static String WRITE_ARRAY_TO_FILE_DEC = 	"http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFileDec.php";
+//	public final static String WRITE_ARRAY_TO_FILE = 		"http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFile.php";
+//	public final static String WRITE_ARRAY_TO_FILE_DEC = 	"http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFileDec.php";
+	public final static String WRITE_ARRAY_TO_FILE_DEC = 	"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/writeArrayToFileDec.php";
 //	public final static String UPLOAD_ADDRESS = WRITE_ARRAY_TO_FILE;
 	public final static String UPLOAD_ADDRESS = WRITE_ARRAY_TO_FILE_DEC;
 	public final static SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -500,6 +507,10 @@ public class Utilities {
 		
 		//cancel existing if any
 		cancelMorning(context);
+		
+		
+		//start loction
+		context.sendBroadcast(new Intent(LocationUtilities.ACTION_START_LOCATION));
 	}
 	
 	private static void updateStudyDay() {
@@ -682,9 +693,10 @@ public class Utilities {
 		String str = 
 				"\nStudy Day: "+getStudyDay(context) + 
 				(!getSP(context, Utilities.SP_SURVEY).getBoolean(Utilities.SP_KEY_SURVEY_SUSPENSION, false)?"\n":"\nUnder suspension.\n") +
+				(RELEASE? "" :
 				"\nMorning  survey at: " + (morning == -1 ? TIME_NONE : getTimeFromLong(morning))+
 				"\nFollowup survey at: " + follow +
-				"\nRandom  survey at: "+random;
+				"\nRandom  survey at: "+random);
 		
 		return str;
 	}
@@ -832,6 +844,7 @@ public class Utilities {
 			location.getAccuracy()+","+location.getProvider()+","+getNameFromType(ActivityRecognitionService.currentUserActivity);
 		
 		
+		String userID = LocationBroadcast.ID;
 		//filename
 		Calendar cl=Calendar.getInstance();
 		SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd"); 
@@ -842,9 +855,9 @@ public class Utilities {
 		try {
 			toWriteArr = encryption(toWrite);
 			if(WRITE_RAW){
-				writeToFile("Location."+"userID"+"."+dateObj+".txt", toWrite);
+				writeToFile("Location."+userID+"."+dateObj+".txt", toWrite);
 			}else{
-				writeToFileEnc("Location."+"userID"+"."+dateObj+".txt", toWriteArr);
+				writeToFileEnc("Location."+userID+"."+dateObj+".txt", toWriteArr);
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -854,7 +867,7 @@ public class Utilities {
 		
 		//Ricky
 		TransmitData transmitData=new TransmitData();
-		transmitData.execute("locations."+"userID"+"."+dateObj,toWriteArr);
+		transmitData.execute("locations."+userID+"."+dateObj,toWriteArr);
 		
 	}
 	

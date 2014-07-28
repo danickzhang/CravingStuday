@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.missouri.niaaa.craving"
-    android:versionCode="191"
-    android:versionName="2.2" >
+    android:versionCode="001"
+    android:versionName="2.3" >
 
     <uses-sdk
-        android:minSdkVersion="18"
+        android:minSdkVersion="19"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -74,7 +74,6 @@
 				
 <!-- 				<action android:name="android.intent.action.DATE_CHANGED" /> -->
 				
-                <action android:name="sounds_alarm" />
             </intent-filter>
         </receiver>
         
@@ -98,6 +97,16 @@
             </intent-filter>
         </receiver>
             
+        <receiver
+            android:name=".location.LocationBroadcast"
+            android:exported="false"
+            >
+            <intent-filter >
+        		<action android:name="edu.missouri.niaaa.craving.START_LOCATION" />
+        		<action android:name="edu.missouri.niaaa.craving.STOP_LOCATION" />
+        	</intent-filter>    
+        </receiver>
+        
         <activity
             android:name=".activity.AdminManageActivity"
             android:screenOrientation="portrait" >

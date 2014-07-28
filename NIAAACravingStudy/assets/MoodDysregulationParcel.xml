@@ -1,7 +1,7 @@
 <root>
 	<category>
 		<description>Mood change</description>
-		<question id="q311" type = "radio">
+		<question id="q1001" type = "radio">
 			<text>How much did your mood change?</text>
 			<answer id = "1">1 - Very Slightly or Not At All</answer>
 			<answer id = "2">2 - A little</answer>
@@ -9,28 +9,28 @@
 			<answer id = "4">4 - Quite a bit</answer>
 			<answer id = "5">5 - Extremely</answer>
 		</question>
-		<question id="q312" type = "radio">
+		<question id="q1002" type = "radio">
 			<text>Are you in a better or worse mood now than before?</text>
-			<answer id="y">Better</answer>
-			<answer id="n" skip="q314">Worse</answer>
+			<answer id="1">Better</answer>
+			<answer id="2" skip="q1004">Worse</answer>
 		</question>
-		<question id= "q313" type = "check">
+		<question id= "q1003" type = "check">
 			<text>If better, WHAT TRIGGERED your mood change? (check all that apply)</text>
-			<answer id = "1" skip="q321">Received good news</answer>
-			<answer id = "2" skip="q321">Someone complimented me</answer>
-			<answer id = "3" skip="q321">Used alcohol</answer>
-			<answer id = "4" skip="q321">Used drugs</answer>
-			<answer id = "5" skip="q321">Used prescribed medications</answer>
-			<answer id = "6" skip="q321">Had sex</answer>
-			<answer id = "7" skip="q321">Spent time with someone close to me</answer>
-			<answer id = "8" skip="q321">Had a nice day or evening</answer>
-			<answer id = "9" skip="q321">Exercised</answer>
-			<answer id = "A" skip="q321">I did something I am proud of</answer>
-			<answer id = "B" skip="q321">Felt accepted and supported by someone</answer>
-			<answer id = "C" skip="q321">Other</answer>
-			<answer id = "D" skip="q321" action="uncheck">THERE WERE NO TRIGGERS</answer>
+			<answer id = "1" skip="q101">Received good news</answer>
+			<answer id = "2" skip="q101">Someone complimented me</answer>
+			<answer id = "3" skip="q101">Used alcohol</answer>
+			<answer id = "4" skip="q101">Used drugs</answer>
+			<answer id = "5" skip="q101">Used prescribed medications</answer>
+			<answer id = "6" skip="q101">Had sex</answer>
+			<answer id = "7" skip="q101">Spent time with someone close to me</answer>
+			<answer id = "8" skip="q101">Had a nice day or evening</answer>
+			<answer id = "9" skip="q101">Exercised</answer>
+			<answer id = "A" skip="q101">I did something I am proud of</answer>
+			<answer id = "B" skip="q101">Felt accepted and supported by someone</answer>
+			<answer id = "C" skip="q101">Other</answer>
+			<answer id = "D" skip="q101" action="uncheck">THERE WERE NO TRIGGERS</answer>
 		</question>
-		<question id= "q314" type = "check">
+		<question id= "q1004" type = "check">
 			<text>If worse, WHAT TRIGGERED your mood change? (check all that apply)</text>
 			<answer id = "1">Lack of sleep</answer>
 			<answer id = "2">Argument or conflict</answer>
@@ -48,7 +48,7 @@
 		</question>	
 	</category>
 
-	<externalsource baseid="q32" filename="MoodSubset.xml"></externalsource>
+	<externalsource baseid="q1" filename="MoodSubset.xml"></externalsource>
 
 	<category>
 		<description>Alcohol Urge/Craving</description>
@@ -58,10 +58,10 @@
 			<answer id = "3">3 - Somewhat</answer>
 			<answer id = "4">4 - Quite a bit</answer>
 			<answer id = "5">5 - Extremely</answer>
-			<text id="q331">Do you CRAVE A DRINK right now?</text>
-			<text id="q332">Do you CRAVE A CIGARETTE right now?</text>
+			<text id="q1005">Do you CRAVE A DRINK right now?</text>
+			<text id="q1006">Do you CRAVE A CIGARETTE right now?</text>
 		</questionblock>
 	</category>
 
-	<externalsource baseid="q34" filename="SituationAndSetting.xml"></externalsource>
+	<externalsource baseid="q6" filename="SituationAndSetting.xml"></externalsource>
 </root>
