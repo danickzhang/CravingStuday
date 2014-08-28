@@ -101,6 +101,8 @@ public class XMLSurveyActivity extends Activity {
 	
 	static Context context;
 	
+	private int randomSeq = -1; //haidong
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +150,8 @@ public class XMLSurveyActivity extends Activity {
 	        Log.d("!!!!!!!!!!!!!!!!", ""+surveyTitle);
 	        if(Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surveyName) != null){
 	        	int i = shp.getInt(Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surveyName), 0); 
+	        	
+	        	randomSeq = i; //haidong
 				switch(i){
 				case 0:
 					surveyTitle = num2seq(Utilities.MAX_TRIGGER_MAP.get(surveyName))+surveyName;
@@ -157,6 +161,19 @@ public class XMLSurveyActivity extends Activity {
 				}
 				Log.d("!!!!!!!!!!!!!!!!2", ""+surveyTitle);
 				dialogTitle = getDialogTitle();
+				
+				//haidong
+				if(surveyName.equals("RANDOM_ASSESSMENT")){
+					Log.d("!!!!!!!!!!!!!!!!hhhhhhhhhhhh", "i="+i+" randomSeq="+randomSeq);
+					
+					String rsID = String.valueOf(randomSeq);
+					Calendar rsT = Calendar.getInstance();
+					String rsDate = (rsT.get(Calendar.MONTH)+1)+"/"+rsT.get(Calendar.DAY_OF_MONTH)+"/"+rsT.get(Calendar.YEAR);
+					String uID = Utilities.getSP(this, Utilities.SP_LOGIN).getString(Utilities.SP_KEY_LOGIN_USERID, "0000");
+					TriggerSignal triggerSignal = new TriggerSignal();
+					triggerSignal.execute(uID,rsDate,rsID);
+					
+				}
 			}
 	        
 	        
@@ -166,7 +183,9 @@ public class XMLSurveyActivity extends Activity {
 			//1. manually do morning survey
 			//2. after bedreport && before 3am can do initial drinking !!
 			Log.d("6666666666666666666", "before 3 is "+ (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)<3));
-			if(!Utilities.completedMorningToday(this) && !surveyName.equals(Utilities.SV_NAME_MORNING) && !surveyName.equals(Utilities.SV_NAME_DRINKING)){
+			if(!Utilities.completedMorningToday(this) && !surveyName.equals(Utilities.SV_NAME_MORNING) && !surveyName.equals(Utilities.SV_NAME_DRINKING)
+					&& !surveyName.equals(Utilities.SV_NAME_MOOD)  && !surveyName.equals(Utilities.SV_NAME_CRAVING)
+					){
 				//give an alert to show morning survey should be done first today. 
 				//or after 12:00 pm automatically cancel the restrict
 				//except morning survey
@@ -461,7 +480,7 @@ public class XMLSurveyActivity extends Activity {
     	@Override    	
     	public void run(){ 
     		
-    		streamID = soundp.play(soundsMap.get(1), 1, 1, 1, 0, 1);
+    		streamID = soundp.play(soundsMap.get(1), 1, 1, 1, 0, 1); // should be different 
     	}
     }
 	
@@ -838,7 +857,20 @@ public class XMLSurveyActivity extends Activity {
 //    		Utilities.scheduleRandomSurvey(this);
 			
     	}
-    	
+		
+    	//haidong
+    	else if(surveyName.equals(Utilities.SV_NAME_RANDOM)){
+    		
+			String rsID = String.valueOf(randomSeq);
+			Calendar rsT = Calendar.getInstance();
+			String rsDate = (rsT.get(Calendar.MONTH)+1)+"/"+rsT.get(Calendar.DAY_OF_MONTH)+"/"+rsT.get(Calendar.YEAR);
+			String uID = Utilities.getSP(this, Utilities.SP_LOGIN).getString(Utilities.SP_KEY_LOGIN_USERID, "0000");
+			CompletedSignal completedSignal = new CompletedSignal();
+			completedSignal.execute(uID,rsDate,rsID);
+			
+    	}
+    	//--
+		
     	//schedule drinking follow-ups if current completion is "initial drinking" or "random survey" with condition 
     	else if(surveyName.equals(Utilities.SV_NAME_DRINKING) || hasTrigger){// and followup triggers followup 
     		Utilities.triggerDrinkingFollowup(this);
@@ -1210,6 +1242,99 @@ public class XMLSurveyActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onStop();
 		Utilities.Log_sys(TAG, "onStop");
+	}
+	
+	//haidong from ricky
+	private class CompletedSignal extends AsyncTask<String,Void, Boolean>
+	{
+
+		@Override
+		protected Boolean doInBackground(String... strings) {
+			// TODO Auto-generated method stub
+	         String UID=strings[0];
+	         String Date=strings[1];
+	         String RSID=strings[2];
+	         if(checkDataConnectivity())
+	 		{
+	         HttpPost request = new HttpPost("http://dslsrv8.cs.missouri.edu/~rs79c/Server/Crt/compliance.php");
+	         List<NameValuePair> params = new ArrayList<NameValuePair>();
+	         params.add(new BasicNameValuePair("category","complete"));                            
+	         params.add(new BasicNameValuePair("UID",UID));
+	         params.add(new BasicNameValuePair("Date",Date));
+	         params.add(new BasicNameValuePair("RSID",RSID));
+	         //params.add(new BasicNameValuePair("userID", UID));
+	         try {
+	         	        	
+	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+	             HttpResponse response = new DefaultHttpClient().execute(request);
+	             if(response.getStatusLine().getStatusCode() == 200){
+	                 String result = EntityUtils.toString(response.getEntity());
+	                 Log.d("Sensor Data Point Info",result);                
+	                // Log.d("Wrist Sensor Data Point Info","Data Point Successfully Uploaded!");
+	             }
+	             return true;
+	         } 
+	         catch (Exception e) 
+	         {	             
+	             e.printStackTrace();
+	             return false;
+	         }
+	 	  }
+	     	
+	     else 
+	     {
+	     	Log.d("Sensor Data Point Info","No Network Connection:Data Point was not uploaded");
+	     	//Toast.makeText(serviceContext, errMSG, Toast.LENGTH_LONG).show();
+	     	return false;
+	      } 
+		    
+		}
+		
+	}
+	private class TriggerSignal extends AsyncTask<String,Void, Boolean>
+	{
+
+		@Override
+		protected Boolean doInBackground(String... strings) {
+			// TODO Auto-generated method stub
+	         String UID=strings[0];
+	         String Date=strings[1];
+	         String RSID=strings[2];
+	         if(checkDataConnectivity())
+	 		{
+	         HttpPost request = new HttpPost("http://dslsrv8.cs.missouri.edu/~rs79c/Server/Crt/compliance.php");
+	         List<NameValuePair> params = new ArrayList<NameValuePair>();
+	         params.add(new BasicNameValuePair("category","trigger"));                            
+	         params.add(new BasicNameValuePair("UID",UID));
+	         params.add(new BasicNameValuePair("Date",Date));
+	         params.add(new BasicNameValuePair("RSID",RSID));
+	         try {
+	         	        	
+	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+	             HttpResponse response = new DefaultHttpClient().execute(request);
+	             if(response.getStatusLine().getStatusCode() == 200){
+	                 String result = EntityUtils.toString(response.getEntity());
+	                 Log.d("Sensor Data Point Info",result);                
+	                // Log.d("Wrist Sensor Data Point Info","Data Point Successfully Uploaded!");
+	             }
+	             return true;
+	         } 
+	         catch (Exception e) 
+	         {	             
+	             e.printStackTrace();
+	             return false;
+	         }
+	 	  }
+	     	
+	     else 
+	     {
+	     	Log.d("Sensor Data Point Info","No Network Connection:Data Point was not uploaded");
+	     	//Toast.makeText(SurveyPinContext, errMSG, Toast.LENGTH_LONG).show();
+	     	return false;
+	      } 
+		    
+		}
+		
 	}
 	
 }

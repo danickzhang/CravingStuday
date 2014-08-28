@@ -76,7 +76,7 @@ public class SuspensionTimePicker extends Activity {
 				
     			//close volume
     			AudioManager audiom = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-            	audiom.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_PLAY_SOUND);
+            	audiom.setStreamVolume(AudioManager.STREAM_MUSIC, 3, AudioManager.FLAG_PLAY_SOUND);
     			
     			//set result and finish
 				setResult(1);// set text to break suspension

@@ -240,7 +240,7 @@ public class SensorLocationService extends Service {
 			c.setTimeInMillis(startTimeStamp);
 			
 			try {
-				Utilities.writeEventToFile(this, Utilities.CODE_SENSOR_CONN, "", 
+				Utilities.writeEventToFile(this, Utilities.CODE_SENSOR_CONN, "", "", "", "",
 						Utilities.sdf.format(c.getTime()), Utilities.sdf.format(Calendar.getInstance().getTime()));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

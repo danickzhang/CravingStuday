@@ -127,12 +127,12 @@ public class MorningScheduler extends Activity {
 					NumberFormat nf = NumberFormat.getInstance();
 					nf.setMinimumIntegerDigits(2);
 					
-					Toast.makeText(getApplicationContext(), getString(R.string.bedtime_set)+nf.format(hour)+":"+nf.format(minute),Toast.LENGTH_LONG).show();
+					Toast.makeText(getApplicationContext(), getString(R.string.bedtime_set)+" "+nf.format(hour)+":"+nf.format(minute),Toast.LENGTH_LONG).show();
 					nf = null;
 					
 					try {
 						Utilities.writeEventToFile(MorningScheduler.this, Utilities.CODE_BEDTIME, 
-								Utilities.sdf.format(Utilities.getMorningCal(hour, minute).getTime()), 
+								Utilities.sdf.format(Utilities.getMorningCal(hour, minute).getTime()), "", "", "",  
 								Utilities.sdf.format(startBedReportCal.getTime()), 
 								Utilities.sdf.format(Calendar.getInstance().getTime()));
 					} catch (IOException e) {

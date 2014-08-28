@@ -434,7 +434,7 @@ public class MainActivity extends Activity {
 				    			c.setTimeInMillis(startTimeStamp);
 				    			
 				    			try {
-				    				Utilities.writeEventToFile(MainActivity.this, Utilities.CODE_SUSPENSION, "", 
+				    				Utilities.writeEventToFile(MainActivity.this, Utilities.CODE_SUSPENSION, "", "", "", "",
 				    						Utilities.sdf.format(c.getTime()), Utilities.sdf.format(Calendar.getInstance().getTime()));
 				    			} catch (IOException e) {
 				    				// TODO Auto-generated catch block
@@ -830,7 +830,7 @@ public class MainActivity extends Activity {
 			c.setTimeInMillis(startTimeStamp);
 			
 			try {
-				Utilities.writeEventToFile(MainActivity.this, Utilities.CODE_SUSPENSION, "", 
+				Utilities.writeEventToFile(MainActivity.this, Utilities.CODE_SUSPENSION, "", "", "", "", 
 						Utilities.sdf.format(c.getTime()), Utilities.sdf.format(Calendar.getInstance().getTime()));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

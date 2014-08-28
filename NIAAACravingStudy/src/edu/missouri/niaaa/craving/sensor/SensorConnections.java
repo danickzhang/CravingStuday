@@ -97,8 +97,15 @@ public class SensorConnections extends Activity {
 	
 	
 	protected void hardReset(){
+		btAdapter.disable();
+		
 		Intent i = new Intent(SensorUtilities.ACTION_DISCONNECT_SENSOR);
 		this.sendBroadcast(i);
+		
+		tbBluetooth.setChecked(getBTState());
+		
+		Intent i2 = new Intent(this,SensorLocationService.class);
+		stopService(i2);
 	}
 	
 	

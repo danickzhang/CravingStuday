@@ -5,18 +5,24 @@
 		<question id = "q1101" type = "radio">
 			<text>Have you CONSUMED ALCOHOL since the last survey you answered?</text>
 			<answer id = "1" triggerFile="DrinkingFollowupParcel.xml">Yes</answer>
-			<answer id = "2">No</answer>
+			<answer id = "2" skip="q1103">No</answer>
+		</question>
+		<question id = "q1102" type = "number">
+			<text>HOW MANY DRINKS did you consume SINCE the last survey you answered?</text>
+			<answer id = "item">drink(s)</answer>
+			<answer id = "min">1</answer>
+			<answer id = "max">24</answer>
 		</question>
 	</category>
 	
 	<category>
 		<description>Recent Smoking</description>
-		<question id= "q1102" type = "radio">
+		<question id= "q1103" type = "radio">
 			<text>Have you SMOKED A CIGARETTE in the PAST 15 MINUTES?</text>
 			<answer id = "1">Yes</answer>
 			<answer id = "2" skip="q101">No</answer>
 		</question>
-		<question id = "q1103" type = "number">
+		<question id = "q1104" type = "number">
 			<text>HOW MANY CIGARETTES did you smoke in the PAST 15 MINUTES?</text>
 			<answer id = "item">cigarette(s)</answer>
 			<answer id = "min">1</answer>
@@ -41,10 +47,10 @@
 			<answer id = "7">Roommate</answer>
 			<answer id = "8">Other family member</answer>
 			<answer id = "9" action="uncheck">THERE WAS NO SUCH INCIDENT/FEELING</answer>
-			<text id="q1104">Since the last prompt have you had a disagreement? (if yes,with whom)</text>
-			<text id="q1105">Since the last prompt have you felt rejected? (if yes,by whom)</text>
-			<text id="q1106">Since the last prompt have you felt complimented or praised? (if yes,by whom)</text>
-			<text id="q1107">Since the last prompt have you felt "let down" by someone you depend on? (if yes,by whom)</text>
+			<text id="q1105">Since the last prompt have you had a disagreement? (if yes, with whom?)</text>
+			<text id="q1106">Since the last prompt have you felt rejected? (if yes, by whom?)</text>
+			<text id="q1107">Since the last prompt have you felt complimented or praised? (if yes, by whom?)</text>
+			<text id="q1108">Since the last prompt have you felt "let down" by someone you depend on? (if yes, by whom?)</text>
 		</questionblock>
 	</category>
 
@@ -53,23 +59,23 @@
 		<questionblock type="radio">
 			<answer id="1">Yes</answer>
 			<answer id="2">No</answer>
-			<text id="q1108">Since the last prompt have you experienced a loss?</text>
-			<text id="q1109">Since the last prompt have you Received bad/good news?</text>
+			<text id="q1109">Since the last prompt have you experienced a loss?</text>
+			<text id="q1110">Since the last prompt have you Received bad/good news?</text>
 			</questionblock>
 	</category>
 
 	<category>
 		<description>Life Events/Experiences</description>
-		<question id = "q1110" type = "radio">
+		<question id = "q1111" type = "radio">
 			<text>Since the last prompt have you slept?</text>
 			<answer id = "1">Yes</answer>
-			<answer id = "2" skip="q1112">No</answer>
+			<answer id = "2" skip="q1113">No</answer>
 		</question>
 	 </category>
 
 	<category>
 		<description>Life Events/Experiences</description>
-		<question id = "q1111" type = "number">
+		<question id = "q1112" type = "number">
 			<text>How many Hour(s)?</text>
 			<answer id = "item">hour(s)</answer>
 			<answer id = "min">1</answer>
@@ -79,16 +85,16 @@
 	 
 	 <category>
 		<description>Life Events/Experiences</description>
-		<question id = "q1112" type = "radio">
+		<question id = "q1113" type = "radio">
 			<text>Since the last prompt have you used caffeine?</text>
 			<answer id = "1">Yes</answer>
-			<answer id = "2" skip="q1114">No</answer>
+			<answer id = "2" skip="q1115">No</answer>
 		</question>
 	 </category>
 
 	<category>
 		<description>Life Events/Experiences</description>
-		<question id = "q1113" type = "number">
+		<question id = "q1114" type = "number">
 			<text>How many Cup(s)?</text>
 			<answer id = "item">cup(s)</answer>
 			<answer id = "min">1</answer>
@@ -98,7 +104,7 @@
 
 	<category>
 		<description>Life Events/Experiences</description>
-		<question id = "q1114" type = "radio">
+		<question id = "q1115" type = "radio">
 			<text>Since the last prompt have you used over the counter-medications? (if yes, log MEDICATIONS in your paper diary)</text>
 			<answer id = "1">Yes</answer>
 			<answer id = "2">No</answer>
@@ -107,7 +113,7 @@
 
 	<category>
 		<description>Life Events/Experiences</description>
-		<question id="q1115" type="radio">
+		<question id="q1116" type="radio">
 			<text>Since the last prompt have you taken your medications as prescribed? (if no, log CHANGES in your paper diary)</text>
 			<answer id="1">I have taken medications as prescribed since the last prompt</answer>
 			<answer id="2">I am not prescribed any medications</answer>

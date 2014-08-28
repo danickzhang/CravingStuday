@@ -4,7 +4,7 @@
     <string name="app_name">Body Sensor Application</string>
 	<string name="yes">Yes</string>
 	<string name="no">No</string>
-	<string name="return_to_main">Return to main Menu</string>
+	<string name="return_to_main">Return to Main Menu</string>
 	<string name="pin_hint">4-digit PIN</string>
     
     
@@ -20,28 +20,28 @@
     <string name="section_2">Stop Service</string>
     <string name="section_3">Survey Menu</string>
     <string name="section_4">Sensor Connections</string>
-    <string name="section_5">Set Bedtime</string>
+    <string name="section_5">Set Wake up Time</string>
     <string name="section_6">Suspension</string>
     <string name="section_62">Break Suspension</string>
     
     <!-- Bed-time -->
-    <string name="bedtime_title">Bedtime Report</string>
-    <string name="bedtime_message">Please complete the bedtime report between 9:00 P.M. and 3:00 A.M.</string>
+    <string name="bedtime_title">Set Wake up Time Report</string>
+    <string name="bedtime_message">This should be done when your are going to bed for the night.</string>
     <string name="bedtime_message_confirm">Please confirm that you are going to bed for the night.</string>
     <string name="bedtime_checkbox">set as default</string>
     
-    <string name="bedtime_set">Set wake-up time at </string>
-    <string name="bedtime_alert">Wake-up time must between 3:00 A.M. and 12:00 P.M.</string>
+    <string name="bedtime_set">Set wake up time at </string>
+    <string name="bedtime_alert">Wake up time must between 3:00 A.M. and 12:00 P.M.</string>
     
     <!-- Suspension -->
-    <string name="suspension_title">Suspension Confirm</string>
-    <string name="suspension_msg">During the suspension you won\'t receive any random prompts, but you WILL receive drinking follow-up ones.</string>
+    <string name="suspension_title">Please Confirm Suspension</string>
+    <string name="suspension_msg">During the suspension you won\'t receive any random prompts, but you WILL receive drinking follow-ups.</string>
     <string name="suspension_break_title">Break Suspension</string>
-    <string name="suspension_break_msg">Please confirm that you want to break suspension to receive surveys.</string>
-    <string name="suspension_set_text">Select suspension time duration:</string>
-    <string name="suspension_set">Set Suspension Time</string>
-    <string name="suspension_end">Suspension ends</string>
-    <string name="suspension_under">Under suspension</string>
+    <string name="suspension_break_msg">Please confirm that you want to break suspension.</string>
+    <string name="suspension_set_text">Select suspension duration:</string>
+    <string name="suspension_set">Set Suspension Length</string>
+    <string name="suspension_end">Suspension has ended</string>
+    <string name="suspension_under">Under Suspension</string>
     
     <!-- Admin  -->
     <string name="admin_set_title">Verify Admin PIN</string>
@@ -49,7 +49,7 @@
     <string name="user_setpwd_title">Set User PIN</string>
     <string name="user_setpwd_msg">Please input 4-digit PIN for \nUser: </string>
     <string name="assign_confirm_title">Confirm</string>
-    <string name="assign_remove_title">Confirm Remove</string>
+    <string name="assign_remove_title">Confirm Removal</string>
     <string name="assign_btn">Assign ID</string>
     <string name="remove_btn">Remove ID</string>
     <string name="assign_title">Please assign an ID:</string>
@@ -63,11 +63,11 @@
     <string name="pin_title_wrong">Pin Incorrect</string>
     <string name="pin_message_wrong">Please press OK to try again.</string>
     
-    <string name="assign_id_null">This ID is not in Database, please double check or add it via web page by administrator first.</string>
+    <string name="assign_id_null">This ID is not in the database, please double-check the ID you entered or have an administrator add it to the database via the web page.</string>
 	<string name="assing_id_exist">This ID has been used before. \nDo you really want to assign this ID: </string>
 	<string name="assign_id_new">Do you want to assign this ID: </string>
-	<string name="assign_id_wrong">The ID format seems not applicable, please try again.</string>
-	<string name="assign_id_net_error">The ID is not accepted, please check network connection and try again.</string>
+	<string name="assign_id_wrong">The ID format is incorrect, please try again.</string>
+	<string name="assign_id_net_error">The ID was not accepted, please check network connection and try again.</string>
 	
 	
     
@@ -77,19 +77,19 @@
     <string name="btn_cancel">Cancel</string>
     <string name="survey_menu_title">Self-Assessment Survey Menu</string>
     <string name="survey_menu_select">Select a survey</string>
-    <string name="survey_timeout">Timeout for completing current survey.</string>
+    <string name="survey_timeout">Timeout has been reached for completing the current survey.</string>
     <string name="survey_completed">Survey Complete.</string>
-    <string name="survey_cancel_title">Do you sure you want to exit?</string>
-    <string name="survey_cancel_msg">This action will erase the current survey.\r\nYou should complete the survey.</string>
+    <string name="survey_cancel_title">Are you sure you want to exit?</string>
+    <string name="survey_cancel_msg">This action will erase the current survey.\r\nAre you sure you wish to exit without completing the survey?</string>
     
     <!-- Morning Report -->
     <string name="morning_report_name">Morning Report</string>
     <string name="morning_report_title">Finished</string>
-    <string name="morning_report_msg">You have already finished Morning Report for today.</string>
+    <string name="morning_report_msg">You have already finished the Morning Report for today.</string>
     <string name="morning_report_title2">Too Late</string>
-    <string name="morning_report_msg2">Morning Report should be done before noon.</string>
+    <string name="morning_report_msg2">The Morning Report should be done before noon.</string>
     <string name="morning_report_title3">Too Early</string>
-    <string name="morning_report_msg3">Morning Report should be done after 3:00 a.m.</string>
+    <string name="morning_report_msg3">The Morning Report should be done after 3:00 a.m.</string>
     <string name="morning_report_set_text">Wake up time (for tomorrow):</string>
     <string name="morning_report_set">Set wake up time</string>
     <string name="morning_report_unfinished">You may need to complete morning survey for today first</string>
@@ -103,7 +103,7 @@
 	<string name="service_start">Service started!</string>
 	<string name="service_stop">Service stopped!</string>
 	<string name="service_stop_title">Confirm Stop Service</string>
-	<string name="service_stop_msg">This will shut down the background service and stop collecting any data from your application. \nDo you really want to do so?</string>
+	<string name="service_stop_msg">This will shut down the background service and stop collecting any sensor data from your application. \nDo you really want to do this?</string>
 	
 <!-- Bluetooth  -->
 	<string name="bluetooth_enabled">Bluetooth is already enabled!</string>
@@ -127,7 +127,7 @@
 	<string name="set_upin_failed">Set PIN failed. Please try again.</string>
 	<string name="set_upin_error">Set PIN error. Please check your network connection and try again.</string>
 	
-	<string name="input_apin_failed">Admin PIN is wrong, exit! Please try again.</string>
+	<string name="input_apin_failed">Admin PIN is incorrect. Please try again.</string>
 	<string name="input_apin_error">Verify failed. Please try again.</string>
 	<string name="input_apin_return">Return code incorrect. Please try again.</string>
 	<string name="input_apin_net_error">Failed. Please try again, with network connection.</string>
