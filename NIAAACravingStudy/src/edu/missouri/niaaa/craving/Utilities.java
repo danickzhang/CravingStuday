@@ -259,10 +259,28 @@ public class Utilities {
 	
 
 /*	validate*/
-	public final static String VALIDATE_ADDRESS = 			"http://dslsrv8.cs.missouri.edu/~rs79c/Server/Crt/validateUser.php";
-//	public final static String WRITE_ARRAY_TO_FILE = 		"http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFile.php";
-//	public final static String WRITE_ARRAY_TO_FILE_DEC = 	"http://dslsrv8.cs.missouri.edu/~czcz4/Server/Crt/writeArrayToFileDec.php";
+	
+/*	Craving Study*/
+	public final static String VALIDATE_ADDRESS = 			"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/validateUser.php";
+	public final static String WRITE_ARRAY_TO_FILE = 		"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/writeArrayToFile.php";
 	public final static String WRITE_ARRAY_TO_FILE_DEC = 	"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/writeArrayToFileDec.php";
+	public final static String COMPLIANCE_ADDRESS = 		"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/compliance.php";
+	public final static String STUDY_DAY_MODIFY_ADDRESS = 	"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/changeStudyWeek.php";
+	
+/*	EMA-STL Study*/
+//	public final static String VALIDATE_ADDRESS = 			"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtEMA/validateUser.php";
+//	public final static String WRITE_ARRAY_TO_FILE = 		"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtEMA/writeArrayToFile.php";
+//	public final static String WRITE_ARRAY_TO_FILE_DEC = 	"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtEMA/writeArrayToFileDec.php";
+//	public final static String COMPLIANCE_ADDRESS = 		"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtEMA/compliance.php";
+//	public final static String STUDY_DAY_MODIFY_ADDRESS = 	"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtEMA/changeStudyWeek.php";
+	
+/*	NIMH Emotion Study*/
+//	public final static String VALIDATE_ADDRESS = 			"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtNIMH/validateUser.php";
+//	public final static String WRITE_ARRAY_TO_FILE = 		"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtNIMH/writeArrayToFile.php";
+//	public final static String WRITE_ARRAY_TO_FILE_DEC = 	"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtNIMH/writeArrayToFileDec.php";
+//	public final static String COMPLIANCE_ADDRESS = 		"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtNIMH/compliance.php";
+//	public final static String STUDY_DAY_MODIFY_ADDRESS = 	"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtNIMH/changeStudyWeek.php";
+	
 //	public final static String UPLOAD_ADDRESS = WRITE_ARRAY_TO_FILE;
 	public final static String UPLOAD_ADDRESS = WRITE_ARRAY_TO_FILE_DEC;
 	public final static SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -320,20 +338,38 @@ public class Utilities {
 		}
 		long peak = c.getTimeInMillis();
 		
-		long unit = (peak-base)/7;
-		long r_unit = (peak-base)/21;
+		long unit = (peak-base)/(MAX_TRIGGER_RANDOM+1);//7
+		long r_unit = (peak-base)/((MAX_TRIGGER_RANDOM+1)*3);//21
 		
 		String random_schedule = new String();
 		
-		for(int i=1;i<7;i++){
+		for(int i=1;i<MAX_TRIGGER_RANDOM+1;i++){//7
 			random_schedule = random_schedule + (base+unit*i+(new Random().nextInt((int) (2*r_unit))-r_unit)+",");
 		}
 		
+		
+		//write to file random schedule
+		//6
 		String strArr[] = random_schedule.split(",");
-		for(String str: strArr){
-			Calendar c2 = Calendar.getInstance();
-			c2.setTimeInMillis(Long.parseLong(str));
-			Log.d("Random Schedule ", "each item is "+str+" "+c2.get(Calendar.HOUR_OF_DAY)+":"+c2.get(Calendar.MINUTE));
+		
+		if(strArr.length != 1){
+			int i =0;
+			for(String str: strArr){
+				Calendar c2 = Calendar.getInstance();
+				c2.setTimeInMillis(Long.parseLong(str));
+				Log.d("Random Schedule ", "each item is "+str+" "+c2.get(Calendar.HOUR_OF_DAY)+":"+c2.get(Calendar.MINUTE));
+				
+				strArr[i] = sdf.format(c2.getTime());
+				i++;
+			}
+			
+			try {
+				//craving gonna be different
+				writeEventToFile(context, 10, strArr[0], strArr[1], strArr[2], strArr[3], strArr[4], strArr[5]);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		Utilities.getSP(context, Utilities.SP_RANDOM_TIME).edit().putString(Utilities.SP_KEY_RANDOM_TIME_SET, random_schedule).commit();
@@ -521,29 +557,29 @@ public class Utilities {
 		//cancel existing if any
 		cancelMorning(context);
 		
-		//write to file random schedule
-		//6
-		String strRandom[] = getSP(context, SP_RANDOM_TIME).getString(SP_KEY_RANDOM_TIME_SET, "").split(",");
-		
-		if(strRandom.length != 1){
-			int i = 0;
-			for(String s: strRandom){
-				Calendar tempCal = Calendar.getInstance();
-				tempCal.setTimeInMillis(Long.parseLong(s));
-				strRandom[i] = sdf.format(tempCal.getTime());
-				i++;
-			}
-			
-			try {
-				//craving gonna be different
-				writeEventToFile(context, 10, strRandom[0], strRandom[1], strRandom[2], strRandom[3], strRandom[4], strRandom[5]);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		else{
-		}
+//		//write to file random schedule
+//		//6
+//		String strRandom[] = getSP(context, SP_RANDOM_TIME).getString(SP_KEY_RANDOM_TIME_SET, "").split(",");
+//		
+//		if(strRandom.length != 1){
+//			int i = 0;
+//			for(String s: strRandom){
+//				Calendar tempCal = Calendar.getInstance();
+//				tempCal.setTimeInMillis(Long.parseLong(s));
+//				strRandom[i] = sdf.format(tempCal.getTime());
+//				i++;
+//			}
+//			
+//			try {
+//				//craving gonna be different
+//				writeEventToFile(context, 10, strRandom[0], strRandom[1], strRandom[2], strRandom[3], strRandom[4], strRandom[5]);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		else{
+//		}
 		
 		//start loction
 		context.sendBroadcast(new Intent(LocationUtilities.ACTION_START_LOCATION));
@@ -937,7 +973,7 @@ public class Utilities {
 		 */
 		String ensb = null;
 		try {
-			ensb = encryption(sb.toString());
+			ensb = encryption_withKey(context, sb.toString());
 			if(WRITE_RAW){
 				writeToFile("Event.txt", sb.toString());
 			}else{
@@ -958,6 +994,60 @@ public class Utilities {
 		
 	}
 
+	//Chen
+	public static String encryption_withKey(Context context, String string) throws Exception {
+		// TODO Auto-generated method stub
+		
+		//generate symmetric key
+		KeyGenerator keygt = KeyGenerator.getInstance("AES");
+		keygt.init(128);
+		SecretKey symkey =keygt.generateKey(); 
+		
+		//get it encoded
+		byte[] aes_ba = symkey.getEncoded();
+		
+		//create cipher
+		SecretKeySpec skeySpec = new SecretKeySpec(aes_ba, "AES");  
+        Cipher cipher = Cipher.getInstance("AES");  
+        cipher.init(Cipher.ENCRYPT_MODE,skeySpec);
+		
+        //encryption
+        byte [] EncSymbyteArray =cipher.doFinal(string.getBytes());
+		
+        //encrypt symKey with PublicKey
+//        Key pubKey = getPublicKey();
+        
+//        Key pubKey = publicKey;
+        
+        InputStream is = context.getResources().openRawResource(R.raw.publickey);
+		ObjectInputStream ois = new ObjectInputStream(is);
+
+		BigInteger m = (BigInteger)ois.readObject();
+		BigInteger e = (BigInteger)ois.readObject();
+	    RSAPublicKeySpec keySpec = new RSAPublicKeySpec(m, e);
+		
+	   
+	    KeyFactory fact = KeyFactory.getInstance("RSA", "BC");
+	    PublicKey pubKey = fact.generatePublic(keySpec);
+	    
+        
+        //RSA cipher
+        Cipher cipherAsm = Cipher.getInstance("RSA", "BC");
+        cipherAsm.init(Cipher.ENCRYPT_MODE, pubKey);
+        
+        //RSA encryption
+        byte [] asymEncsymKey = cipherAsm.doFinal(aes_ba);
+        
+//	        File f3 = new File(BASE_PATH,"enc.txt");
+//	        File f3key = new File(BASE_PATH,"enckey.txt");
+//	        File f3file = new File(BASE_PATH,"encfile.txt");
+//	        writeToFile2(f3,f3key,f3file, asymEncsymKey, EncSymbyteArray);
+        
+        //byte != new String
+        //return new String(byteMerger(asymEncsymKey, EncSymbyteArray));
+        return Base64.encodeToString(byteMerger(asymEncsymKey, EncSymbyteArray),Base64.DEFAULT);
+        
+	}
 	
 	//Chen
 	public static String encryption(String string) throws Exception {
@@ -981,6 +1071,7 @@ public class Utilities {
 		
         //encrypt symKey with PublicKey
 //        Key pubKey = getPublicKey();
+        
         Key pubKey = publicKey;
         
         //RSA cipher

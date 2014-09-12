@@ -106,6 +106,15 @@ public class SensorConnections extends Activity {
 		
 		Intent i2 = new Intent(this,SensorLocationService.class);
 		stopService(i2);
+		
+		//wait some time
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		turnOnBt();
 	}
 	
 	

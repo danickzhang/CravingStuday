@@ -67,7 +67,7 @@
 	<category>
 		<description>Life Events/Experiences</description>
 		<question id = "q1111" type = "radio">
-			<text>Since the last prompt have you slept?</text>
+			<text>Since the last prompt have you slept/napped?</text>
 			<answer id = "1">Yes</answer>
 			<answer id = "2" skip="q1113">No</answer>
 		</question>

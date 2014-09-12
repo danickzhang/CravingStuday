@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface Category {
 	
-	public Question followingQuestion();
+	public Question nextQuestion();
 	
-	public Question previousQuestion();
+	public Question lastQuestion();
 
 	public Question getQuestion(int index);
 	

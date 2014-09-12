@@ -16,6 +16,7 @@
 
 package edu.missouri.niaaa.craving.activity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import edu.missouri.niaaa.craving.MainActivity;
 import edu.missouri.niaaa.craving.R;
 import edu.missouri.niaaa.craving.Utilities;
 import android.app.Activity;
@@ -39,12 +41,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
@@ -319,20 +323,20 @@ public class AdminManageActivity extends TabActivity {
 	 		            	//add in web page first
 	 		            	
 	 		            	String s1 = getString(R.string.assign_id_null);
-	 		            	buildDialog1(ctx, s1).show();
+	 		            	assignFailDialog(ctx, s1).show();
 	 		            	
 	 		            }else if(result.equals("UserIDIsUsed")){
 	 		            	String s2 = getString(R.string.assing_id_exist)+asedID;
-	 		                buildDialog2(ctx, s2).show();
+	 		            	assignConfirmDialog(ctx, s2, true).show();
 	 		            	 		            	
 	 		            }else if(result.equals("UserIDIsNotActive")){
 	 		            	//assign
 	 		            	String s3 = getString(R.string.assign_id_new)+asedID;
-	 		            	buildDialog2(ctx, s3).show();
+	 		            	assignConfirmDialog(ctx, s3, false).show();
 	 		            	
 	 		            }else{
 	 		            	String s4 = getString(R.string.assign_id_wrong);
-	 		            	buildDialog1(ctx, s4).show();
+	 		            	assignFailDialog(ctx, s4).show();
 	 		            	
 	 		            }
 	 		            
@@ -341,7 +345,7 @@ public class AdminManageActivity extends TabActivity {
  					// TODO Auto-generated catch block
  		        	e.printStackTrace();
  					String s4 = getString(R.string.assign_id_net_error);
-		            buildDialog1(ctx, s4).show();
+ 					assignFailDialog(ctx, s4).show();
  		        }
  			}
          });
@@ -361,39 +365,7 @@ public class AdminManageActivity extends TabActivity {
  				Log.d(TAG,"cur is "+currentAssID);
  				
  				if(!currentAssID.equals("")){
- 					Dialog alertDialog = new AlertDialog.Builder(ctx)
- 					.setCancelable(false)
- 					.setTitle(R.string.assign_remove_title)
- 					.setMessage(R.string.remove_msg)
- 					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() { 
- 	                     
- 	                    @Override 
- 	                    public void onClick(DialogInterface dialog, int which) { 
- 	                        // TODO Auto-generated method stub  
- 	        				
- 	                    	cleanUp(ctx);//replace following
- 	                    	
-// 	                    	editor.putString(Utilities.SP_KEY_LOGIN_USERID, "");	        				
-// 	        				editor.putString(Utilities.SP_KEY_LOGIN_USERPWD, "");
-// 	        				editor.putString(Utilities.SP_KEY_LOGIN_STUDY_STARTTIME, "");
-// 	        				editor.commit();
- 	        				
- 	        				
- 	        				setHints();
- 	        				finish();
- 	                    } 
- 	                })
- 	                . setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() { 
- 	                    
- 	                   @Override 
- 	                   public void onClick(DialogInterface dialog, int which) { 
- 	                       // TODO Auto-generated method stub  
- 	                   
- 	                   } 
- 	                })
- 					.create();
- 					
- 					alertDialog.show();
+ 					removeDialog(ctx).show();
  				}
  			}
  		});
@@ -407,8 +379,74 @@ public class AdminManageActivity extends TabActivity {
     	Utilities.getSP(context, Utilities.SP_LOGIN).edit().clear().commit();
     }
     
+    private Dialog removeDialog(Context context){
+    	
+		LayoutInflater inflater = LayoutInflater.from(context);
+		final View textEntryView = inflater.inflate(R.layout.remove_id, null);  
+		final CheckBox rm_check = (CheckBox) textEntryView.findViewById(R.id.rm_local);
+		rm_check.setText(R.string.remove_local);
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);  
+		builder.setView(textEntryView);  
+		builder.setCancelable(false);
+		builder.setTitle(R.string.assign_remove_title);
+		builder.setMessage(R.string.remove_msg);
+		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() { 
+             
+            @Override 
+            public void onClick(DialogInterface dialog, int which) { 
+                // TODO Auto-generated method stub  
+				
+            	cleanUp(ctx);//replace following
+            	
+//                 	editor.putString(Utilities.SP_KEY_LOGIN_USERID, "");	        				
+//     				editor.putString(Utilities.SP_KEY_LOGIN_USERPWD, "");
+//     				editor.putString(Utilities.SP_KEY_LOGIN_STUDY_STARTTIME, "");
+//     				editor.commit();
+				
+				// remove local file, if checked
+            	Log.d(TAG, "is checked "+rm_check.isChecked());
+            	if(rm_check.isChecked()){
+            		deleteDirectory(Utilities.PHONE_BASE_PATH);
+            	}
+            	
+				setHints();
+				finish();
+            } 
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() { 
+            
+           @Override 
+           public void onClick(DialogInterface dialog, int which) { 
+               // TODO Auto-generated method stub  
+           
+           } 
+        });
+		
+		return builder.create();  
+    	
+    }
     
-    private Dialog buildDialog1(Context context, String str) {  
+    public void deleteDirectory(String dest)
+    {
+        File f = new File(dest);
+        if (f.exists())
+        {
+            if (f.isDirectory())
+            {
+                File[] fs = f.listFiles();
+                if (fs.length > 0)
+                {
+                    for (File file : fs)
+                    {
+                        deleteDirectory(file.getAbsolutePath());
+                    }
+                }
+            }
+            f.delete();
+        }
+    }
+    
+    private Dialog assignFailDialog(Context context, String str) {  
         AlertDialog.Builder builder = new  AlertDialog.Builder(context);  
         builder.setCancelable(false);
         builder.setTitle(R.string.assign_confirm_title);  
@@ -421,8 +459,16 @@ public class AdminManageActivity extends TabActivity {
         return builder.create();  
     }
     
-    private Dialog buildDialog2(Context context, String str) {  
+    private Dialog assignConfirmDialog(Context context, String str, boolean startNewWeek) {
+    	
+    	LayoutInflater inflater = LayoutInflater.from(context);
+		final View textEntryView = inflater.inflate(R.layout.remove_id, null);  
+		final CheckBox rm_check = (CheckBox) textEntryView.findViewById(R.id.rm_local);
+		rm_check.setText(R.string.assign_new_week);
     	AlertDialog.Builder builder = new  AlertDialog.Builder(context);  
+    	if(startNewWeek){
+    		builder.setView(textEntryView);
+    	}
         builder.setCancelable(false);
         builder.setTitle(R.string.assign_confirm_title);  
         builder.setMessage(str);
@@ -435,6 +481,13 @@ public class AdminManageActivity extends TabActivity {
 				editor.putString(Utilities.SP_KEY_LOGIN_USERPWD, "");
 				editor.putString(Utilities.SP_KEY_LOGIN_STUDY_STARTTIME, ""+Calendar.getInstance().getTimeInMillis());
 				editor.commit();
+				
+				//start new study week, if checked
+				if(rm_check.isChecked()){
+					ChangeStudyWeek changeStudyWeek = new ChangeStudyWeek();
+		        	changeStudyWeek.execute(asID.getText().toString());
+				}
+				
 				setHints();
 				//continue with set user pin (8)
 				setResult(Activity.RESULT_OK);
@@ -452,11 +505,43 @@ public class AdminManageActivity extends TabActivity {
         return builder.create();  
     }
 
+	private class ChangeStudyWeek extends AsyncTask<String,Void, Boolean>
+	{
 
+		@Override
+		protected Boolean doInBackground(String... strings) {
+			// TODO Auto-generated method stub
+	         String UID=strings[0];
+	         HttpPost request = new HttpPost(Utilities.STUDY_DAY_MODIFY_ADDRESS);
+	         List<NameValuePair> params = new ArrayList<NameValuePair>();                        
+	         params.add(new BasicNameValuePair("UID",UID));
+	         //params.add(new BasicNameValuePair("userID", UID));
+	         try {
+	         	        	
+	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
+	             HttpResponse response = new DefaultHttpClient().execute(request);
+	             if(response.getStatusLine().getStatusCode() == 200){
+//	                 String result = EntityUtils.toString(response.getEntity());
+	             }
+	             return true;
+	         } 
+	         catch (Exception e) 
+	         {	             
+	             e.printStackTrace();
+	             return false;
+	         }	 	  	     	
+		    
+		}
+		
+	}
+    
 	@Override
     protected void onDestroy() {
         super.onDestroy();
         DialadminPin.dismiss();
+        
+        imm.toggleSoftInput(0, InputMethodManager.RESULT_SHOWN);
+     	imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
     }
 
 }

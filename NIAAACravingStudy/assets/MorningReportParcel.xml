@@ -42,5 +42,14 @@
 
 	<externalsource baseid="q5" filename="CravingsAndSymptomsSubset.xml"></externalsource>
 	<externalsource baseid="q6" filename="SituationAndSetting.xml"></externalsource>
+	
+	<category>
+		<description>Today's plan on Drinking</description>
+		<question id = "q701" type = "radio">
+			<text>Do you plan on drinking today or tonight?</text>
+			<answer id = "1">Yes</answer>
+			<answer id = "2">No</answer>
+		</question>
+	</category>
 
 </root>

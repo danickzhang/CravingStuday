@@ -186,8 +186,22 @@ public class SurveyMenu extends Activity {
 			if(resultCode == 1){
 				Toast.makeText(this, R.string.survey_timeout, Toast.LENGTH_LONG).show();
 			}
-			else if(resultCode == 2) {
+			else if(resultCode == 2){
 				Toast.makeText(this, R.string.morning_report_unfinished, Toast.LENGTH_LONG).show();
+			}
+			else if(resultCode == 3){
+//				Toast.makeText(this, "morning complete", Toast.LENGTH_LONG).show();
+				new AlertDialog.Builder(this)
+			    .setTitle(R.string.morning_report_title4)
+			    .setMessage(R.string.morning_report_msg4)
+			    .setCancelable(false)
+			    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {		          
+			        @Override  
+			        public void onClick(DialogInterface dialog, int which) { 
+			        	dialog.cancel();
+			        }
+			    })
+			    .create().show();
 			}else{
 				
 			}

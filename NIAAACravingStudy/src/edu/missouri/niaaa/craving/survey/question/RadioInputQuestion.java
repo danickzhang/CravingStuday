@@ -137,5 +137,10 @@ public class RadioInputQuestion extends SurveyQuestion{
 		return false;
 	}
 
+	public boolean clearSelectedAnswers(){
+//		answers = null;
+//		answered = false;
+		return true;
+	}
 
 }

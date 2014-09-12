@@ -25,8 +25,7 @@ public class LocationBroadcast extends BroadcastReceiver {
 			Utilities.Log(TAG, "location recording start");
 			LocationUtilities.requestLocation(locationM);
 			
-			/*acquire wake lock*/
-			
+			/*acquire wake lock*/			
 		}
 		
 		else if(action.equals(LocationUtilities.ACTION_STOP_LOCATION)){

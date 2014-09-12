@@ -69,7 +69,8 @@ public class CheckQuestion extends SurveyQuestion{
 				
 				public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
 					Answer a = answerViews.get(buttonView);
-					skipTo = a.getSkip();
+//					Log.d("final check", "answer text is "+a.getAnswerText()+" "+"answer getskip is "+a.getSkip());
+					skipTo = a.getSkip();//should put into if(isChecked)
 					
 					if(isChecked){
 						a.setSelected(true);
@@ -133,5 +134,15 @@ public class CheckQuestion extends SurveyQuestion{
 				temp.add(answer.getId());
 		}
 		return temp;
+	}
+	
+	public boolean clearSelectedAnswers(){
+//		Log.d("final 3", "clear");
+//		answers = null;
+		for(Answer answer: answers){
+			answer.setSelected(false);
+		}
+		answered = false;
+		return true;
 	}
 }

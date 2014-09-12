@@ -81,4 +81,10 @@ public class TextQuestion extends SurveyQuestion{
 		temp.add(selectedText);
 		return temp;
 	}
+	
+	public boolean clearSelectedAnswers(){
+//		answers = null;
+//		answered = false;
+		return true;
+	}
 }

@@ -32,4 +32,6 @@ public interface Question {
 	
 	public ArrayList<String> getSelectedAnswers();
 	
+	public boolean clearSelectedAnswers();
+	
 }

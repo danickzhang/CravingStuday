@@ -74,9 +74,11 @@ public class RadioQuestion extends SurveyQuestion {
 				
 				public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
 					Answer a = answerViews.get(buttonView);
-					skipTo = a.getSkip();
+					
 					
 					if(isChecked){
+//						Log.d("final ", "answer text is "+a.getAnswerText()+" "+"answer getskip is "+a.getSkip());
+						skipTo = a.getSkip();
 						a.setSelected(true);
 						for(Map.Entry<View, Answer> entry: answerViews.entrySet()){
 							if(!entry.getValue().equals(a)){
@@ -144,5 +146,15 @@ public class RadioQuestion extends SurveyQuestion {
 				temp.add(answer.getId());
 		}
 		return temp;
+	}
+	
+	public boolean clearSelectedAnswers(){
+//		Log.d("final 3", "clear");
+//		answers. = null;
+		for(Answer answer: answers){
+			answer.setSelected(false);
+		}
+		answered = false;
+		return true;
 	}
 }

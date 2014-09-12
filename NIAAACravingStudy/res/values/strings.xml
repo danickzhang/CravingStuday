@@ -57,6 +57,8 @@
     <string name="remove_msg">Do you really want to remove this ID and all related data from the device?</string>
     <string name="assign_hint">Four-digit ID goes here</string>
     <string name="remove_hint">Not set yet</string>
+    <string name="assign_new_week">Start a new study-week</string>
+    <string name="remove_local">Remove phone backup files</string>
     
     <string name="pin_title">Login</string>
     <string name="pin_message">Please input your PIN number.</string>
@@ -80,7 +82,7 @@
     <string name="survey_timeout">Timeout has been reached for completing the current survey.</string>
     <string name="survey_completed">Survey Complete.</string>
     <string name="survey_cancel_title">Are you sure you want to exit?</string>
-    <string name="survey_cancel_msg">This action will erase the current survey.\r\nAre you sure you wish to exit without completing the survey?</string>
+    <string name="survey_cancel_msg">This action will erase the current survey.\r\nIf you just want to go back to the previous question, use \'Previous Question\' button.\r\n\nAre you sure you wish to exit without completing the survey?</string>
     
     <!-- Morning Report -->
     <string name="morning_report_name">Morning Report</string>
@@ -93,6 +95,8 @@
     <string name="morning_report_set_text">Wake up time (for tomorrow):</string>
     <string name="morning_report_set">Set wake up time</string>
     <string name="morning_report_unfinished">You may need to complete morning survey for today first</string>
+    <string name="morning_report_title4">Alert</string>
+    <string name="morning_report_msg4">Please remember to connect your sensor.</string>
     
     <!-- Initial Drinking -->
     <string name="initial_drink_name">Initial Drinking</string>

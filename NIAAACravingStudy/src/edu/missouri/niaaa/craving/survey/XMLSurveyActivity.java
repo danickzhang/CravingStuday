@@ -170,8 +170,8 @@ public class XMLSurveyActivity extends Activity {
 					Calendar rsT = Calendar.getInstance();
 					String rsDate = (rsT.get(Calendar.MONTH)+1)+"/"+rsT.get(Calendar.DAY_OF_MONTH)+"/"+rsT.get(Calendar.YEAR);
 					String uID = Utilities.getSP(this, Utilities.SP_LOGIN).getString(Utilities.SP_KEY_LOGIN_USERID, "0000");
-					TriggerSignal triggerSignal = new TriggerSignal();
-					triggerSignal.execute(uID,rsDate,rsID);
+					ComplianceSignal triggerSignal = new ComplianceSignal();
+					triggerSignal.execute(uID,rsDate,rsID,"trigger");
 					
 				}
 			}
@@ -282,7 +282,7 @@ public class XMLSurveyActivity extends Activity {
 			//Set current category to the first category
 			currentCategory = cats.get(0);
 			//Setup the layout
-			ViewGroup vg = setupLayout(nextQuestion());
+			ViewGroup vg = setupLayout(nextQuestionLayout());
 			if(vg != null)
 				setContentView(vg);
 		}
@@ -591,8 +591,10 @@ public class XMLSurveyActivity extends Activity {
 	
 	
 	//Get the next question to be displayed
-    protected LinearLayout nextQuestion(){
-//    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~next", "");
+    protected LinearLayout nextQuestionLayout(){
+    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~next", "currentQ"+
+    	(currentQuestion != null ? currentQuestion.getSelectedAnswers().get(0)+currentQuestion.getSkip() : "null"));
+    	
     	Question temp = null;
     	boolean done = false;
     	boolean allowSkip = false;
@@ -606,7 +608,7 @@ public class XMLSurveyActivity extends Activity {
     			answerMap.put(temp.getId(), null);
     		
     		//Simplest case: category has the next question
-    		temp = currentCategory.followingQuestion();
+    		temp = currentCategory.nextQuestion();
 
     		
     		//Category is out of questions, try to move to next category
@@ -636,7 +638,9 @@ public class XMLSurveyActivity extends Activity {
     		}
     		
     	}while(temp == null ||
-    			(currentQuestion != null && currentQuestion.getSkip() != null && !(currentQuestion.getSkip().equals(temp.getId()) || allowSkip))
+    			(currentQuestion != null && currentQuestion.getSkip() != null && !(currentQuestion.getSkip().equals(temp.getId()) || allowSkip) 
+    			&& ( !currentQuestion.getId().equals(temp.getId()) && temp.clearSelectedAnswers())
+    			)
     		  );
 		/*if(currentQuestion != null){
 			answerMap.put(currentQuestion.getId(), currentQuestion.getSelectedAnswers());
@@ -654,12 +658,13 @@ public class XMLSurveyActivity extends Activity {
     	
     }
     
-    protected LinearLayout lastQuestion(){
+    protected LinearLayout lastQuestionLayout(){
+    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~last", "skipFrom"+ skipFrom);
     	Question temp = null;
     	
     	while(temp == null){
 //    		Utilities.Log("~~~~~~~~~while", "0 skipfrom "+skipFrom+"skipTo "+skipTo);
-    		temp = currentCategory.previousQuestion();
+    		temp = currentCategory.lastQuestion();
     		//Log.d(TAG,"Trying to get previous question");
     		/*
     		 * If temp is null, this category is out of questions,
@@ -729,7 +734,7 @@ public class XMLSurveyActivity extends Activity {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				if(currentQuestion.validateSubmit()){
-					ViewGroup vg = setupLayout(nextQuestion());
+					ViewGroup vg = setupLayout(nextQuestionLayout());
 					if(vg != null){
 						setContentView(vg);
 					}
@@ -747,7 +752,7 @@ public class XMLSurveyActivity extends Activity {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				
-				ViewGroup vg = setupLayout(lastQuestion());
+				ViewGroup vg = setupLayout(lastQuestionLayout());
 				if(vg != null)
 					setContentView(vg);
 				
@@ -856,6 +861,8 @@ public class XMLSurveyActivity extends Activity {
 //    		//schedule random survey
 //    		Utilities.scheduleRandomSurvey(this);
 			
+			// for those have sensor only
+			setResult(3);
     	}
 		
     	//haidong
@@ -865,8 +872,8 @@ public class XMLSurveyActivity extends Activity {
 			Calendar rsT = Calendar.getInstance();
 			String rsDate = (rsT.get(Calendar.MONTH)+1)+"/"+rsT.get(Calendar.DAY_OF_MONTH)+"/"+rsT.get(Calendar.YEAR);
 			String uID = Utilities.getSP(this, Utilities.SP_LOGIN).getString(Utilities.SP_KEY_LOGIN_USERID, "0000");
-			CompletedSignal completedSignal = new CompletedSignal();
-			completedSignal.execute(uID,rsDate,rsID);
+			ComplianceSignal completedSignal = new ComplianceSignal();
+			completedSignal.execute(uID,rsDate,rsID,"complete");
 			
     	}
     	//--
@@ -1245,32 +1252,30 @@ public class XMLSurveyActivity extends Activity {
 	}
 	
 	//haidong from ricky
-	private class CompletedSignal extends AsyncTask<String,Void, Boolean>
+	private class ComplianceSignal extends AsyncTask<String,Void, Boolean>
 	{
 
 		@Override
 		protected Boolean doInBackground(String... strings) {
 			// TODO Auto-generated method stub
-	         String UID=strings[0];
-	         String Date=strings[1];
-	         String RSID=strings[2];
+	         String UID = strings[0];
+	         String Date = strings[1];
+	         String RSID = strings[2];
+	         String CMD = strings[3];
 	         if(checkDataConnectivity())
 	 		{
-	         HttpPost request = new HttpPost("http://dslsrv8.cs.missouri.edu/~rs79c/Server/Crt/compliance.php");
+	         HttpPost request = new HttpPost(Utilities.COMPLIANCE_ADDRESS);
 	         List<NameValuePair> params = new ArrayList<NameValuePair>();
-	         params.add(new BasicNameValuePair("category","complete"));                            
+	         params.add(new BasicNameValuePair("category",CMD));                            
 	         params.add(new BasicNameValuePair("UID",UID));
 	         params.add(new BasicNameValuePair("Date",Date));
 	         params.add(new BasicNameValuePair("RSID",RSID));
-	         //params.add(new BasicNameValuePair("userID", UID));
 	         try {
 	         	        	
 	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
 	             HttpResponse response = new DefaultHttpClient().execute(request);
 	             if(response.getStatusLine().getStatusCode() == 200){
 	                 String result = EntityUtils.toString(response.getEntity());
-	                 Log.d("Sensor Data Point Info",result);                
-	                // Log.d("Wrist Sensor Data Point Info","Data Point Successfully Uploaded!");
 	             }
 	             return true;
 	         } 
@@ -1283,58 +1288,10 @@ public class XMLSurveyActivity extends Activity {
 	     	
 	     else 
 	     {
-	     	Log.d("Sensor Data Point Info","No Network Connection:Data Point was not uploaded");
-	     	//Toast.makeText(serviceContext, errMSG, Toast.LENGTH_LONG).show();
 	     	return false;
 	      } 
 		    
 		}
 		
 	}
-	private class TriggerSignal extends AsyncTask<String,Void, Boolean>
-	{
-
-		@Override
-		protected Boolean doInBackground(String... strings) {
-			// TODO Auto-generated method stub
-	         String UID=strings[0];
-	         String Date=strings[1];
-	         String RSID=strings[2];
-	         if(checkDataConnectivity())
-	 		{
-	         HttpPost request = new HttpPost("http://dslsrv8.cs.missouri.edu/~rs79c/Server/Crt/compliance.php");
-	         List<NameValuePair> params = new ArrayList<NameValuePair>();
-	         params.add(new BasicNameValuePair("category","trigger"));                            
-	         params.add(new BasicNameValuePair("UID",UID));
-	         params.add(new BasicNameValuePair("Date",Date));
-	         params.add(new BasicNameValuePair("RSID",RSID));
-	         try {
-	         	        	
-	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
-	             HttpResponse response = new DefaultHttpClient().execute(request);
-	             if(response.getStatusLine().getStatusCode() == 200){
-	                 String result = EntityUtils.toString(response.getEntity());
-	                 Log.d("Sensor Data Point Info",result);                
-	                // Log.d("Wrist Sensor Data Point Info","Data Point Successfully Uploaded!");
-	             }
-	             return true;
-	         } 
-	         catch (Exception e) 
-	         {	             
-	             e.printStackTrace();
-	             return false;
-	         }
-	 	  }
-	     	
-	     else 
-	     {
-	     	Log.d("Sensor Data Point Info","No Network Connection:Data Point was not uploaded");
-	     	//Toast.makeText(SurveyPinContext, errMSG, Toast.LENGTH_LONG).show();
-	     	return false;
-	      } 
-		    
-		}
-		
-	}
-	
 }

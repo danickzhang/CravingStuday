@@ -115,7 +115,7 @@ public class NumberQuestion extends SurveyQuestion {
 
 	
 	public boolean validateSubmit() {
-		if(answered && result > 0)
+		if(answered && result >= 0)
 			return true;
 		return false;
 	}
@@ -134,5 +134,13 @@ public class NumberQuestion extends SurveyQuestion {
 		ArrayList<String> temp = new ArrayList<String>();
 		temp.add(Integer.valueOf(result).toString());
 		return temp;
+	}
+	
+	public boolean clearSelectedAnswers(){
+		Log.d("final 3", "clear");
+//		answers = null;
+		result = -1;
+		answered = false;
+		return true;
 	}
 }

@@ -10,7 +10,6 @@ public class SurveyCategory implements Category{
 	
 	protected ArrayList<Question> questions;
 	protected int nextQuestionNumber = 0;
-	protected int currentQuestionNumber = -1;
 	protected String questionDesc;
 	
 	public SurveyCategory(){
@@ -34,7 +33,7 @@ public class SurveyCategory implements Category{
 		addQuestions(questions);
 	}	
 	
-	public Question followingQuestion(){
+	public Question nextQuestion(){
 		Utilities.Log("~~~~~~~~~~~~~~~~~~~~f", "index "+nextQuestionNumber);
 		if((nextQuestionNumber) >= questions.size()){
 			return null;
@@ -45,7 +44,7 @@ public class SurveyCategory implements Category{
 	}
 	
 	
-	public Question previousQuestion(){
+	public Question lastQuestion(){
 		Utilities.Log("~~~~~~~~~~~~~~~~~~~~p", "index "+nextQuestionNumber);
 		if(nextQuestionNumber == 0)
 			return null;
@@ -53,26 +52,6 @@ public class SurveyCategory implements Category{
 			Utilities.Log("~~~~~~~~~~~~~~~~~~~~pp", "q "+questions.get(nextQuestionNumber-1).getId());
 			return questions.get(--nextQuestionNumber);
 	}
-	
-//	public Question followingQuestion(){
-//		Utilities.Log("~~~~~~~~~~~~~~~~~~~~f", "index "+currentQuestionNumber+"question size "+questions.size());
-//		if(currentQuestionNumber >= questions.size()-1){
-//			return null;
-//		}
-//		Utilities.Log("~~~~~~~~~~~~~~~~~~~~ff", "index ");
-//		//get starts from 0, get current then ++
-//		return questions.get(++currentQuestionNumber);
-//	}
-//	
-//	
-//	public Question previousQuestion(){
-//		Utilities.Log("~~~~~~~~~~~~~~~~~~~~p", "index "+currentQuestionNumber);
-//		if(currentQuestionNumber-1 == -1)
-//			return null;
-//		else
-//			Utilities.Log("~~~~~~~~~~~~~~~~~~~~pp", "q "+questions.get(currentQuestionNumber).getId());
-//			return questions.get(--currentQuestionNumber);
-//	}
 	
 	
 	public Question getQuestion(int index){
