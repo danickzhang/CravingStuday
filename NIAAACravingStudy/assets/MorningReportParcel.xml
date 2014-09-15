@@ -45,7 +45,7 @@
 	
 	<category>
 		<description>Today's plan on Drinking</description>
-		<question id = "q701" type = "radio">
+		<question id = "q206" type = "radio">
 			<text>Do you plan on drinking today or tonight?</text>
 			<answer id = "1">Yes</answer>
 			<answer id = "2">No</answer>
