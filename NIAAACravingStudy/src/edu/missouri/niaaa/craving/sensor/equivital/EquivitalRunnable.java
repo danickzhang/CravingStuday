@@ -61,9 +61,10 @@ import edu.missouri.niaaa.craving.services.SensorLocationService;
 
 
 public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISemDeviceAccelerometerEvents {
-	
-	final static String TAG = "Equivital Runnable";
+
+	private final static Logger log = Logger.getLogger(EquivitalRunnable.class);
 	private static SemDevice device;
+	private static EquivitalRunnable _instanceEQ = null;
 	String deviceAddress;
 	String deviceName;
 	String phoneID;
@@ -88,12 +89,30 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 	//private double medianFilteredAcc = 0;
 	// delay time 11s
 	//private int delaySecond = 10;
-	
 
-	public EquivitalRunnable(String address,String name,String ID)
+	/**
+	 * Singleton Class
+	 *
+	 * @author Ricky
+	 * @param address
+	 * @param name
+	 * @param ID
+	 * @return
+	 */
+	public static EquivitalRunnable getInstance(String address, String name,
+			String ID) {
+		if (_instanceEQ == null) {
+			_instanceEQ = new EquivitalRunnable(address, name, ID);
+		} else {
+			log.d("EquivitalRunnable is not null");
+		}
+		return _instanceEQ;
+	}
+
+	protected EquivitalRunnable(String address, String name, String ID)
 	{
-		Log.d(TAG, "new instance");
-		
+		log.d("Create new instance");
+
 		deviceAddress=address;
 		deviceName=name;
 		phoneID=ID;
@@ -135,14 +154,17 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 	@Override
 	public void summaryDataUpdated(SemDevice arg0, SemSummaryDataEventArgs arg1) {
 		// TODO Auto-generated method stub
-		updateSummary(arg1.getSummary().getMotion().name(),arg1.getSummary().getOrientation().name(),
+		updateSummary(arg1.getSummary().getMotion().name(),
+				arg1.getSummary().getOrientation().name(),
 				arg1.getSummary().getBreathingRate().getBeltSensorRate(),
-				arg1.getSummary().getBreathingRate().getEcgDerivedRate(),arg1.getSummary().getBreathingRate().getImpedanceRate(),
-				arg1.getSummary().getHeartRate().getEcgRate(),arg1.getSummary().getQualityConfidence().getBeltQuality(),
+				arg1.getSummary().getBreathingRate().getEcgDerivedRate(),
+				arg1.getSummary().getBreathingRate().getImpedanceRate(),
+				arg1.getSummary().getHeartRate().getEcgRate(),
+				arg1.getSummary().getQualityConfidence().getBeltQuality(),
 				arg1.getSummary().getQualityConfidence().getECGQuality(),
 				arg1.getSummary().getQualityConfidence().getImpedanceQuality(),
 				arg1.getSummary().getQualityConfidence().getHeartRateConfidence(),
-				arg1.getSummary().getQualityConfidence().getBreathingRateConfidence(),arg1.getSummary().getGalvanicSkinResistance());
+				arg1.getSummary().getQualityConfidence().getBreathingRateConfidence());
 		//Log.d("Chest Acc Info","chest data recorded:");
 	}
 
@@ -150,7 +172,7 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 			double beltSensorRate, double ecgDerivedRate,double impedanceRate,
 			double ecgRate, double beltQuality, double ecgQuality,
 			double impedanceQuality, double heartRateConfidence,
-			double breathingRateConfidence,double GSR) {
+			double breathingRateConfidence) {
 		// TODO Auto-generated method stub
 			/* 
 			 * 1/22 Ricky Reduce ecgDerivedRate,impedanceRate,impedanceQuality
@@ -160,8 +182,13 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 					 String.valueOf(impedanceRate)+","+String.valueOf(ecgRate)+","+String.valueOf(beltQuality)+","+String.valueOf(ecgQuality)+","+
 					 String.valueOf(impedanceQuality)+","+String.valueOf(heartRateConfidence)+","+String.valueOf(breathingRateConfidence)+","+String.valueOf(GSR);
 			*/
-		String dataFromChestSensor=motion+","+bodyPosition+","+String.valueOf(beltSensorRate)+","+String.valueOf(ecgRate)+","+String.valueOf(beltQuality)+","+String.valueOf(ecgQuality)+","+
-				 String.valueOf(heartRateConfidence)+","+String.valueOf(breathingRateConfidence)+","+String.valueOf(GSR);
+		String dataFromChestSensor=motion+","+bodyPosition+","
+				+String.valueOf(beltSensorRate)+","
+				+String.valueOf(ecgRate)+","
+				+String.valueOf(beltQuality)+","
+				+String.valueOf(ecgQuality)+","
+				+String.valueOf(heartRateConfidence)+","
+				+String.valueOf(breathingRateConfidence);
 		 Message msgData=new Message();
 		 msgData.what = CHEST_SENSOR_DATA;
 		 Bundle dataBundle = new Bundle();
@@ -264,9 +291,9 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 //        File encStat = new File(Utilities.PHONE_BASE_PATH,"encStat.txt");
          String endataToWrite = null;
          try {
-        	 if(Utilities.WRITE_RAW) 
-        		 Utilities.writeToFile(file_name, dataToWrite);
-        	 else{
+        	 if(Utilities.WRITE_RAW) {
+				Utilities.writeToFile(file_name, dataToWrite);
+			} else{
         		 endataToWrite = Utilities.encryption(dataToWrite);
         		 Utilities.writeToFileEnc(file_name, endataToWrite);
         	 }
@@ -275,8 +302,8 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
          	// TODO Auto-generated catch block
          	e.printStackTrace();
          }
-         
-         Log.d("DEFE!!!!!!!!!!!!!!!!!!!!!!!!!", "tranis "+dataPoints.size());
+
+		// log.d("DEFE!!!!!!!!!!!!!!!!!!!!!!!!!: tranis: " + dataPoints.size());
         if(dataPoints.size()==57)
         {
         	    List<String> subList = dataPoints.subList(0,56);
@@ -329,9 +356,9 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 		//chen
 		String endataToWrite = null;
          try {
-        	 if(Utilities.WRITE_RAW) 
-        		 Utilities.writeToFile(file_name, dataToWrite);
-        	 else{
+        	 if(Utilities.WRITE_RAW) {
+				Utilities.writeToFile(file_name, dataToWrite);
+			} else{
         		 endataToWrite = Utilities.encryption(dataToWrite);
         		 Utilities.writeToFileEnc(file_name, endataToWrite);
         	 }
@@ -539,13 +566,22 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 //		}
 	 
 	 public void stop(){
+		log.d("Stop Connection");
 		 count = 0;
 		 chestAccList.clear();
 		 //medianList.clear();
 		 //medianWindowQueue.clear();
-		 device.stop(true);
-		 SemBluetoothConnection.disconnect();		 
-		 device.removeAccelerometerEventListener(this);
+		 
+		 //previous
+//		 device.stop(true);
+//		 SemBluetoothConnection.disconnect();		 
+//		 device.removeAccelerometerEventListener(this);
+//		done previous
+
+		// SemBluetoothConnection.disconnect();
+		device.removeAccelerometerEventListener(this);
+		device.stop();
+		_instanceEQ = null;
 	 }
 	
 

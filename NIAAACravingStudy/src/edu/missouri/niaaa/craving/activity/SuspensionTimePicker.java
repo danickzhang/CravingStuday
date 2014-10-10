@@ -32,7 +32,7 @@ public class SuspensionTimePicker extends Activity {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_suspension_picker);
-		SharedPreferences sp = getSharedPreferences(Utilities.SP_LOGIN, Context.MODE_PRIVATE);
+		final SharedPreferences sp = getSharedPreferences(Utilities.SP_LOGIN, Context.MODE_PRIVATE);
 		if(!sp.contains(Utilities.SP_KEY_SUSPENSION_TS)){
 			sp.edit().putLong(Utilities.SP_KEY_SUSPENSION_TS, Calendar.getInstance().getTimeInMillis()).commit();
 		}
@@ -63,7 +63,8 @@ public class SuspensionTimePicker extends Activity {
 				
 //				section_6.setText("Break Suspension");
 				Utilities.getSP(SuspensionTimePicker.this, Utilities.SP_SURVEY).edit().putBoolean(Utilities.SP_KEY_SURVEY_SUSPENSION, true).commit();
-				
+				sp.edit().putInt(Utilities.SP_KEY_SUSPENSION_CHOICE, seq + 1).commit();
+
 				//set suspension alarm
 				AlarmManager am = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
 				

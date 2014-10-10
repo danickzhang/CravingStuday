@@ -7,11 +7,6 @@ import java.util.List;
 
 import org.xml.sax.InputSource;
 
-import edu.missouri.niaaa.craving.R;
-import edu.missouri.niaaa.craving.Utilities;
-import edu.missouri.niaaa.craving.survey.SurveyInfo;
-import edu.missouri.niaaa.craving.survey.XMLConfigParser;
-import edu.missouri.niaaa.craving.survey.XMLSurveyActivity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -24,6 +19,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.missouri.niaaa.craving.R;
+import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.survey.SurveyInfo;
+import edu.missouri.niaaa.craving.survey.XMLConfigParser;
+import edu.missouri.niaaa.craving.survey.XMLSurveyActivity;
 
 public class SurveyMenu extends Activity {
 
@@ -74,6 +74,7 @@ public class SurveyMenu extends Activity {
 				
 				b.setOnClickListener(new OnClickListener(){
 					
+					@Override
 					public void onClick(View v) {
 						final SurveyInfo temp = buttonMap.get(v);
 						Utilities.Log(TAG, temp.getDisplayName());

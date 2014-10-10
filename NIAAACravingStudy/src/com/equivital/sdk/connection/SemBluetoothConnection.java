@@ -74,6 +74,7 @@ public class SemBluetoothConnection implements ISemConnection
 	/**
 	 * Adds an event listener
 	 */
+	@Override
 	public void addEventHandler(ISemConnectionEvents eventHandler)
 	{
 		if(!_eventHandlers.contains(eventHandler)) _eventHandlers.add(eventHandler);
@@ -82,6 +83,7 @@ public class SemBluetoothConnection implements ISemConnection
 	/**
 	 * Removes an event handler.
 	 */
+	@Override
 	public void removeEventHandler(ISemConnectionEvents eventHandler)
 	{
 		if(_eventHandlers.contains(eventHandler)) _eventHandlers.remove(eventHandler);
@@ -195,7 +197,9 @@ public class SemBluetoothConnection implements ISemConnection
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         
-        if(address != null) connectToDeviceWithAddress(address);
+        if(address != null) {
+			connectToDeviceWithAddress(address);
+		}
         
 	}	
 	
@@ -208,7 +212,9 @@ public class SemBluetoothConnection implements ISemConnection
 		if(mState == STATE_NONE || mState == STATE_RECONNECTING )
 		{
 			_portAddress = address;
-			if(address != null) connectToDeviceWithAddress(address);
+			if(address != null) {
+				connectToDeviceWithAddress(address);
+			}
 		}
 	}
 	
@@ -227,6 +233,7 @@ public class SemBluetoothConnection implements ISemConnection
 	 * @return A connection manager instance (or null if the connection is unmanaged)
 	 */
 	
+	@Override
 	public ISemConnectionManager getManager()
 	{
 		return null;
@@ -237,6 +244,7 @@ public class SemBluetoothConnection implements ISemConnection
 	 * @return The connection string.
 	 */
 	
+	@Override
 	public String getConnectionInfo()
 	{
 		return "Bluetooth Port [" + _portAddress + "]";
@@ -247,6 +255,7 @@ public class SemBluetoothConnection implements ISemConnection
 	 * @return True if a device is connected.
 	 */
 	
+	@Override
 	public boolean isConnected()
 	{
 		return isSocketConnected();
@@ -276,9 +285,12 @@ public class SemBluetoothConnection implements ISemConnection
 	 * @return True if successful.
 	 */
 	
+	@Override
 	public boolean write(byte[] dataToWrite)
 	{
-		if(mState == STATE_NONE) return false;
+		if(mState == STATE_NONE) {
+			return false;
+		}
 		
 		writeData(dataToWrite, dataToWrite.length);
 		return true;
@@ -290,6 +302,7 @@ public class SemBluetoothConnection implements ISemConnection
 	 * @return True if successful. 
 	 */
 	
+	@Override
 	public boolean write(String dataToWrite)
 	{
 		return write(dataToWrite.getBytes());
@@ -299,9 +312,12 @@ public class SemBluetoothConnection implements ISemConnection
 	 * Closes the underlying bluetooth connection.
 	 */
 	
+	@Override
 	public void close()
 	{
-		if(mState != STATE_NONE) disconnect();
+		if(mState != STATE_NONE) {
+			disconnect();
+		}
 	}
 	
     
@@ -393,13 +409,13 @@ public class SemBluetoothConnection implements ISemConnection
     /**
      * Stop all threads
      */
-    public synchronized static void disconnect()
-    {
+	public synchronized void disconnect() {
+		Log.d("SEM", "sem disconnect");
         if (mConnectThread != null) {mConnectThread.cancel(); mConnectThread = null;}
         if (mConnectedThread != null) {mConnectedThread.cancel(); mConnectedThread = null;}
         setState(STATE_NONE);
         //reconnectDevice();
-		//fireConnectionClosedEvent();
+		fireConnectionClosedEvent();
     }
     
     private synchronized void writeData(byte[] bufferToWrite, int sizeOfBuffer)
@@ -543,7 +559,8 @@ public class SemBluetoothConnection implements ISemConnection
             mmSocket = tmp;
         }
 
-        public void run()
+        @Override
+		public void run()
         {
             setName("ConnectThread");
 
@@ -633,9 +650,12 @@ public class SemBluetoothConnection implements ISemConnection
 
         volatile boolean sentinel = false;
        
-        public void run()
+        @Override
+		public void run()
         {
-        	if(!isValidDevice()) return;
+        	if(!isValidDevice()) {
+				return;
+			}
         	
             connectionSucceeded();
             
@@ -656,7 +676,9 @@ public class SemBluetoothConnection implements ISemConnection
 	                
                     try
                     {
-                    	if(length < maxBufSize) Thread.sleep(50);
+                    	if(length < maxBufSize) {
+							Thread.sleep(50);
+						}
                     }
                     catch(Exception e)
                     {

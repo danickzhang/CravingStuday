@@ -3,9 +3,11 @@ package edu.missouri.niaaa.craving.sensor.internal;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -18,23 +20,21 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import edu.missouri.niaaa.craving.Utilities;
-import edu.missouri.niaaa.craving.services.SensorLocationService;
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.provider.Settings;
-import android.util.Log;
-import android.widget.Toast;
-
 //Ricky 2013/12/09
 import android.os.AsyncTask;
+import android.util.Log;
+import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.logger.Logger;
+import edu.missouri.niaaa.craving.services.SensorLocationService;
 
 public class InternalRunnable implements Runnable, SensorEventListener {// haven't been used for now
-	
-	static SensorManager mSensorManager;
+	private final Logger log = Logger.getLogger(InternalRunnable.class);
+	private SensorManager mSensorManager;
+	private static InternalRunnable _instanceInternal = null;
 	int SensorType;
 	int SamplingRate;
 	static int Count=0;
@@ -43,9 +43,27 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 	List<String> dataPoints=new ArrayList<String>();
 	Calendar c=Calendar.getInstance();
     SimpleDateFormat curFormater;
-    private List<Double> AccList = new ArrayList<Double>();
+	private List<Double> AccList = Collections.synchronizedList(new ArrayList<Double>());
     private double avgAcc = 0;
 
+	/**
+	 * Singleton Class
+	 *
+	 * @author Ricky
+	 * @param sensorManager
+	 * @param sensorType
+	 * @param samplingRate
+	 * @param uniqueIdentifier
+	 * @return
+	 */
+	public static InternalRunnable getInstance(SensorManager sensorManager,
+			int sensorType, int samplingRate, String uniqueIdentifier) {
+		if (_instanceInternal == null) {
+			_instanceInternal = new InternalRunnable(sensorManager, sensorType,
+					samplingRate, uniqueIdentifier);
+		}
+		return _instanceInternal;
+	}
 	public InternalRunnable(SensorManager sensorManager,int sensorType,int samplingRate,String uniqueIdentifier)
 	{
 	    mSensorManager = sensorManager;
@@ -89,50 +107,61 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
    		cal.setTimeZone(TimeZone.getTimeZone("US/Central"));
 		return String.valueOf(cal.getTime());
 	}
-	//1/22 Ricky disabled phone accelerometer/light data transmission to server
+
 	@Override
 	public void onSensorChanged(SensorEvent event) {				
 		// TODO Auto-generated method stub
-   		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) 
-	      {		
-   				float x = event.values[0];
-   				float y = event.values[1];
-   				float z = event.values[2];
-   				//Log.d("wtest","x:"+x+"y:"+y+"x:"+z);
-   				double ResultAcc = Math.sqrt(x*x+y*y+z*z);
-   				if (compressAccelerometerData(ResultAcc)){
-		    		//String Accelerometer_Values = getTimeStamp()+","+event.values[0]+","+event.values[1]+","+event.values[2];
-   					String Accelerometer_Values = getTimeStamp()+","+String.valueOf(avgAcc);
-   					String file_name="Accelerometer."+identifier+"."+getDate()+".txt";
-		            File f = new File(Utilities.PHONE_BASE_PATH,file_name);
-		            //Log.d("wtest",avgAcc+"");
-		            /*
-	                dataPoints.add(Accelerometer_Values+";");              
-		            if(dataPoints.size()==80)
-		            {
-		            	    List<String> subList = dataPoints.subList(0,41);
-		     	            String data=subList.toString();	     	            
-		     	            String formatedData=data.replaceAll("[\\[\\]]","");	
-		     	            //Ricky 2013/12/09
-		     	            //sendDatatoServer("Accelerometer."+identifier+"."+getDate(),formatedData);
-		     	            TransmitData transmitData=new TransmitData();
-		     	            transmitData.execute("Accelerometer."+identifier+"."+getDate(),formatedData);
-		     	            subList.clear(); 	     	            
-		     	    }
-		     	    */
-		    		try {
-						writeToFile(f,Accelerometer_Values);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
+		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+			// log.d("Type detected: ACC Sensor");
+			double ResultAcc = getOverallAcc(event.values[0], event.values[1],
+					event.values[2]);
+			if (compressAccelerometerData(ResultAcc)) {
+				log.d("get avg Acc data");
+				DecimalFormat df = new DecimalFormat("#0.00000");
+				String avgAccStr = df.format(avgAcc);
+				log.d(avgAccStr);
+				String Accelerometer_Values = getTimeStamp() + ","
+						+ String.valueOf(avgAccStr);
+				dataPoints.add(Accelerometer_Values + ";");
+				String file_name = "Accelerometer." + identifier + "."
+						+ getDate();
+
+				String encDataToWrite = null;
+				try {
+					if (Utilities.WRITE_RAW) {
+						Utilities.writeToFile(file_name, Accelerometer_Values);
+					} else {
+						encDataToWrite = Utilities
+								.encryption(Accelerometer_Values);
+						Utilities.writeToFileEnc(file_name, encDataToWrite);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				log.d("dataPoints'size: " + dataPoints.size());
+				if (dataPoints.size() == 57) {
+					List<String> subList = dataPoints.subList(0, 56);
+					String data = subList.toString();
+					String formattedData = data.replaceAll("[\\[\\]]", "");
+					String enformattedData = null;
+					try {
+						enformattedData = Utilities.encryption(formattedData);
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
-   				}
-	      
-	      }
-   			 else if (event.sensor.getType() == Sensor.TYPE_LIGHT) 
-	        {
-	            //TODO: get values 
-   				 
+
+					TransmitData transmitData = new TransmitData();
+					transmitData.execute(file_name, enformattedData);
+
+					log.d("Accelerometer Data Point Sent " + enformattedData);
+					subList.clear();
+					subList = null;
+				}
+			}
+		} else if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+	            //TODO: get values
+
    				String LightIntensity= getTimeStamp()+","+event.values[0];
 	        	String file_name="LightSensor."+identifier+"."+getDate()+".txt";
 	            File f = new File(Utilities.PHONE_BASE_PATH,file_name);
@@ -156,9 +185,12 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	    				        
+		}
 	       }
-	       
+
+	private double getOverallAcc(float xACC, float yACC, float zACC) {
+		return Math.sqrt(xACC * xACC + yACC * yACC + zACC * zACC)
+				- SensorManager.STANDARD_GRAVITY;
 	}
 	
 	protected static void writeToFile(File f, String toWrite) throws IOException{
@@ -178,9 +210,10 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 	public void stop()
 	{
 		mSensorManager.unregisterListener(this);
-	}	
-	
-	
+		_instanceInternal = null;
+	}
+
+
 	//Ricky 2013/12/09
 	private class TransmitData extends AsyncTask<String,Void, Boolean>
 	{
@@ -232,12 +265,12 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 	 * @param rawAccelerometerData Resultant Value of three axis
 	 * @return True/False
 	 */
-	private Boolean compressAccelerometerData(Double rawAccelerometerData){		
-		if (AccList.size()<=15){
-			AccList.add(rawAccelerometerData);
-			return false;
-		}
-		else {
+	private Boolean compressAccelerometerData(Double rawAccelerometerData){
+		synchronized (AccList) {
+			if (AccList.size() <= InternalRunnableUtilities.Accelerometer.ACC_INTERVAL_MAX_POINT_VAL) {
+				AccList.add(rawAccelerometerData);
+				return false;
+			} else {
 			avgAcc = 0;
 			for (int i=0;i<AccList.size();i++){
 				avgAcc +=AccList.get(i); 
@@ -248,6 +281,12 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 			return true;
 		}
 	}
-	
-	
+	}
+
+}
+
+class InternalRunnableUtilities {
+	public class Accelerometer {
+		public final static int ACC_INTERVAL_MAX_POINT_VAL = 250;
+	}
 }

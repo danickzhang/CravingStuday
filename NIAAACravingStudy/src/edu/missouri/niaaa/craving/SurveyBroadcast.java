@@ -188,6 +188,20 @@ public class SurveyBroadcast extends BroadcastReceiver {
 			}else{
 				Utilities.LogB("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", surveyName);
 				Toast.makeText(context, surveyName+" has been skipped under current survey you are doing!", Toast.LENGTH_LONG).show();
+
+				try {
+					// for under doing some TRIGGERED survey, the new one will be skipped
+					// Random
+					// Drinking follow-ups
+
+					Utilities.writeEventToFile(context, (surveyName.equals(Utilities.SV_NAME_RANDOM) ? Utilities.CODE_SKIP_BLOCK_SURVEY_RANDOM : Utilities.CODE_SKIP_BLOCK_SURVEY_DRINKING),
+							"", "", "", surveyName, "" + 
+							(shp.getInt(triggerSeq, 0) != 0 ? shp.getInt(triggerSeq, 0) : Utilities.MAX_TRIGGER_MAP.get(surveyName)),
+							Utilities.sdf.format(Calendar.getInstance().getTime()));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		
@@ -231,7 +245,20 @@ public class SurveyBroadcast extends BroadcastReceiver {
 				}
 				else if(shp.getBoolean(Utilities.SP_KEY_SURVEY_SUSPENSION, false)){
 					Toast.makeText(context, surveyName+" has been skipped under suspension!", Toast.LENGTH_LONG).show();
-					Log.d("XXXXXXXXXXXXXXXX", "under suspension");
+					Log.d("XXXXXXXXXXXXXXXX", "under suspension " + surveyName + " " + shp.getInt(triggerSeq, 0));
+
+					try {
+						// since suspension doesn't skip drinking follow-ups and
+						// morning, this is only for random
+
+						Utilities.writeEventToFile(context, Utilities.CODE_SKIP_BLOCK_SURVEY_RANDOM, "", "", "",
+								surveyName,
+								"" + (shp.getInt(triggerSeq, 0) != 0 ? shp.getInt(triggerSeq, 0) : Utilities.MAX_TRIGGER_MAP.get(surveyName)),
+								Utilities.sdf.format(Calendar.getInstance().getTime()));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
 			

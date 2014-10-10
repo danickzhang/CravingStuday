@@ -118,6 +118,7 @@ public class SensorConnections extends Activity {
 	}
 	
 	
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult " + requestCode+" "+resultCode);
         

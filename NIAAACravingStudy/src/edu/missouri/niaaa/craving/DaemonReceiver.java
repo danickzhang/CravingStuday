@@ -54,8 +54,8 @@ public class DaemonReceiver extends BroadcastReceiver {
 			Utilities.Log(TAG, "on receiver daemon 1");
 			
     		//today at noon
-			Utilities.morningComplete(context);
-			
+			Utilities.morningComplete(context, true);
+
 			Toast.makeText(context, "Noon daemon trigger random popups for you.", Toast.LENGTH_LONG).show();
 			
 			//Noon

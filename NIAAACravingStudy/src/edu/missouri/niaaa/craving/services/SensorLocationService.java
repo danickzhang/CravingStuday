@@ -38,11 +38,15 @@ public class SensorLocationService extends Service {
 
 
 	String TAG = "SensorLocationService";
-	
+	private final Logger log = Logger.getLogger(SensorLocationService.class);
 	PowerManager mPowerManager;
 	WakeLock serviceWakeLock;
 	
 	EquivitalRunnable equivitalThread;
+	InternalRunnable accelermetorThread;
+
+	SensorManager mSensorManager;
+
 	public static boolean cancelBlueToothFlag = false;
 	public static Context serviceContext;
 	
@@ -66,6 +70,7 @@ public class SensorLocationService extends Service {
 		
 		mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		
+		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		serviceWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK , "SensorServiceLock");
 		serviceWakeLock.acquire();
 		
@@ -97,7 +102,8 @@ public class SensorLocationService extends Service {
 		
 		serviceWakeLock.release();
 		mIsRunning = false;
-		
+
+		stopInternalThread(accelermetorThread);
 		stopEquivitalThread();
 		stopSound();
 	}
@@ -175,8 +181,10 @@ public class SensorLocationService extends Service {
 				String userID = Utilities.getSP(context, Utilities.SP_LOGIN).getString(Utilities.SP_KEY_LOGIN_USERID, "0000");
 				
 				cancelBlueToothFlag = false;
-				equivitalThread = new EquivitalRunnable(address,deviceName, userID);
+				equivitalThread = EquivitalRunnable.getInstance(address, deviceName, userID);
 				equivitalThread.run();
+				accelermetorThread = InternalRunnable.getInstance(mSensorManager,Sensor.TYPE_ACCELEROMETER,SensorManager.SENSOR_DELAY_GAME, userID);
+				accelermetorThread.run();
 				
 //				Calendar c=Calendar.getInstance();
 //				SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd"); 
@@ -201,7 +209,8 @@ public class SensorLocationService extends Service {
 			
 			//hard reset
 			else if(action.equals(SensorUtilities.ACTION_DISCONNECT_SENSOR)){
-				
+				log.d("action received: "+ SensorUtilities.ACTION_DISCONNECT_SENSOR);
+				stopInternalThread(accelermetorThread);
 				stopEquivitalThread();
 				stopSound();
 			}
@@ -223,13 +232,21 @@ public class SensorLocationService extends Service {
 	}
 	
 	private void stopEquivitalThread(){
-		
+		log.d("stopEquivitalThread(): called");
 		if(equivitalThread != null){
 			equivitalThread.stop();
+			log.d("stopEquivitalThread(): stop()");
 		}
 		writeSensorConn();
 	}
-	
+
+	private void stopInternalThread(InternalRunnable internalThread) {
+		log.d("stopInternalThread(): called");
+		if (internalThread != null) {
+			internalThread.stop();
+			log.d("stopInternalThread(): stop()");
+		}
+	}
 	private void writeSensorConn(){
 		
 		if(!cancelBlueToothFlag){
@@ -270,10 +287,12 @@ public class SensorLocationService extends Service {
 	}
 	
 	private void stopSound(){
-		if(soundTimer != null)
+		if(soundTimer != null) {
 			soundTimer.cancel();
-		if(voiceTimer != null)
+		}
+		if(voiceTimer != null) {
 			voiceTimer.cancel();
+		}
 		mSoundP.stop(soundStreamID);
 		mSoundP.stop(voiceStreamID);
 	}
