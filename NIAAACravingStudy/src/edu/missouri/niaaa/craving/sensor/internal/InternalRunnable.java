@@ -123,16 +123,14 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 				String Accelerometer_Values = getTimeStamp() + ","
 						+ String.valueOf(avgAccStr);
 				dataPoints.add(Accelerometer_Values + ";");
-				String file_name = "Accelerometer." + identifier + "."
-						+ getDate();
+				String file_name = "Accelerometer." + identifier + "." + getDate();
 
 				String encDataToWrite = null;
 				try {
 					if (Utilities.WRITE_RAW) {
 						Utilities.writeToFile(file_name, Accelerometer_Values);
 					} else {
-						encDataToWrite = Utilities
-								.encryption(Accelerometer_Values);
+						encDataToWrite = Utilities.encryption(Accelerometer_Values);
 						Utilities.writeToFileEnc(file_name, encDataToWrite);
 					}
 				} catch (Exception e) {
@@ -141,18 +139,27 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 				}
 				log.d("dataPoints'size: " + dataPoints.size());
 				if (dataPoints.size() == 57) {
+
+					StringBuilder prefix_sb = new StringBuilder(Utilities.PREFIX_LEN);
+					String prefix = file_name;
+					prefix_sb.append(prefix);
+
+					for (int i = prefix.length(); i <= Utilities.PREFIX_LEN; i++) {
+						prefix_sb.append(" ");
+					}
+
 					List<String> subList = dataPoints.subList(0, 56);
 					String data = subList.toString();
 					String formattedData = data.replaceAll("[\\[\\]]", "");
 					String enformattedData = null;
 					try {
-						enformattedData = Utilities.encryption(formattedData);
+						enformattedData = Utilities.encryption(prefix_sb.toString() + formattedData);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 
 					TransmitData transmitData = new TransmitData();
-					transmitData.execute(file_name, enformattedData);
+					transmitData.execute(enformattedData);
 
 					log.d("Accelerometer Data Point Sent " + enformattedData);
 					subList.clear();
@@ -221,16 +228,20 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 		@Override
 		protected Boolean doInBackground(String... strings) {
 			// TODO Auto-generated method stub
-			 String fileName=strings[0];
-	         String dataToSend=strings[1];
+			String data = strings[0];
+
+			//			 String fileName=strings[0];
+			//	         String dataToSend=strings[1];
 	         if(checkDataConnectivity())
 	 		{
 	         HttpPost request = new HttpPost(Utilities.UPLOAD_ADDRESS);	
 	         List<NameValuePair> params = new ArrayList<NameValuePair>();
-	         //file_name 
-	         params.add(new BasicNameValuePair("file_name",fileName));        
-	         //data                       
-	         params.add(new BasicNameValuePair("data",dataToSend));
+				params.add(new BasicNameValuePair("data", data));
+
+				//	         //file_name
+				//	         params.add(new BasicNameValuePair("file_name",fileName));
+				//	         //data
+				//	         params.add(new BasicNameValuePair("data",dataToSend));
 	         try {
 	         	        	
 	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));

@@ -1,27 +1,19 @@
 package edu.missouri.niaaa.craving.services;
 
-import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import edu.missouri.niaaa.craving.MainActivity;
-import edu.missouri.niaaa.craving.R;
-import edu.missouri.niaaa.craving.Utilities;
-import edu.missouri.niaaa.craving.location.LocationBroadcast;
-import edu.missouri.niaaa.craving.location.LocationUtilities;
-import edu.missouri.niaaa.craving.sensor.SensorUtilities;
-import edu.missouri.niaaa.craving.sensor.equivital.EquivitalRunnable;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.location.LocationManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.net.ConnectivityManager;
@@ -29,10 +21,16 @@ import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.Vibrator;
 import android.os.PowerManager.WakeLock;
+import android.os.Vibrator;
 import android.util.Log;
 import android.widget.Toast;
+import edu.missouri.niaaa.craving.R;
+import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.logger.Logger;
+import edu.missouri.niaaa.craving.sensor.SensorUtilities;
+import edu.missouri.niaaa.craving.sensor.equivital.EquivitalRunnable;
+import edu.missouri.niaaa.craving.sensor.internal.InternalRunnable;
 
 public class SensorLocationService extends Service {
 

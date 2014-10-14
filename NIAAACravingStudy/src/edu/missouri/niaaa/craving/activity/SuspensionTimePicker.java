@@ -2,8 +2,6 @@ package edu.missouri.niaaa.craving.activity;
 
 import java.util.Calendar;
 
-import edu.missouri.niaaa.craving.R;
-import edu.missouri.niaaa.craving.Utilities;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -17,7 +15,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.NumberPicker.OnValueChangeListener;
-import android.widget.Toast;
+import edu.missouri.niaaa.craving.R;
+import edu.missouri.niaaa.craving.Utilities;
 
 public class SuspensionTimePicker extends Activity {
 

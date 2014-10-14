@@ -137,7 +137,7 @@ public class NumberQuestion extends SurveyQuestion {
 	}
 	
 	public boolean clearSelectedAnswers(){
-		Log.d("final 3", "clear");
+//		Log.d("final 3", "clear");
 //		answers = null;
 		result = -1;
 		answered = false;

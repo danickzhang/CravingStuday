@@ -21,15 +21,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import edu.missouri.niaaa.craving.activity.AdminManageActivity;
-import edu.missouri.niaaa.craving.activity.MorningScheduler;
-import edu.missouri.niaaa.craving.activity.SurveyMenu;
-import edu.missouri.niaaa.craving.activity.SuspensionTimePicker;
-import edu.missouri.niaaa.craving.location.LocationBroadcast;
-import edu.missouri.niaaa.craving.location.LocationUtilities;
-import edu.missouri.niaaa.craving.sensor.SensorConnections;
-import edu.missouri.niaaa.craving.services.SensorLocationService;
-import edu.missouri.niaaa.craving.services.SensorLocationService.MyBinder;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -64,6 +55,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.missouri.niaaa.craving.activity.AdminManageActivity;
+import edu.missouri.niaaa.craving.activity.MorningScheduler;
+import edu.missouri.niaaa.craving.activity.SurveyMenu;
+import edu.missouri.niaaa.craving.activity.SuspensionTimePicker;
+import edu.missouri.niaaa.craving.location.LocationUtilities;
+import edu.missouri.niaaa.craving.sensor.SensorConnections;
+import edu.missouri.niaaa.craving.services.SensorLocationService;
+import edu.missouri.niaaa.craving.services.SensorLocationService.MyBinder;
 
 
 public class MainActivity extends Activity {
@@ -192,26 +191,37 @@ public class MainActivity extends Activity {
 		builder.setTitle(R.string.user_setpwd_title);
 		builder.setView(textEntryView);  
 		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				
 				EditText pinEdite = (EditText) textEntryView.findViewById(R.id.pin_edit);
 				String pinStr = pinEdite.getText().toString();
 				Utilities.Log("Pin Dialog", "pin String is "+pinStr);
-				
+
+				String data = null;
+				try {
+					data = Utilities.encryption(ID + "," + "3" + "," + pinStr);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
 /*				check network*/
 
 /*				prepare params for server*/
 				HttpPost request = new HttpPost(Utilities.VALIDATE_ADDRESS);
  		        
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
- 		        
- 		        //file_name 
- 		        params.add(new BasicNameValuePair("userID",ID));        
- 		        //function
- 		        params.add(new BasicNameValuePair("pre","3"));
- 		        //data                       
- 		        params.add(new BasicNameValuePair("password",pinStr));
-				
+
+				params.add(new BasicNameValuePair("data", data));
+
+				// 		        //file_name
+				// 		        params.add(new BasicNameValuePair("userID",ID));
+				// 		        //function
+				// 		        params.add(new BasicNameValuePair("pre","3"));
+				// 		        //data
+				// 		        params.add(new BasicNameValuePair("password",pinStr));
+
 /*				check identity*/
  		        
  		        try {
@@ -260,8 +270,9 @@ public class MainActivity extends Activity {
 		});
 		
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int whichButton) {  
-		    	
+		    @Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+
 		    	imm.toggleSoftInput(0, InputMethodManager.RESULT_SHOWN);
 				imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
                 finish(); 
@@ -397,8 +408,9 @@ public class MainActivity extends Activity {
 						.setCancelable(false)
 						.setNegativeButton(android.R.string.cancel, null)
 						.setPositiveButton(android.R.string.ok, new android.content.DialogInterface.OnClickListener() {
-						
-						    public void onClick(DialogInterface arg0, int arg1) {
+
+						    @Override
+							public void onClick(DialogInterface arg0, int arg1) {
 						    	Intent intent = new Intent(getApplicationContext(), SuspensionTimePicker.class);
 								startActivityForResult(intent, 2);
 						    }
@@ -413,8 +425,9 @@ public class MainActivity extends Activity {
 						.setCancelable(false)
 						.setNegativeButton(android.R.string.cancel, null)
 						.setPositiveButton(android.R.string.ok, new android.content.DialogInterface.OnClickListener() {
-						
-						    public void onClick(DialogInterface arg0, int arg1) {
+
+						    @Override
+							public void onClick(DialogInterface arg0, int arg1) {
 						    	section_6.setText(R.string.section_6);
 								Utilities.getSP(MainActivity.this, Utilities.SP_SURVEY).edit().putBoolean(Utilities.SP_KEY_SURVEY_SUSPENSION, false).commit();
 								
@@ -633,6 +646,7 @@ public class MainActivity extends Activity {
 		builder.setTitle(R.string.pin_title);
 		builder.setView(DialogView);  
 		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 				
 				EditText pinEdite = (EditText) DialogView.findViewById(R.id.pin_edit);
@@ -659,9 +673,10 @@ public class MainActivity extends Activity {
 		});
 		
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int whichButton) {  
-		    	
-		    }  
+		    @Override
+			public void onClick(DialogInterface dialog, int whichButton) {
+
+		    }
 		});
 		
 		return builder.create();  

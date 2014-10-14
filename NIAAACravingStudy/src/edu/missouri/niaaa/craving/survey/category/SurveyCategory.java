@@ -34,22 +34,22 @@ public class SurveyCategory implements Category{
 	}	
 	
 	public Question nextQuestion(){
-		Utilities.Log("~~~~~~~~~~~~~~~~~~~~f", "index "+nextQuestionNumber);
+//		Utilities.Log("~~~~~~~~~~~~~~~~~~~~f", "index "+nextQuestionNumber);
 		if((nextQuestionNumber) >= questions.size()){
 			return null;
 		}
-		Utilities.Log("~~~~~~~~~~~~~~~~~~~~", "index ");
+//		Utilities.Log("~~~~~~~~~~~~~~~~~~~~", "index ");
 		//get starts from 0, get current then ++
 		return questions.get(nextQuestionNumber++);
 	}
 	
 	
 	public Question lastQuestion(){
-		Utilities.Log("~~~~~~~~~~~~~~~~~~~~p", "index "+nextQuestionNumber);
+//		Utilities.Log("~~~~~~~~~~~~~~~~~~~~p", "index "+nextQuestionNumber);
 		if(nextQuestionNumber == 0)
 			return null;
 		else
-			Utilities.Log("~~~~~~~~~~~~~~~~~~~~pp", "q "+questions.get(nextQuestionNumber-1).getId());
+//			Utilities.Log("~~~~~~~~~~~~~~~~~~~~pp", "q "+questions.get(nextQuestionNumber-1).getId());
 			return questions.get(--nextQuestionNumber);
 	}
 	

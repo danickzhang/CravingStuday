@@ -97,6 +97,8 @@
     <string name="morning_report_unfinished">You may need to complete morning survey for today first</string>
     <string name="morning_report_title4">Alert</string>
     <string name="morning_report_msg4">Please remember to connect your sensor.</string>
+    <string name="morning_report_title5">Alert</string>
+    <string name="morning_report_msg5">It is already in a Drinking Followup cycle. You don\'t need to do an Initial Drinking again.</string>
     
     <!-- Initial Drinking -->
     <string name="initial_drink_name">Initial Drinking</string>

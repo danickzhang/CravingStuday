@@ -30,9 +30,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import edu.missouri.niaaa.craving.MainActivity;
-import edu.missouri.niaaa.craving.R;
-import edu.missouri.niaaa.craving.Utilities;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -54,6 +51,8 @@ import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.missouri.niaaa.craving.R;
+import edu.missouri.niaaa.craving.Utilities;
 
 /**
  * This Activity appears as a dialog. It lists any paired devices and
@@ -147,21 +146,31 @@ public class AdminManageActivity extends TabActivity {
 				EditText pinEdite = (EditText) textEntryView.findViewById(R.id.pin_edit);
 				String pinStr = pinEdite.getText().toString();
 				Utilities.Log("Pin Dialog", "pin String is "+pinStr);
-				
+
+				String data = null;
+				try {
+					data = Utilities.encryption("0000" + "," + "1" + "," + pinStr);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
 /*				check network*/
 				
 /*				prepare params for server*/
 				HttpPost request = new HttpPost(Utilities.VALIDATE_ADDRESS);
  		        
  		        List<NameValuePair> params = new ArrayList<NameValuePair>();
- 		        
- 		        //file_name 
- 		        params.add(new BasicNameValuePair("userID","0000"));        
- 		        //function
- 		        params.add(new BasicNameValuePair("pre","1"));
- 		        //data                       
- 		        params.add(new BasicNameValuePair("password",pinStr));
-				
+
+				params.add(new BasicNameValuePair("data", data));
+
+// 		        //file_name
+// 		        params.add(new BasicNameValuePair("userID","0000"));
+// 		        //function
+// 		        params.add(new BasicNameValuePair("pre","1"));
+// 		        //data
+// 		        params.add(new BasicNameValuePair("password",pinStr));
+
 /*				check identity*/
  		        
  		        try {
@@ -299,17 +308,27 @@ public class AdminManageActivity extends TabActivity {
 /*				prepare params for server*/
             	String asedID = asID.getText().toString();
             	Log.d(TAG, "get from edittext is "+asedID);
-            	
+
+            	String data = null;
+				try {
+					data = Utilities.encryption(asedID + "," + "2");
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
             	HttpPost request = new HttpPost(Utilities.VALIDATE_ADDRESS);
  		        
  		        List<NameValuePair> params = new ArrayList<NameValuePair>();
- 		        
- 		        //file_name 
- 		        params.add(new BasicNameValuePair("userID",asedID));        
- 		        //function
- 		        params.add(new BasicNameValuePair("pre","2"));
- 		        //data                       
- 		        //params.add(new BasicNameValuePair("password",""));
+
+				params.add(new BasicNameValuePair("data", data));
+
+				// 		        //file_name
+				// 		        params.add(new BasicNameValuePair("userID",asedID));
+				// 		        //function
+				// 		        params.add(new BasicNameValuePair("pre","2"));
+				// 		        //data
+				// 		        //params.add(new BasicNameValuePair("password",""));
 
 /*				check identity*/
  		        
@@ -488,8 +507,17 @@ public class AdminManageActivity extends TabActivity {
 				
 				//start new study week, if checked
 				if(rm_check.isChecked()){
+
+					String UID = null;
+					try {
+						UID = Utilities.encryption(asID.getText().toString());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 					ChangeStudyWeek changeStudyWeek = new ChangeStudyWeek();
-		        	changeStudyWeek.execute(asID.getText().toString());
+					changeStudyWeek.execute(UID);
 				}
 				
 				setHints();

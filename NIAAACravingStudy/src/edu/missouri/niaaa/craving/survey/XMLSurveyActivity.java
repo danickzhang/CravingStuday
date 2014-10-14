@@ -21,12 +21,6 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.xml.sax.InputSource;
 
-import edu.missouri.niaaa.craving.R;
-import edu.missouri.niaaa.craving.Utilities;
-import edu.missouri.niaaa.craving.survey.category.Answer;
-import edu.missouri.niaaa.craving.survey.category.Category;
-import edu.missouri.niaaa.craving.survey.category.Question;
-import edu.missouri.niaaa.craving.survey.category.RandomCategory;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -42,19 +36,25 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.os.Vibrator;
 import android.os.PowerManager.WakeLock;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.missouri.niaaa.craving.R;
+import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.survey.category.Answer;
+import edu.missouri.niaaa.craving.survey.category.Category;
+import edu.missouri.niaaa.craving.survey.category.Question;
+import edu.missouri.niaaa.craving.survey.category.RandomCategory;
 
 public class XMLSurveyActivity extends Activity {
 
@@ -133,9 +133,18 @@ public class XMLSurveyActivity extends Activity {
 			
 			String[] reminder = getReminderTimeStamp(context);
 			try {
+				String seq = "";
+				int surSeq = shp.getInt(Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surveyName), -1);
+				if (surSeq == 0) {
+					surSeq = Utilities.MAX_TRIGGER_MAP.get(surveyName);
+				}
+				if (surveyName.equals(Utilities.SV_NAME_RANDOM)) {
+					seq = "," + surSeq;
+				}
+
 				Utilities.writeEventToFile(context, getSurveyType(), getScheduleTimeStamp(),
 						reminder[0], reminder[1], reminder[2],
-						Utilities.sdf.format(Calendar.getInstance().getTime()), Utilities.sdf.format(Calendar.getInstance().getTime()));
+						Utilities.sdf.format(Calendar.getInstance().getTime()), Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -180,9 +189,18 @@ public class XMLSurveyActivity extends Activity {
 					Calendar rsT = Calendar.getInstance();
 					String rsDate = (rsT.get(Calendar.MONTH)+1)+"/"+rsT.get(Calendar.DAY_OF_MONTH)+"/"+rsT.get(Calendar.YEAR);
 					String uID = Utilities.getSP(this, Utilities.SP_LOGIN).getString(Utilities.SP_KEY_LOGIN_USERID, "0000");
+
+					String data = null;
+					try {
+						data = Utilities.encryption(uID + "," + rsDate + "," + rsID + "," + "trigger");
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 					ComplianceSignal triggerSignal = new ComplianceSignal();
-					triggerSignal.execute(uID,rsDate,rsID,"trigger");
-					
+					triggerSignal.execute(data);
+
 				}
 			}
 	        
@@ -269,20 +287,20 @@ public class XMLSurveyActivity extends Activity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		Log.d("---------------^^^^^^^^______________", "start");
-		for(Category ca :cats){
-			Utilities.Log(TAG, "category is "+ca.getQuestionDesc());
-			Utilities.Log(TAG, "category contains questions "+ca.totalQuestions());
-			for(Question q: ca.getQuestions()){
-				Utilities.Log(TAG, "question id "+q.getId());
-				for(Answer a: q.getAnswers()){
-					Utilities.Log(TAG, "contains trigger "+a.hasSurveyTrigger()+" is selected "+a.isSelected()+" answer skipto "+a.getSkip());
-				}
-			}
-		}
-			
-		
+
+//		Log.d("---------------^^^^^^^^______________", "start");
+//		for(Category ca :cats){
+//			Utilities.Log(TAG, "category is "+ca.getQuestionDesc());
+//			Utilities.Log(TAG, "category contains questions "+ca.totalQuestions());
+//			for(Question q: ca.getQuestions()){
+//				Utilities.Log(TAG, "question id "+q.getId());
+//				for(Answer a: q.getAnswers()){
+//					Utilities.Log(TAG, "contains trigger "+a.hasSurveyTrigger()+" is selected "+a.isSelected()+" answer skipto "+a.getSkip());
+//				}
+//			}
+//		}
+
+
 		//Survey doesn't contain any categories
 		if(cats == null){
 			//surveyComplete();
@@ -345,11 +363,22 @@ public class XMLSurveyActivity extends Activity {
 		
 		if(intent.getBooleanExtra(Utilities.SV_REMINDER_LAST, false)){
 			Toast.makeText(getApplicationContext(), R.string.survey_timeout, Toast.LENGTH_LONG).show();
+			String surName = intent.getStringExtra(Utilities.SV_NAME);
+			SharedPreferences surShp = Utilities.getSP(this, Utilities.SP_SURVEY);
 			String[] reminder = getReminderTimeStamp(context);
 			try {
+				String seq = "";
+				int surSeq = surShp.getInt(Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surName), -1);
+				if (surSeq == 0) {
+					surSeq = Utilities.MAX_TRIGGER_MAP.get(surName);
+				}
+				if (surName.equals(Utilities.SV_NAME_RANDOM)) {
+					seq = "," + surSeq;
+				}
+
 				Utilities.writeEventToFile(context, getSurveyType(), getScheduleTimeStamp(),
 						reminder[0], reminder[1], reminder[2],
-						Utilities.sdf.format(startCal.getTime()), Utilities.sdf.format(Calendar.getInstance().getTime()));
+						Utilities.sdf.format(startCal.getTime()), Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -369,14 +398,18 @@ public class XMLSurveyActivity extends Activity {
 					// Random
 					// Drinking follow-ups
 
+					String seq = "";
 					int surSeq = surShp.getInt(Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surName), -1);
 					if (surSeq == 0) {
 						surSeq = Utilities.MAX_TRIGGER_MAP.get(surName);
 					}
+					if (surName.equals(Utilities.SV_NAME_RANDOM)) {
+						seq = "," + surSeq;
+					}
 
-					Utilities.writeEventToFile(context, (surName.equals(Utilities.SV_NAME_RANDOM) ? Utilities.CODE_SKIP_BLOCK_SURVEY_RANDOM : Utilities.CODE_SKIP_BLOCK_SURVEY_DRINKING), "", "", "",
-							"" + surName, "" + surSeq,
-							Utilities.sdf.format(Calendar.getInstance().getTime()));
+					Utilities.writeEventToFile(context, (surName.equals(Utilities.SV_NAME_RANDOM) ? Utilities.CODE_SKIP_BLOCK_SURVEY_RANDOM : Utilities.CODE_SKIP_BLOCK_SURVEY_DRINKING),
+							"", "", "", "",
+							"", Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -639,9 +672,8 @@ public class XMLSurveyActivity extends Activity {
 	
 	//Get the next question to be displayed
     protected LinearLayout nextQuestionLayout(){
-    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~next", "currentQ"+
-    	(currentQuestion != null ? currentQuestion.getSelectedAnswers().get(0)+currentQuestion.getSkip() : "null"));
-    	
+//		Utilities.Log("~~~~~~~~~~~~~~~~~~~~next", "currentQ" + (currentQuestion != null ? currentQuestion.getSelectedAnswers().get(0) + currentQuestion.getSkip() : "null"));
+
     	Question temp = null;
     	boolean done = false;
     	boolean allowSkip = false;
@@ -708,7 +740,7 @@ public class XMLSurveyActivity extends Activity {
     }
     
     protected LinearLayout lastQuestionLayout(){
-    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~last", "skipFrom"+ skipFrom);
+//    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~last", "skipFrom"+ skipFrom);
     	Question temp = null;
     	
     	while(temp == null){
@@ -888,10 +920,10 @@ public class XMLSurveyActivity extends Activity {
 //    					Log.d("_________________________________","has trigger");
     				}
     			}
-    			
-    			for(String answer: question.getSelectedAnswers()){
-    				Log.d("+++++++++++++++++++++++++++++","answer string "+answer);
-    			}
+
+//    			for(String answer: question.getSelectedAnswers()){
+//    				Log.d("+++++++++++++++++++++++++++++","answer string "+answer);
+//    			}
     		}
     	}
 		//answerMap.put(currentQuestion.getId(), currentQuestion.getSelectedAnswers());
@@ -910,9 +942,22 @@ public class XMLSurveyActivity extends Activity {
 //    		Utilities.updateStudyDay();
 //    		//schedule random survey
 //    		Utilities.scheduleRandomSurvey(this);
-			
-			// for those have sensor only
+
+			// craving for those have sensor only
 			setResult(3);
+
+			new AlertDialog.Builder(this)
+					.setTitle(R.string.morning_report_title4)
+					.setMessage(R.string.morning_report_msg4)
+					.setCancelable(false)
+					.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.cancel();
+							finish();
+						}
+					})
+					.create().show();
     	}
 		
     	//haidong
@@ -922,9 +967,18 @@ public class XMLSurveyActivity extends Activity {
 			Calendar rsT = Calendar.getInstance();
 			String rsDate = (rsT.get(Calendar.MONTH)+1)+"/"+rsT.get(Calendar.DAY_OF_MONTH)+"/"+rsT.get(Calendar.YEAR);
 			String uID = Utilities.getSP(this, Utilities.SP_LOGIN).getString(Utilities.SP_KEY_LOGIN_USERID, "0000");
+
+			String data = null;
+			try {
+				data = Utilities.encryption(uID + "," + rsDate + "," + rsID + "," + "complete");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			ComplianceSignal completedSignal = new ComplianceSignal();
-			completedSignal.execute(uID,rsDate,rsID,"complete");
-			
+			completedSignal.execute(data);
+
     	}
     	//--
 
@@ -951,7 +1005,10 @@ public class XMLSurveyActivity extends Activity {
 		}
 		
     	Toast.makeText(this, R.string.survey_completed, Toast.LENGTH_LONG).show();
-    	finish();
+
+		if (!surveyName.equals(Utilities.SV_NAME_MORNING)) {
+			finish();
+		}
     }
 
 
@@ -1113,6 +1170,15 @@ public class XMLSurveyActivity extends Activity {
 			SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd"); 
 			String dateObj =curFormater.format(c.getTime()); 		
 			String file_name=surveyName+"."+userID+"."+dateObj+".txt";
+
+		StringBuilder prefix_sb = new StringBuilder(Utilities.PREFIX_LEN);
+		String prefix = surveyName + "." + userID + "." + dateObj;
+		prefix_sb.append(prefix);
+
+		for (int i = prefix.length(); i <= Utilities.PREFIX_LEN; i++) {
+			prefix_sb.append(" ");
+		}
+
 		/************************************************************************
 		 * Chen 
 		 * 
@@ -1121,7 +1187,7 @@ public class XMLSurveyActivity extends Activity {
 		 */
 		String ensb = null;
 		try {
-			ensb = Utilities.encryption(sb.toString());
+			ensb = Utilities.encryption(prefix_sb.toString() + sb.toString());
 
 			if(Utilities.WRITE_RAW) {
 				Utilities.writeToFile(file_name, sb.toString());
@@ -1137,9 +1203,9 @@ public class XMLSurveyActivity extends Activity {
 		
 		//Ricky 2013/12/09
 		TransmitData transmitData=new TransmitData();
-		transmitData.execute(surveyName+"."+userID+"."+dateObj, ensb);
-		
-		
+		transmitData.execute(ensb);
+
+
 		//for debug
 		int i = shp.getInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_RANDOM, -1);
 		Utilities.writeToFile("Event.txt",sb.substring(0, sb.indexOf("q"))+
@@ -1155,18 +1221,22 @@ public class XMLSurveyActivity extends Activity {
 		@Override
 		protected Boolean doInBackground(String... strings) {
 			// TODO Auto-generated method stub
-			String fileName=strings[0];
-	        String dataToSend=strings[1];
+			String data = strings[0];
+
+			//			String fileName=strings[0];
+			//	        String dataToSend=strings[1];
 	        if(checkDataConnectivity())
 	 		{
 	        		 
 	        Log.d("((((((((((((((((((((((((", ""+Thread.currentThread().getId());
 	         HttpPost request = new HttpPost(Utilities.UPLOAD_ADDRESS);
 	         List<NameValuePair> params = new ArrayList<NameValuePair>();
-	         //file_name 
-	         params.add(new BasicNameValuePair("file_name",fileName));        
-	         //data                       
-	         params.add(new BasicNameValuePair("data",dataToSend));
+				params.add(new BasicNameValuePair("data", data));
+
+				//	         //file_name
+				//	         params.add(new BasicNameValuePair("file_name",fileName));
+				//	         //data
+				//	         params.add(new BasicNameValuePair("data",dataToSend));
 	         try {
 	         	        	
 	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
@@ -1322,18 +1392,20 @@ public class XMLSurveyActivity extends Activity {
 		@Override
 		protected Boolean doInBackground(String... strings) {
 			// TODO Auto-generated method stub
-	         String UID = strings[0];
-	         String Date = strings[1];
-	         String RSID = strings[2];
-	         String CMD = strings[3];
+			String data = strings[0];
+			//	         String UID = strings[0];
+			//	         String Date = strings[1];
+			//	         String RSID = strings[2];
+			//	         String CMD = strings[3];
 	         if(checkDataConnectivity())
 	 		{
 	         HttpPost request = new HttpPost(Utilities.COMPLIANCE_ADDRESS);
 	         List<NameValuePair> params = new ArrayList<NameValuePair>();
-	         params.add(new BasicNameValuePair("category",CMD));                            
-	         params.add(new BasicNameValuePair("UID",UID));
-	         params.add(new BasicNameValuePair("Date",Date));
-	         params.add(new BasicNameValuePair("RSID",RSID));
+				params.add(new BasicNameValuePair("data", data));
+				//	         params.add(new BasicNameValuePair("category",CMD));
+				//	         params.add(new BasicNameValuePair("UID",UID));
+				//	         params.add(new BasicNameValuePair("Date",Date));
+				//	         params.add(new BasicNameValuePair("RSID",RSID));
 	         try {
 	         	        	
 	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));

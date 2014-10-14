@@ -1,27 +1,10 @@
 package edu.missouri.niaaa.craving.sensor.equivital;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.math.BigInteger;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import java.security.spec.RSAPublicKeySpec;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -32,16 +15,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-
-
-
-
 //Ricky
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Base64;
 import android.util.Log;
 
 import com.equivital.sdk.ISemConnection;
@@ -55,6 +33,7 @@ import com.equivital.sdk.decoder.events.ISemDeviceSummaryEvents;
 import com.equivital.sdk.decoder.events.SemSummaryDataEventArgs;
 
 import edu.missouri.niaaa.craving.Utilities;
+import edu.missouri.niaaa.craving.logger.Logger;
 import edu.missouri.niaaa.craving.services.SensorLocationService;
 
 
@@ -309,12 +288,20 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
         	    List<String> subList = dataPoints.subList(0,56);
  	            String data=subList.toString();
  	            String formattedData=data.replaceAll("[\\[\\]]","");
- 	           
+
+			StringBuilder prefix_sb = new StringBuilder(Utilities.PREFIX_LEN);
+			String prefix = "chestsensor" + "." + phoneID + "." + deviceName + "." + dateObj;
+			prefix_sb.append(prefix);
+
+			for (int i = prefix.length(); i <= Utilities.PREFIX_LEN; i++) {
+				prefix_sb.append(" ");
+			}
+
  	            //chen - calculate the time consumption
  	            String enformattedData = null;
  	            try {
 // 	            	long st = Calendar.getInstance().getTimeInMillis();
- 	            	enformattedData = Utilities.encryption(formattedData);
+				enformattedData = Utilities.encryption(prefix_sb.toString() + formattedData);
 // 	            	long ed = Calendar.getInstance().getTimeInMillis();
 // 	            	writeToFile(encStat,String.valueOf(ed-st));
  	            } catch (Exception e) {
@@ -324,8 +311,8 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
  	            
  	            TransmitData transmitData=new TransmitData();
 // 	            transmitData.execute("chestsensor"+"."+phoneID+"."+deviceName+"."+dateObj,formattedData);
- 	            transmitData.execute("chestsensor"+"."+phoneID+"."+deviceName+"."+dateObj,enformattedData);
- 	            
+			transmitData.execute(enformattedData);
+
  	            Log.d("Equivital","Chest Summary Data Point Sent "+enformattedData);
  	            subList.clear();  
  	            subList=null;
@@ -374,11 +361,20 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
  	            String data=subList.toString();
  	            String formattedData=data.replaceAll("[\\[\\]]","");
  	            //sendDatatoServer("chestsensor"+"."+phoneAddress+"."+deviceName+"."+dateObj,formattedData);
- 	            
+
+ 	           StringBuilder prefix_sb = new StringBuilder(Utilities.PREFIX_LEN);
+ 				String prefix = fileName+"."+phoneID+"."+deviceName+"."+dateObj;
+ 				prefix_sb.append(prefix);
+
+ 				for (int i = prefix.length(); i <= Utilities.PREFIX_LEN; i++) {
+ 					prefix_sb.append(" ");
+ 				}
+
+
  	            //chen
  	            String enformattedData = null;
  	            try {
- 	            	enformattedData = Utilities.encryption(formattedData);
+				enformattedData = Utilities.encryption(prefix_sb.toString() + formattedData);
  	            } catch (Exception e) {
  	            	// TODO Auto-generated catch block
  	            	e.printStackTrace();
@@ -387,7 +383,7 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
  	            
  	            TransmitData transmitData=new TransmitData();
  	            //transmitData.execute(fileName+"."+phoneID+"."+deviceName+"."+dateObj,formattedData);
- 	            transmitData.execute(fileName+"."+phoneID+"."+deviceName+"."+dateObj,enformattedData);
+			transmitData.execute(enformattedData);
  	            Log.d("Equivital","AVG Accelerometer Data Point Sent");
  	            subList.clear();  
  	            subList=null;
@@ -505,18 +501,22 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 		@Override
 		protected Boolean doInBackground(String... strings) {
 			// TODO Auto-generated method stub
-			 String fileName=strings[0];
-	         String dataToSend=strings[1];
+			String data = strings[0];
+
+			//			 String fileName=strings[0];
+			//	         String dataToSend=strings[1];
 	         Log.d("DEFE!!!!!!!!!!!!!!!!!!!!!!!!!", "tranis data0");
 	         if(checkDataConnectivity())
 	 		{
 	        	 Log.d("DEFE!!!!!!!!!!!!!!!!!!!!!!!!!", "tranis data");
 	         HttpPost request = new HttpPost(Utilities.UPLOAD_ADDRESS);
 	         List<NameValuePair> params = new ArrayList<NameValuePair>();
-	         //file_name 
-	         params.add(new BasicNameValuePair("file_name",fileName));        
-	         //data                       
-	         params.add(new BasicNameValuePair("data",dataToSend));
+				params.add(new BasicNameValuePair("data", data));
+
+				//	         //file_name
+				//	         params.add(new BasicNameValuePair("file_name",fileName));
+				//	         //data
+				//	         params.add(new BasicNameValuePair("data",dataToSend));
 	         try {
 	         	        	
 	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));

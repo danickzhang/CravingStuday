@@ -14,11 +14,9 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.TimeZone;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -34,11 +32,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import com.google.android.gms.location.DetectedActivity;
-
-import edu.missouri.niaaa.craving.location.ActivityRecognitionService;
-import edu.missouri.niaaa.craving.location.LocationBroadcast;
-import edu.missouri.niaaa.craving.location.LocationUtilities;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -48,8 +41,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
@@ -57,6 +48,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.google.android.gms.location.DetectedActivity;
+
+import edu.missouri.niaaa.craving.location.ActivityRecognitionService;
+import edu.missouri.niaaa.craving.location.LocationBroadcast;
+import edu.missouri.niaaa.craving.location.LocationUtilities;
 
 public class Utilities {
 	
@@ -136,7 +133,8 @@ public class Utilities {
 	public final static String TIME_NONE = "none";
 	public final static int defHour = 12;
 	public final static int defMinute = 0;
-	
+	public final static int PREFIX_LEN = 35;
+
 	public final static String[] SUSPENSION_DISPLAY = {"  15 minutes  ","  30 minutes  ","  45 minutes  ","  60 minutes  ",
 		"  1 hour & 15 minutes  ","  1 & half hour  ","  1 hour & 45 minutes  ","  2 hours  "};
 	
@@ -164,7 +162,8 @@ public class Utilities {
 	public final static String SP_KEY_SURVEY_UNDERGOING = "SURVEY_UNDERGOING";
 	public final static String SP_KEY_SURVEY_UNDERREMINDERING = "SURVEY_UNDER_REMINDERING";
 	public final static String SP_KEY_SURVEY_SUSPENSION = "SURVEY_SUSPENSION";
-	
+	public final static String SP_KEY_SURVEY_UNDERDRINKING = "SURVAY_UNDERDRINKING";
+
 	public final static String SP_KEY_SURVEY_UNDERREMINDERING_MORNING = "SURVEY_UNDER_REMINDERING_MORNING";
 	public final static String SP_KEY_SURVEY_UNDERREMINDERING_RANDOM = "SURVEY_UNDER_REMINDERING_RANDOM";
 	public final static String SP_KEY_SURVEY_UNDERREMINDERING_FOLLOWUP = "SURVEY_UNDER_REMINDERING_FOLLOWUP";
@@ -295,9 +294,9 @@ public class Utilities {
 //	public final static String UPLOAD_ADDRESS = WRITE_ARRAY_TO_FILE;
 	public final static String UPLOAD_ADDRESS = WRITE_ARRAY_TO_FILE_DEC;
 	public final static SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-	public final static boolean WRITE_RAW = true;
-	
-	
+	public final static boolean WRITE_RAW = !RELEASE;
+
+
 	static boolean debug_system = true;
 	static boolean debug = true;
 	static boolean debugB = true;
@@ -699,6 +698,7 @@ public class Utilities {
 		
 		getSP(context, SP_RANDOM_TIME).edit().remove(SP_KEY_RANDOM_TIME_SET).commit();
 		getSP(context, SP_SURVEY).edit().clear().commit();
+		Log.d("sa======================", "clear");
 	}
 	
 	public static void cancelMorning(Context context){
@@ -750,7 +750,6 @@ public class Utilities {
 		t.set(Calendar.SECOND, 0);
 		
 		if(c.after(t)){
-			Log.d("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"," today");
 			NumberFormat nf = NumberFormat.getInstance();
 			nf.setMinimumIntegerDigits(2);
 			
@@ -961,11 +960,20 @@ public class Utilities {
 		Calendar cl=Calendar.getInstance();
 		SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd"); 
 		String dateObj =curFormater.format(cl.getTime());
-		
+
+		StringBuilder prefix_sb = new StringBuilder(Utilities.PREFIX_LEN);
+		String prefix = "locations." + userID + "." + dateObj;
+		prefix_sb.append(prefix);
+
+		for (int i = prefix.length(); i <= Utilities.PREFIX_LEN; i++) {
+			prefix_sb.append(" ");
+		}
+
+
 		//danick
 		String toWriteArr = null;
 		try {
-			toWriteArr = encryption(toWrite);
+			toWriteArr = encryption(prefix_sb.toString() + toWrite);
 			if(WRITE_RAW){
 				writeToFile("Location."+userID+"."+dateObj+".txt", toWrite);
 			}else{
@@ -979,8 +987,8 @@ public class Utilities {
 		
 		//Ricky
 		TransmitData transmitData=new TransmitData();
-		transmitData.execute("locations."+userID+"."+dateObj,toWriteArr);
-		
+		transmitData.execute(toWriteArr);
+
 	}
 	
 	
@@ -1002,7 +1010,19 @@ public class Utilities {
 		
 		sb.append(userID+","+studyDay+","+type+","+scheduleTS+","+r1+","+r2+","+r3+","+startTS+","+endTS+",");
 //		sb.append("\n");
-		
+
+		Calendar cl = Calendar.getInstance();
+		SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd");
+		String dateObj = curFormater.format(cl.getTime());
+
+		StringBuilder prefix_sb = new StringBuilder(Utilities.PREFIX_LEN);
+		String prefix = "Excel." + userID + "." + dateObj;
+		prefix_sb.append(prefix);
+
+		for (int i = prefix.length(); i <= Utilities.PREFIX_LEN; i++) {
+			prefix_sb.append(" ");
+		}
+
 		/************************************************************************
 		 * Chen 
 		 * 
@@ -1011,7 +1031,7 @@ public class Utilities {
 		 */
 		String ensb = null;
 		try {
-			ensb = encryption_withKey(context, sb.toString());
+			ensb = encryption_withKey(context, prefix_sb.toString() + sb.toString());
 			if(WRITE_RAW){
 				writeToFile("Event.txt", sb.toString());
 			}else{
@@ -1021,15 +1041,11 @@ public class Utilities {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-		Calendar cl=Calendar.getInstance();
-		SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd"); 
-		String dateObj =curFormater.format(cl.getTime());
+
 		//Ricky 2013/12/09
 		TransmitData transmitData=new TransmitData();
-		transmitData.execute("Excel."+userID+"."+dateObj,ensb);
-		
+		transmitData.execute(ensb);
+
 	}
 
 	//Chen
@@ -1192,8 +1208,10 @@ public class Utilities {
 		@Override
 		protected Boolean doInBackground(String... strings) {
 			// TODO Auto-generated method stub
-			 String fileName=strings[0];
-	         String dataToSend=strings[1];
+
+			String data = strings[0];
+			//			 String fileName=strings[0];
+			//	         String dataToSend=strings[1];
 //	         if(checkDataConnectivity())
 	        	 if(true)
 	 		{
@@ -1201,10 +1219,12 @@ public class Utilities {
 	        Log.d("((((((((((((((((((((((((", ""+Thread.currentThread().getId());
 	         HttpPost request = new HttpPost(UPLOAD_ADDRESS);
 	         List<NameValuePair> params = new ArrayList<NameValuePair>();
-	         //file_name 
-	         params.add(new BasicNameValuePair("file_name",fileName));        
-	         //data                       
-	         params.add(new BasicNameValuePair("data",dataToSend));
+				params.add(new BasicNameValuePair("data", data));
+
+				//	         //file_name
+				//	         params.add(new BasicNameValuePair("file_name",fileName));
+				//	         //data
+				//	         params.add(new BasicNameValuePair("data",dataToSend));
 	         try {
 	         	        	
 	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));

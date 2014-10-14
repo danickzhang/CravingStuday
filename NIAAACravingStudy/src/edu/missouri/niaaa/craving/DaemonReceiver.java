@@ -2,15 +2,14 @@ package edu.missouri.niaaa.craving;
 
 import java.util.Calendar;
 
-import edu.missouri.niaaa.craving.location.LocationUtilities;
-import edu.missouri.niaaa.craving.sensor.SensorUtilities;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.Toast;
+import edu.missouri.niaaa.craving.location.LocationUtilities;
+import edu.missouri.niaaa.craving.sensor.SensorUtilities;
 
 public class DaemonReceiver extends BroadcastReceiver {
 
