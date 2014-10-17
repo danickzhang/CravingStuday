@@ -137,6 +137,9 @@
 	<string name="input_apin_error">Verify failed. Please try again.</string>
 	<string name="input_apin_return">Return code incorrect. Please try again.</string>
 	<string name="input_apin_net_error">Failed. Please try again, with network connection.</string>
+	
+	<string name="notification_text_alarm">Please notice that SEM sensor has been disconnected. \nPlease reconnect it by using the \"Sensor Connections\" menu.</string>
+	<string name="notification_btn">Don\'t remind later</string>
 
 	
 	

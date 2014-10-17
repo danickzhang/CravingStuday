@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -56,8 +58,11 @@ public class SensorLocationService extends Service {
 	int soundStreamID;
 	int voiceStreamID;
 	public static boolean mIsRunning = false;
-	
-	
+
+	AlarmManager am;
+	Intent itTrigger = itTrigger = new Intent(SensorUtilities.ACTION_LOST_CONNECTION_REMINDER);
+
+
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
@@ -65,7 +70,8 @@ public class SensorLocationService extends Service {
 		Utilities.Log_sys(TAG, "Service OnCreate");
 		serviceContext = this;
 		mIsRunning = true;
-		
+
+		am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -83,6 +89,7 @@ public class SensorLocationService extends Service {
 		sensorIntent.addAction(SensorUtilities.ACTION_CONNECT_SENSOR);
 		sensorIntent.addAction(SensorUtilities.ACTION_DISCONNECT_SENSOR);
 		sensorIntent.addAction(SensorUtilities.ACTION_LOST_CONNECTION_SOUND);
+		sensorIntent.addAction(SensorUtilities.ACTION_LOST_CONNECTION_REMINDER);
 		this.registerReceiver(SensorReceiver,sensorIntent);
 		
 		
@@ -103,7 +110,7 @@ public class SensorLocationService extends Service {
 
 		stopInternalThread(accelermetorThread);
 		stopEquivitalThread();
-		stopSound();
+		stopSound(this, itTrigger, am);
 	}
 
 	@Override
@@ -210,15 +217,36 @@ public class SensorLocationService extends Service {
 				log.d("action received: "+ SensorUtilities.ACTION_DISCONNECT_SENSOR);
 				stopInternalThread(accelermetorThread);
 				stopEquivitalThread();
-				stopSound();
+				stopSound(context, itTrigger, am);
 			}
 			
 			else if(action.equals(SensorUtilities.ACTION_LOST_CONNECTION_SOUND)){
 				
 				//sound alert that bluetooth connection is lost, check to connect again
 				Log.d(TAG, "sensor connection is lost, sound should come off");
-				playSound();
+
+				PendingIntent piTrigger = null;
+				Long time = Long.MAX_VALUE;
+
+				for (int i = 0; i < 3; i++) {
+					piTrigger = PendingIntent.getBroadcast(context, i, itTrigger, Intent.FLAG_ACTIVITY_NEW_TASK);
+					time = Calendar.getInstance().getTimeInMillis() + Utilities.REMINDER_IN_SECONDS * 1000 * i;
+
+					am.setExact(AlarmManager.RTC_WAKEUP, time, piTrigger);
+				}
+
+				Intent it = new Intent(context, NotificationSystem.class);
+				it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				it.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				startActivity(it);
+
+//				playSound();
 				writeSensorConn();
+			}
+
+			else if(action.equals(SensorUtilities.ACTION_LOST_CONNECTION_REMINDER)){
+
+				playSound();
 			}
 		}
 		
@@ -283,8 +311,17 @@ public class SensorLocationService extends Service {
 		Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         v.vibrate(1000);
 	}
-	
-	private void stopSound(){
+
+	private void stopSound(Context context, Intent itTrigger, AlarmManager am) {
+
+		PendingIntent piTrigger = null;
+
+		for (int i = 0; i < 3; i++) {
+			piTrigger = PendingIntent.getBroadcast(context, i, itTrigger, Intent.FLAG_ACTIVITY_NEW_TASK);
+
+			am.cancel(piTrigger);
+		}
+
 		if(soundTimer != null) {
 			soundTimer.cancel();
 		}

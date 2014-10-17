@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.missouri.niaaa.craving"
-    android:versionCode="033"
+    android:versionCode="034"
     android:versionName="2.3" >
 
     <uses-sdk
@@ -143,6 +143,13 @@
             android:name=".sensor.DeviceListActivity"
             android:screenOrientation="portrait" >
         </activity>
+        
+        <activity
+            android:name=".services.NotificationSystem"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Dialog">
+        </activity>
+            
         
     </application>
 

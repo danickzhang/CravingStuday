@@ -271,12 +271,12 @@ public class Utilities {
 /*	validate*/
 	
 /*	Craving Study*/
-	public final static String VALIDATE_ADDRESS = 			"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/validateUser.php";
+	public final static String VALIDATE_ADDRESS = "http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/validateUserDec.php";
 	public final static String WRITE_ARRAY_TO_FILE = 		"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/writeArrayToFile.php";
 	public final static String WRITE_ARRAY_TO_FILE_DEC = 	"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/writeArrayToFileDec.php";
-	public final static String COMPLIANCE_ADDRESS = 		"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/compliance.php";
-	public final static String STUDY_DAY_MODIFY_ADDRESS = 	"http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/changeStudyWeek.php";
-	
+	public final static String COMPLIANCE_ADDRESS = "http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/complianceDec.php";
+	public final static String STUDY_DAY_MODIFY_ADDRESS = "http://dslsrv8.cs.missouri.edu/~hw85f/Server/Crt2/changeStudyWeekDec.php";
+
 /*	EMA-STL Study*/
 //	public final static String VALIDATE_ADDRESS = 			"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtEMA/validateUser.php";
 //	public final static String WRITE_ARRAY_TO_FILE = 		"http://dslsrv8.cs.missouri.edu/~hw85f/Server/CrtEMA/writeArrayToFile.php";

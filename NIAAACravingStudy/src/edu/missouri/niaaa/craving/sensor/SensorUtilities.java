@@ -1,8 +1,5 @@
 package edu.missouri.niaaa.craving.sensor;
 
-import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.content.Intent;
 
 public class SensorUtilities {
 
@@ -17,7 +14,8 @@ public class SensorUtilities {
 	public static final String ACTION_CONNECT_SENSOR = "edu.missouri.niaaa.craving.CONNECT_SENSOR";
 	public static final String ACTION_DISCONNECT_SENSOR = "edu.missouri.niaaa.craving.DISCONNECT_SENSOR";
 	public static final String ACTION_LOST_CONNECTION_SOUND = "edu.missouri.niaaa.craving.LOST_CONNECTION_SOUND";
-	
+	public static final String ACTION_LOST_CONNECTION_REMINDER = "edu.missouri.niaaa.craving.LOST_CONNECTION_REMINDER";
+
 	public final static String KEY_ADDRESS = "KEY_ADDRESS";
 	public final static String KEY_DEVICE_NAME = "KEY_DEVICE_NAME";
 	

@@ -282,7 +282,7 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
          	e.printStackTrace();
          }
 
-		// log.d("DEFE!!!!!!!!!!!!!!!!!!!!!!!!!: tranis: " + dataPoints.size());
+		log.d("EquivitalRunnable: tranis: " + dataPoints.size());
         if(dataPoints.size()==57)
         {
         	    List<String> subList = dataPoints.subList(0,56);
