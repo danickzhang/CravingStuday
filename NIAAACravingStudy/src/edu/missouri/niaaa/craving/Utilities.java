@@ -499,20 +499,22 @@ public class Utilities {
 			
 			//write complete time
 			getSP(context, SP_BED_TIME).edit().putLong(SP_KEY_MORNING_COMPLETE_TIME, Calendar.getInstance().getTimeInMillis()).commit();
-			
-//			if(isRandomScheduled(context)){
-//				//reschedule today's random
-//				reScheduleRandom(context);
-//			}
-//			else{
-//				//schedule random
-//				scheduleRandomSurvey(context, false);
-//			}
-			
+
+			if (isRandomScheduled(context)) {
+				//reschedule today's random
+				reScheduleRandom(context);
+				writeReboot();
+			}
+			else {
+				//schedule random
+				scheduleRandomSurvey(context, true, true);
+				reScheduleRandom(context);
+			}
+
 			//instead, we do this as a new way:
-			scheduleRandomSurvey(context, true, true);
-			reScheduleRandom(context);
-			
+//			scheduleRandomSurvey(context, true, true);
+//			reScheduleRandom(context);
+
 		}
 		
 		//before previous set morning time & before noon
@@ -530,8 +532,13 @@ public class Utilities {
 			//do nothing
 		}
 	}
-	
-	
+
+
+	private static void writeReboot() {
+		// TODO Auto-generated method stub
+
+	}
+
 	private static boolean isRandomScheduled(Context context){
 		//random
 		String strRandom[] = getSP(context, SP_RANDOM_TIME).getString(SP_KEY_RANDOM_TIME_SET, "").split(",");

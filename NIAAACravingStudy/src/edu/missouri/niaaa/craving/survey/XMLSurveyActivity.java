@@ -144,7 +144,7 @@ public class XMLSurveyActivity extends Activity {
 
 				Utilities.writeEventToFile(context, getSurveyType(), getScheduleTimeStamp(),
 						reminder[0], reminder[1], reminder[2],
-						Utilities.sdf.format(Calendar.getInstance().getTime()), Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
+						"", Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -360,7 +360,9 @@ public class XMLSurveyActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onNewIntent(intent);
 		Utilities.Log(TAG, "on new intent");
-		
+
+		//autoTriggered = getIntent().getBooleanExtra(Utilities.SV_AUTO_TRIGGERED, false);
+
 		if(intent.getBooleanExtra(Utilities.SV_REMINDER_LAST, false)){
 			Toast.makeText(getApplicationContext(), R.string.survey_timeout, Toast.LENGTH_LONG).show();
 			String surName = intent.getStringExtra(Utilities.SV_NAME);
@@ -378,7 +380,7 @@ public class XMLSurveyActivity extends Activity {
 
 				Utilities.writeEventToFile(context, getSurveyType(), getScheduleTimeStamp(),
 						reminder[0], reminder[1], reminder[2],
-						Utilities.sdf.format(startCal.getTime()), Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
+						"", Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1299,6 +1301,26 @@ public class XMLSurveyActivity extends Activity {
 
 		    @Override
 			public void onClick(DialogInterface arg0, int arg1) {
+
+		    	String[] reminder = getReminderTimeStamp(context);
+				try {
+					String seq = "";
+					int surSeq = shp.getInt(Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surveyName), -1);
+					if (surSeq == 0) {
+						surSeq = Utilities.MAX_TRIGGER_MAP.get(surveyName);
+					}
+					if (surveyName.equals(Utilities.SV_NAME_RANDOM)) {
+						seq = "," + surSeq;
+					}
+
+					Utilities.writeEventToFile(context, getSurveyType(), getScheduleTimeStamp(),
+							reminder[0], reminder[1], reminder[2],
+							"", Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 		    	XMLSurveyActivity.super.onBackPressed();
 		    }
 		}).create().show();
