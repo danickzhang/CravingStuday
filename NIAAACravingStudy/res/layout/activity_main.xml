@@ -46,8 +46,7 @@
     <Button
         android:id="@+id/section_label7"
         style="@style/button_style"
-        android:text="followups"
-        android:visibility="gone"
+        android:text="@string/section_7"
         />
     <Button
         android:id="@+id/section_label8"

@@ -1,7 +1,5 @@
 package edu.missouri.niaaa.craving.location;
 
-import com.google.android.gms.location.ActivityRecognitionResult;
-import com.google.android.gms.location.DetectedActivity;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -10,9 +8,12 @@ import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.util.Log;
 
+import com.google.android.gms.location.ActivityRecognitionResult;
+import com.google.android.gms.location.DetectedActivity;
+
 
 public class ActivityRecognitionService extends IntentService{
-	
+
 	private static final String TAG ="ActivityRecognitionService";
 	public final static String BASE_PATH = "sdcard/TestResults/";
 	ActivityRecognitionResult result;
@@ -23,13 +24,13 @@ public class ActivityRecognitionService extends IntentService{
 	AlarmManager mAlarmManager;
 	LocationManager mLocationManager;
 	IntentFilter mIntentFilter;
-	
-	
+
+
 	public ActivityRecognitionService() {
 		super("ActivityRecognitionService");
 		Log.d(TAG, "constructor");
 	}
-	
+
 	/**
 	* Google Play Services calls this once it has analysed the sensor data
 	*/
@@ -43,16 +44,16 @@ public class ActivityRecognitionService extends IntentService{
 		   Log.d(TAG, "ActivityRecognitionResult: "+getNameFromType(result.getMostProbableActivity().getType()));
 	   }
 	}
-	
-	
-	
+
+
+
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		
+
 	}
-	
+
 	private String getNameFromType(int activityType) {
 	    switch(activityType) {
 	        case DetectedActivity.IN_VEHICLE:
@@ -67,39 +68,39 @@ public class ActivityRecognitionService extends IntentService{
 	            return "unknown";
 	        case DetectedActivity.TILTING:
 	            return "tilting";
-	            
+
 	    }
 	    return "unknown";
 	}
-	
+
 	public  void setCurrentUserActivity(int Activity,int Confidence){
-		
+
 		Log.d(TAG, "current user activity changed");
 		switch (Activity) {
-		case DetectedActivity.IN_VEHICLE:		
-		case DetectedActivity.ON_BICYCLE:		
+		case DetectedActivity.IN_VEHICLE:
+		case DetectedActivity.ON_BICYCLE:
 		case DetectedActivity.ON_FOOT:
 			if(Confidence>=75)
 			{
 				currentUserActivity=Activity;
 //	    		Intent i=new Intent("INTENT_ACTION_SCHEDULE_LOCATION");
 //	    		i.putExtra("activity",currentUserActivity);
-//				this.sendBroadcast(i);			
+//				this.sendBroadcast(i);
 				Log.d(TAG, "current user activity changed inner");
 			}
-		case DetectedActivity.TILTING:			
+		case DetectedActivity.TILTING:
 		case DetectedActivity.STILL:
-	    case DetectedActivity.UNKNOWN:    	
+	    case DetectedActivity.UNKNOWN:
 		default:
 			  //stopLocationUpdates();
 		}
 	}
-	
+
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
-		super.onCreate();	
-		
+		super.onCreate();
+
 		Log.d(TAG, "gps reco service onCreate");
 	}
 

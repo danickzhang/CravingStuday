@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.missouri.niaaa.craving"
-    android:versionCode="034"
+    android:versionCode="039"
     android:versionName="2.3" >
 
     <uses-sdk
@@ -12,6 +12,7 @@
 <!--     <uses-permission android:name="android.permission.DEVICE_POWER" /> -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SEND_SMS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -108,6 +109,11 @@
         </receiver>
         
         <activity
+            android:name=".activity.SupportActivity"
+            android:screenOrientation="portrait"
+            />
+        
+        <activity
             android:name=".activity.AdminManageActivity"
             android:screenOrientation="portrait" >
         </activity>
@@ -143,13 +149,6 @@
             android:name=".sensor.DeviceListActivity"
             android:screenOrientation="portrait" >
         </activity>
-        
-        <activity
-            android:name=".services.NotificationSystem"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Dialog">
-        </activity>
-            
         
     </application>
 

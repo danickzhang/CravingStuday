@@ -1,15 +1,15 @@
 package edu.missouri.niaaa.craving.location;
 
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.ActivityRecognitionClient;
-
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.ActivityRecognitionClient;
 
 
 public class ActivityRecognitionScan implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
@@ -18,7 +18,7 @@ public class ActivityRecognitionScan implements GooglePlayServicesClient.Connect
 	private Context mContext;
 
 	private static final String TAG = "ActivityRecognitionScan";
-	private static ActivityRecognitionClient mActivityRecognitionClient;	
+	private static ActivityRecognitionClient mActivityRecognitionClient;
 	private static PendingIntent mActivityRecognitionPendingIntent;
 
 	public ActivityRecognitionScan(Context context) {
@@ -35,15 +35,15 @@ public class ActivityRecognitionScan implements GooglePlayServicesClient.Connect
 	{
 		Log.d(TAG,"start activity recognition scan");
 		mActivityRecognitionClient	= new ActivityRecognitionClient(mContext, this, this);
-		mActivityRecognitionClient.connect();	
+		mActivityRecognitionClient.connect();
 	}
 
 	public void stopActivityRecognitionScan(){
 		try
 		{
-			mActivityRecognitionClient.removeActivityUpdates(mActivityRecognitionPendingIntent);	
+			mActivityRecognitionClient.removeActivityUpdates(mActivityRecognitionPendingIntent);
 			requestDisconnection();
-		} 
+		}
 		catch (IllegalStateException e)
 		{
 			Log.d(TAG,"Exception Caught");
@@ -52,7 +52,7 @@ public class ActivityRecognitionScan implements GooglePlayServicesClient.Connect
 
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
-		Log.d(TAG,"onConnectionFailed");		
+		Log.d(TAG,"onConnectionFailed");
 	}
 	/**
 	* Connection established - start listening now
@@ -60,50 +60,50 @@ public class ActivityRecognitionScan implements GooglePlayServicesClient.Connect
 
 	@Override
 	public void onDisconnected() {
-		
+
 	}
 
-	private ActivityRecognitionClient getActivityRecognitionClient() 
+	private ActivityRecognitionClient getActivityRecognitionClient()
 	{
-        if (mActivityRecognitionClient == null) 
+        if (mActivityRecognitionClient == null)
         {
             mActivityRecognitionClient = new ActivityRecognitionClient(mContext, this, this);
         }
-        
+
         return mActivityRecognitionClient;
     }
 
-	private void continueRequestActivityUpdates() 
+	private void continueRequestActivityUpdates()
 	{
 		/*
 		 * Request updates, using the default detection interval.
 		 * The PendingIntent sends updates to ActivityRecognitionIntentService
 		 */
-		
+
 		Log.d(TAG,"request activity updates");
 		Log.d(TAG, "continue request activity updates "+getActivityRecognitionClient().toString()+" "+createRequestPendingIntent().toString());
 		getActivityRecognitionClient().requestActivityUpdates(2*1000,createRequestPendingIntent());
-		
+
 		// Disconnect the client
 		//requestDisconnection();
 	}
 
-	private void requestDisconnection() 
+	private void requestDisconnection()
 	{
 		getActivityRecognitionClient().disconnect();
 	}
 
 	@Override
-	public void onConnected(Bundle connectionHint) 
+	public void onConnected(Bundle connectionHint)
 	{
-		// TODO Auto-generated method stub		
+		// TODO Auto-generated method stub
 		continueRequestActivityUpdates();
 		Log.d(TAG,"location scen on connected");
 	}
 
 	public PendingIntent getRequestPendingIntent() {
 		return mActivityRecognitionPendingIntent;
-		
+
 	}
 
 	/**

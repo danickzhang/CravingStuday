@@ -59,7 +59,7 @@ import edu.missouri.niaaa.craving.survey.category.RandomCategory;
 public class XMLSurveyActivity extends Activity {
 
 	String TAG = "XML Survey Activity~~~~";
-	
+
 	//Layout question will be displayed on
     LinearLayout surveyLayout;
   	//Tell the parser which survey to use
@@ -82,7 +82,7 @@ public class XMLSurveyActivity extends Activity {
     String skipFrom = null;
     //Category position in arraylist
   	int categoryNum;
-  	
+
   	SoundPool soundp;
 	private HashMap<Integer, Integer> soundsMap;
 	int soundDelay = 1000;
@@ -90,47 +90,48 @@ public class XMLSurveyActivity extends Activity {
 	int streamID;
 	String surveyTitle;
 	String dialogTitle;
-	
+
 	Dialog pinDialog;
 	Dialog reDialog;
 	SharedPreferences shp;
 	boolean underManuallyGoing = false;
-	
+
 	Calendar startCal;
 	WakeLock wl;
-	
+
 	static Context context;
-	
+
 	private int randomSeq = -1; //haidong
-	
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		Utilities.Log_sys(TAG, "onCreate");
-		
+
 		context = this;
-		
+
 		shp = Utilities.getSP(this, Utilities.SP_SURVEY);
 		surveyTitle = surveyName = getIntent().getStringExtra(Utilities.SV_NAME);
 		dialogTitle = getString(R.string.pin_title);
 		autoTriggered = getIntent().getBooleanExtra(Utilities.SV_AUTO_TRIGGERED, false);
-		
-		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);  
-        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Gank");  
-        
-		
+
+		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP, "Gank");
+
+
 		soundp = new SoundPool(2, AudioManager.STREAM_MUSIC, 100);
 		soundsMap = new HashMap<Integer, Integer>();
 		soundsMap.put(1, soundp.load(this, R.raw.alarm_sound, 1));
 		t=new Timer();
-		
-		
+
+
 		Log.d("ssssssssss", "reminder last is "+getIntent().getBooleanExtra(Utilities.SV_REMINDER_LAST, false));
 		if(getIntent().getBooleanExtra(Utilities.SV_REMINDER_LAST, false)){
 			Toast.makeText(getApplicationContext(), R.string.survey_timeout, Toast.LENGTH_LONG).show();
-			
+			Toast.makeText(getApplicationContext(), "2", Toast.LENGTH_LONG).show();
+
 			String[] reminder = getReminderTimeStamp(context);
 			try {
 				String seq = "";
@@ -157,19 +158,19 @@ public class XMLSurveyActivity extends Activity {
 		else if(autoTriggered){
 			AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 			am.setStreamVolume(AudioManager.STREAM_MUSIC, Utilities.VOLUME, AudioManager.FLAG_PLAY_SOUND);
-			
+
 			acquireLock();
-			
+
 			prepareSound();
-			
+
 			Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 	        v.vibrate(1000);
-	        
+
 	        //prepare seq title and reminder title
 	        Log.d("!!!!!!!!!!!!!!!!", ""+surveyTitle);
 	        if(Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surveyName) != null){
-	        	int i = shp.getInt(Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surveyName), 0); 
-	        	
+	        	int i = shp.getInt(Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surveyName), 0);
+
 	        	randomSeq = i; //haidong
 				switch(i){
 				case 0:
@@ -180,11 +181,11 @@ public class XMLSurveyActivity extends Activity {
 				}
 				Log.d("!!!!!!!!!!!!!!!!2", ""+surveyTitle);
 				dialogTitle = getDialogTitle();
-				
+
 				//haidong
 				if(surveyName.equals("RANDOM_ASSESSMENT")){
 					Log.d("!!!!!!!!!!!!!!!!hhhhhhhhhhhh", "i="+i+" randomSeq="+randomSeq);
-					
+
 					String rsID = String.valueOf(randomSeq);
 					Calendar rsT = Calendar.getInstance();
 					String rsDate = (rsT.get(Calendar.MONTH)+1)+"/"+rsT.get(Calendar.DAY_OF_MONTH)+"/"+rsT.get(Calendar.YEAR);
@@ -203,8 +204,8 @@ public class XMLSurveyActivity extends Activity {
 
 				}
 			}
-	        
-	        
+
+
 		}else{
 			//manually click in
 			//excepts
@@ -214,37 +215,37 @@ public class XMLSurveyActivity extends Activity {
 			if(!Utilities.completedMorningToday(this) && !surveyName.equals(Utilities.SV_NAME_MORNING) && !surveyName.equals(Utilities.SV_NAME_DRINKING)
 					&& !surveyName.equals(Utilities.SV_NAME_MOOD)  && !surveyName.equals(Utilities.SV_NAME_CRAVING)
 					){
-				//give an alert to show morning survey should be done first today. 
+				//give an alert to show morning survey should be done first today.
 				//or after 12:00 pm automatically cancel the restrict
 				//except morning survey
-				
+
 				setResult(2);
 				finish();
 			}
-			
-			else if(surveyName.equals(Utilities.SV_NAME_DRINKING) && 
+
+			else if(surveyName.equals(Utilities.SV_NAME_DRINKING) &&
 					Calendar.getInstance().get(Calendar.HOUR_OF_DAY)>=3 && Calendar.getInstance().get(Calendar.HOUR_OF_DAY)<12 && !Utilities.completedMorningToday(this)
 					){
-				
+
 				setResult(2);
 				finish();
 			}
-			
-//			if(!Utilities.completedMorningToday(this) && !surveyName.equals(Utilities.SV_NAME_MORNING) && !surveyName.equals(Utilities.SV_NAME_DRINKING) 
-//					&& Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 3 
-//					&& Calendar.getInstance().getTimeInMillis() < 							
+
+//			if(!Utilities.completedMorningToday(this) && !surveyName.equals(Utilities.SV_NAME_MORNING) && !surveyName.equals(Utilities.SV_NAME_DRINKING)
+//					&& Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 3
+//					&& Calendar.getInstance().getTimeInMillis() <
 //							Utilities.getSP(XMLSurveyActivity.this, Utilities.SP_BED_TIME).getLong(Utilities.SP_KEY_BED_TIME_LONG, -1)
 //							){//problem
 //				//same as above
 //				setResult(2);
 //				finish();
 //			}
-			
-//			if((!Utilities.completedMorningToday(this) && !surveyName.equals(Utilities.SV_NAME_MORNING) && !surveyName.equals(Utilities.SV_NAME_DRINKING)) || 
-//					(!Utilities.completedMorningToday(this) 
-//					&& surveyName.equals(Utilities.SV_NAME_DRINKING) 
-//					&& Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 3 
-//					&& Calendar.getInstance().getTimeInMillis() < 							
+
+//			if((!Utilities.completedMorningToday(this) && !surveyName.equals(Utilities.SV_NAME_MORNING) && !surveyName.equals(Utilities.SV_NAME_DRINKING)) ||
+//					(!Utilities.completedMorningToday(this)
+//					&& surveyName.equals(Utilities.SV_NAME_DRINKING)
+//					&& Calendar.getInstance().get(Calendar.HOUR_OF_DAY) >= 3
+//					&& Calendar.getInstance().getTimeInMillis() <
 //							Utilities.getSP(XMLSurveyActivity.this, Utilities.SP_BED_TIME).getLong(Utilities.SP_KEY_BED_TIME_LONG, -1)
 //					)
 //			){//problem
@@ -253,29 +254,29 @@ public class XMLSurveyActivity extends Activity {
 //				finish();
 //			}
 		}
-		
+
 		if(surveyName.equals(Utilities.SV_NAME_MORNING)){
-			
+
 		}
 
       	setTitle(Utilities.RELEASE? surveyName: surveyTitle);
-		
-		
-        
-		
+
+
+
+
 		setContentView(R.layout.survey_layout);
 		setListeners();
-		
+
 		//Initialize map that will pass questions and answers to service
         answerMap = new LinkedHashMap<String, List<String>>();
-        //Tell the parser which survey to use		
+        //Tell the parser which survey to use
       	surveyFile = Utilities.SV_MAP.get(surveyName);
-      	
+
       	Utilities.Log(TAG, "survey file is "+surveyFile);
-      	
+
       	//Setup XML parser
       	XMLParser parser = new XMLParser();
-      	
+
 		//Open the specified survey
 		try {
 			/* .parseQuestion takes an input source to the assets file,
@@ -315,15 +316,15 @@ public class XMLSurveyActivity extends Activity {
 				setContentView(vg);
 			}
 		}
-		
-		
+
+
 		pinDialog = PinCheckDialog(this);
 		reDialog = retryDialog();
 		pinDialog.show();
-		
+
 	}
-	
-	
+
+
 	private void acquireLock() {
 		// TODO Auto-generated method stub
 		wl.acquire();
@@ -331,11 +332,11 @@ public class XMLSurveyActivity extends Activity {
 
 
 	private String getDialogTitle(){
-		
+
 		int seq = shp.getInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, 1);
 		Editor ed = Utilities.getSP(context, Utilities.SP_REMINDER_INFO).edit();
 		String ts = Utilities.sdf.format(Calendar.getInstance().getTime());
-		
+
         //write reminder timestamp to shared preferences
         if(seq == 3){
         	ed.putString(Utilities.SP_KEY_REMINDER_INFO_3, ts).commit();
@@ -354,7 +355,7 @@ public class XMLSurveyActivity extends Activity {
 		}
 		return getString(R.string.pin_title) + " for reminder "+ seq;
 	}
-	
+
 	@Override
 	protected void onNewIntent(Intent intent) {
 		// TODO Auto-generated method stub
@@ -365,8 +366,11 @@ public class XMLSurveyActivity extends Activity {
 
 		if(intent.getBooleanExtra(Utilities.SV_REMINDER_LAST, false)){
 			Toast.makeText(getApplicationContext(), R.string.survey_timeout, Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), "1", Toast.LENGTH_LONG).show();
+
 			String surName = intent.getStringExtra(Utilities.SV_NAME);
 			SharedPreferences surShp = Utilities.getSP(this, Utilities.SP_SURVEY);
+
 			String[] reminder = getReminderTimeStamp(context);
 			try {
 				String seq = "";
@@ -388,9 +392,12 @@ public class XMLSurveyActivity extends Activity {
 
 			finish();
 		}
+
 		else if(underManuallyGoing){
-			
+
 			Toast.makeText(getApplicationContext(), "manually one block the auto one!", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), "4", Toast.LENGTH_LONG).show();
+
 			String surName = intent.getStringExtra(Utilities.SV_NAME);
 			SharedPreferences surShp = Utilities.getSP(this, Utilities.SP_SURVEY);
 
@@ -418,12 +425,12 @@ public class XMLSurveyActivity extends Activity {
 				}
 			}
 		}
-		
+
 		else{//auto triggered
 			acquireLock();
-			
+
 			playSound();
-			
+
 			shp = Utilities.getSP(this, Utilities.SP_SURVEY);
 			dialogTitle = getDialogTitle();
 			if(pinDialog.isShowing()) {
@@ -432,10 +439,10 @@ public class XMLSurveyActivity extends Activity {
 			pinDialog = PinCheckDialog(this);
 			pinDialog.show();
 		}
-		
+
 	}
-	
-	
+
+
 	private String num2seq(int num){
 		String seq = "";
 		switch(num){
@@ -453,62 +460,62 @@ public class XMLSurveyActivity extends Activity {
 		}
 		return seq;
 	}
-	
+
 	private Dialog retryDialog(){
-		
+
 		return new AlertDialog.Builder(this)
 		.setCancelable(false)
 		.setTitle(R.string.pin_title_wrong)
 		.setMessage(R.string.pin_message_wrong)
-		.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() { 
+		.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 
-			@Override 
-			public void onClick(DialogInterface dialog, int which) { 
-				// TODO Auto-generated method stub  
-				
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+
 				pinDialog.show();
 				dialog.cancel();
-				
+
 				Log.d("fffffffffffff", ""+Utilities.getSP(XMLSurveyActivity.this, Utilities.SP_SURVEY).getBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, false) + " "+
 						Utilities.getSP(XMLSurveyActivity.this, Utilities.SP_SURVEY).getString(Utilities.SP_KEY_SURVEY_UNDERREMINDERING, "nothing")+ " "+
 						Utilities.getSP(XMLSurveyActivity.this, Utilities.SP_SURVEY).getInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, -1)
 						);
-			} 
+			}
 		})
 		.create();
 	}
-	
-	
+
+
 	private Dialog PinCheckDialog(final Context context) {
 		LayoutInflater inflater = LayoutInflater.from(context);
-		final View DialogView = inflater.inflate(R.layout.pin_input, null);  
+		final View DialogView = inflater.inflate(R.layout.pin_input, null);
 		TextView pinText = (TextView) DialogView.findViewById(R.id.pin_text);
 		pinText.setText(R.string.pin_message);
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);  
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setCancelable(false);
 		builder.setTitle(dialogTitle);
-		builder.setView(DialogView);  
+		builder.setView(DialogView);
 		builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int whichButton) {
-				
+
 				EditText pinEdite = (EditText) DialogView.findViewById(R.id.pin_edit);
 				String pinStr = pinEdite.getText().toString();
 				Utilities.Log("Pin Dialog", "pin String is "+pinStr);
-				
+
 				if (pinStr.equals(Utilities.getPWD(context))){
 					Log.d("test", "b r o a d is "+ surveyName+" "+Utilities.BD_REMINDER_MAP.get(surveyName));
 					soundp.stop(streamID);
-					
+
 					startCal = Calendar.getInstance();
-					
+
 					if(autoTriggered){
 						//undergoing
 						shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, true).commit();
-						
+
 						//underreminder
 //						shp.edit().putString(Utilities.SP_KEY_SURVEY_UNDERREMINDERING, surveyFile).commit();
-						
+
 						//notify broadcast to set timeout
 						Intent it = new Intent(Utilities.BD_REMINDER_MAP.get(surveyName));
 						it.putExtra(Utilities.SV_NAME, surveyName);
@@ -518,57 +525,57 @@ public class XMLSurveyActivity extends Activity {
 						//under manual
 //						shp.edit().putBoolean("undermangoing", true).commit();
 						underManuallyGoing = true;
-						
+
 					}
-					
+
 					dialog.cancel();
 	        	}
 	        	else {
 	        		dialog.cancel();
 	        		reDialog.show();
-	        	}			        	
+	        	}
 	        	dialog.cancel();
-	         		        
-			}  
+
+			}
 		});
-		
+
 		builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 		    @Override
 			public void onClick(DialogInterface dialog, int whichButton) {
 
 		    	soundp.stop(streamID);
 				finish();
-		    }  
+		    }
 		});
-		
-		return builder.create();  
+
+		return builder.create();
 	}
-	
-	
-	
+
+
+
 	private void playSound(){
 //		this.setVolumeControlStream(AudioManager.STREAM_ALARM);
 		AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 		am.setStreamVolume(AudioManager.STREAM_MUSIC, Utilities.VOLUME, AudioManager.FLAG_PLAY_SOUND);
-		
+
 		t.schedule(new StartSound(),soundDelay);
-		
+
 		Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         v.vibrate(1000);
 	}
-	
-	
+
+
     private class StartSound extends TimerTask {
-    	@Override    	
-    	public void run(){ 
-    		
-    		streamID = soundp.play(soundsMap.get(1), 1, 1, 1, 0, 1); // should be different 
+    	@Override
+    	public void run(){
+
+    		streamID = soundp.play(soundsMap.get(1), 1, 1, 1, 0, 1); // craving should be different
     	}
     }
-	
+
 	private void prepareSound(){
 		soundp.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-			
+
 			@Override
 			public void onLoadComplete(SoundPool arg0, int arg1, int arg2) {
 				// TODO Auto-generated method stub
@@ -576,25 +583,25 @@ public class XMLSurveyActivity extends Activity {
 			}
 		});
 	}
-	
-	
-	
-	
+
+
+
+
 //	protected LinearLayout nextQuestion(){
 //		Utilities.Log("~~~~~~~~~~~~~~~~~~~~n", "start");
 //		Question temp = null;
 //		boolean done = false;
-//		
+//
 ////		if(currentQuestion != null)
 ////			skipFrom = currentQuestion.getId();
-//		
+//
 //		do{
 ////			if(temp != null)
 ////    			answerMap.put(temp.getId(), null);
-//			
+//
 //    		//Simplest case: category has the next question
 //    		temp = currentCategory.followingQuestion();
-//    		
+//
 //    		//Category is out of questions, try to move to next category
 //    		if(temp == null && (++categoryNum < cats.size())){
 //    			Utilities.Log("~~~~~~~~~!!~~~~~~~~~", "category is out of questions");
@@ -603,7 +610,7 @@ public class XMLSurveyActivity extends Activity {
 //    			 */
 //    			currentCategory = cats.get(categoryNum);
 //    		}
-//    		
+//
 //    		//Out of categories, survey must be done
 //    		else if(temp == null){
 //    			Utilities.Log("~~~~~~~~~!!~~~~~~~~~", "survey complete");
@@ -612,15 +619,15 @@ public class XMLSurveyActivity extends Activity {
 //    			break;
 //    			//surveyComplete();
 //    		}
-//    		
+//
 //    		else{
 //    			Utilities.Log("~~~~~~~~~!!~~~~~~~~~", "get into this situation");
 //    		}
-//    			
-//    		
+//
+//
 //		}
 //		while(temp == null);
-//		
+//
 //		if(done){
 //    		//surveyComplete();
 //    		return null;
@@ -630,12 +637,12 @@ public class XMLSurveyActivity extends Activity {
 //    		Utilities.Log("~~~~~~~~~~~~~~~~~~~~n", currentQuestion.getId());
 //    		return currentQuestion.prepareLayout(this);
 //    	}
-//		
+//
 //	}
-//	
+//
 //	protected LinearLayout lastQuestion(){
 //		Question temp = null;
-//    	
+//
 //    	while(temp == null)
 //    	{
 //    		temp = currentCategory.previousQuestion();
@@ -643,7 +650,7 @@ public class XMLSurveyActivity extends Activity {
 //    		// out of current category, need to go previous category if any
 //    		if(temp == null){
 //    			Utilities.Log("~~~~~~~~~~~~~~~~~~~~l", "out of current category");
-//    			
+//
 //    			//
 //    			if(categoryNum - 1 >= 0){
 //    				Utilities.Log("~~~~~~~~~~~~~~~~~~~~l", "have previous category");
@@ -651,7 +658,7 @@ public class XMLSurveyActivity extends Activity {
 //    				currentCategory = cats.get(categoryNum);
 //    				temp = null;
 //    			}
-//    			
+//
 //    			//First question in first category, return currentQuestion
 //    			else{
 //    				Utilities.Log("~~~~~~~~~~~~~~~~~~~~l", "in the very beginning");
@@ -660,18 +667,18 @@ public class XMLSurveyActivity extends Activity {
 //    			}
 //    		}
 //    		else{
-//    			
+//
 //    			Utilities.Log("~~~~~~~~~~~~~~~~~~~~l", "else");
 //    		}
-//    		
+//
 //    	}
 //    	currentQuestion = temp;
 //    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~l", currentQuestion.getId());
 //    	return currentQuestion.prepareLayout(this);
-//		
+//
 //	}
-	
-	
+
+
 	//Get the next question to be displayed
     protected LinearLayout nextQuestionLayout(){
 //		Utilities.Log("~~~~~~~~~~~~~~~~~~~~next", "currentQ" + (currentQuestion != null ? currentQuestion.getSelectedAnswers().get(0) + currentQuestion.getSkip() : "null"));
@@ -693,7 +700,7 @@ public class XMLSurveyActivity extends Activity {
     		//Simplest case: category has the next question
     		temp = currentCategory.nextQuestion();
 
-    		
+
     		//Category is out of questions, try to move to next category
     		if(temp == null && (++categoryNum < cats.size())){
     			/* Advance the category.  Loop will get the question
@@ -706,12 +713,12 @@ public class XMLSurveyActivity extends Activity {
     				if(tempCat.containsQuestion(currentQuestion.getSkip())){
     					allowSkip = true;
     				}
-    				
+
     			}
     		}
-    		
-    		
-    		
+
+
+
     		//Out of categories, survey must be done
     		else if(temp == null){
     			//Log.d("XMLActivity","Should be done...");
@@ -719,16 +726,16 @@ public class XMLSurveyActivity extends Activity {
     			break;
     			//surveyComplete();
     		}
-    		
+
     	}while(temp == null ||
-    			(currentQuestion != null && currentQuestion.getSkip() != null && !(currentQuestion.getSkip().equals(temp.getId()) || allowSkip) 
+    			(currentQuestion != null && currentQuestion.getSkip() != null && !(currentQuestion.getSkip().equals(temp.getId()) || allowSkip)
     			&& ( !currentQuestion.getId().equals(temp.getId()) && temp.clearSelectedAnswers())
     			)
     		  );
 		/*if(currentQuestion != null){
 			answerMap.put(currentQuestion.getId(), currentQuestion.getSelectedAnswers());
 		}*/
-    	
+
     	if(done){
     		//surveyComplete();
     		return null;
@@ -738,13 +745,13 @@ public class XMLSurveyActivity extends Activity {
 //    		Utilities.Log("~~~~~~~~~~~~~~~~~~~~n", currentQuestion.getId());
     		return currentQuestion.prepareLayout(this);
     	}
-    	
+
     }
-    
+
     protected LinearLayout lastQuestionLayout(){
 //    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~last", "skipFrom"+ skipFrom);
     	Question temp = null;
-    	
+
     	while(temp == null){
 //    		Utilities.Log("~~~~~~~~~while", "0 skipfrom "+skipFrom+"skipTo "+skipTo);
     		temp = currentCategory.lastQuestion();
@@ -779,7 +786,7 @@ public class XMLSurveyActivity extends Activity {
 //    			Utilities.Log("~~~~~~~~~", "2 "+temp.getId()+" "+temp.validateSubmit());
     			temp = null;
     		}
-    		
+
     		if(temp != null && hasSkip && !temp.getId().equals(skipFrom)){
 //    			Utilities.Log("~~~~~~~~~", "3 skipfrom"+skipFrom);
     			temp = null;
@@ -793,14 +800,14 @@ public class XMLSurveyActivity extends Activity {
     	}
     	currentQuestion = temp;
 //    	Utilities.Log("~~~~~~~~~~~~~~~~~~~~l", currentQuestion.getId());
-    	
+
     	return currentQuestion.prepareLayout(this);
     }
-	
-	
+
+
 	private void setListeners() {
 		// TODO Auto-generated method stub
-		
+
 		/*
          * The same submit button is used for every question.
          * New buttons could be made for each question if
@@ -810,7 +817,7 @@ public class XMLSurveyActivity extends Activity {
         backButton = new Button(this);
         submitButton.setText(R.string.btn_submit);
         backButton.setText(R.string.btn_cancel);
-        
+
         submitButton.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -823,18 +830,18 @@ public class XMLSurveyActivity extends Activity {
 					}
 					backButton.setText(R.string.btn_previous);
 				}
-				
+
 //				setTitle(surveyName);
-				
+
 			}
 		});
-        
+
         backButton.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				
+
 				ViewGroup vg = setupLayout(lastQuestionLayout());
 				if(vg != null) {
 					setContentView(vg);
@@ -843,11 +850,11 @@ public class XMLSurveyActivity extends Activity {
 				if(backButton.getText().equals(XMLSurveyActivity.this.getString(R.string.btn_cancel))){
 					onBackPressed();
 				}
-				
+
 			}
 		});
-        
-        
+
+
 	}
 
 
@@ -871,28 +878,28 @@ public class XMLSurveyActivity extends Activity {
 				((ViewGroup)backButton.getParent()).removeView(backButton);
 			}
 			//Add submit button to layout
-			
+
 			LinearLayout.LayoutParams keepFull = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-			
+
 			RelativeLayout.LayoutParams keepBTTM = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
 			keepBTTM.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-			
+
 			//sv.setLayoutParams(keepFull);
 			//layout.setLayoutParams(keepFull);
-			
+
 			LinearLayout rela = new LinearLayout(getApplicationContext());
 			//rela.setLayoutParams(keepFull);
-						
+
 			LinearLayout buttonCTN = new LinearLayout(getApplicationContext());
 			buttonCTN.setOrientation(LinearLayout.VERTICAL);
 			buttonCTN.setLayoutParams(keepFull);
-			
+
 			buttonCTN.addView(submitButton);
 			buttonCTN.addView(backButton);
 
 			rela.addView(buttonCTN);
 			layout.addView(rela);
-			
+
 			//layout.addView(submitButton);
 			//layout.addView(backButton);
 			//Add layout to scroll view in case it's too long
@@ -904,7 +911,7 @@ public class XMLSurveyActivity extends Activity {
     }
 
 	protected void surveyComplete(){
-    	
+
 		boolean hasTrigger = false;
     	//Fill answer map for when it is passed to service
     	for(Category cat: cats){
@@ -931,7 +938,7 @@ public class XMLSurveyActivity extends Activity {
 		//answerMap.put(currentQuestion.getId(), currentQuestion.getSelectedAnswers());
 
     	if(surveyName.equals(Utilities.SV_NAME_MORNING)){
-    		
+
     		//notify to set next day at noon (cancel today's Noon)
     		Intent i = new Intent(Utilities.BD_ACTION_DAEMON);
 			i.putExtra(Utilities.BD_ACTION_DAEMON_FUNC, -1);
@@ -961,7 +968,7 @@ public class XMLSurveyActivity extends Activity {
 					})
 					.create().show();
     	}
-		
+
     	//haidong
     	if(surveyName.equals(Utilities.SV_NAME_RANDOM)){
 
@@ -987,13 +994,14 @@ public class XMLSurveyActivity extends Activity {
     	//schedule drinking follow-ups if current completion is "initial drinking" or "random survey" with condition
     	if(surveyName.equals(Utilities.SV_NAME_DRINKING) || hasTrigger){// and followup triggers followup
     		Utilities.triggerDrinkingFollowup(this);
+			shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERDRINKING, true).commit();
     	}
-    	
+
     	//notify broadcast to cancel timeout alarm
 //    	Intent it = new Intent(Utilities.BD_REMINDER_MAP.get(surveyName));
 //		it.putExtra(Utilities.SV_NAME, surveyName);
 //		sendBroadcast(it);
-    	
+
 		//recording
     	try {
 			writeSurveyToFile(answerMap);
@@ -1005,9 +1013,10 @@ public class XMLSurveyActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
     	Toast.makeText(this, R.string.survey_completed, Toast.LENGTH_LONG).show();
 
+		//craving only
 		if (!surveyName.equals(Utilities.SV_NAME_MORNING)) {
 			finish();
 		}
@@ -1034,18 +1043,18 @@ public class XMLSurveyActivity extends Activity {
 	}
 
 	private String getScheduleTimeStamp(){
-		
+
 		long scheduleTimeStamp = 0;
 		String scheduleTS = "";
-		
+
 		//default time to 12:00 at noon
 //		Calendar d = Utilities.getMorningCal(Utilities.defHour, Utilities.defMinute);
 		Calendar d = Utilities.getDefaultMorningCal(this);
-    	long defTime = d.getTimeInMillis(); 
-		
+    	long defTime = d.getTimeInMillis();
+
 		//schedule timestamp for morning, random and followups
 		if(autoTriggered){
-			
+
 			//sequence
 			String triggerSeq = Utilities.SP_KEY_TRIGGER_SEQ_MAP.get(surveyName);
 			int seq = shp.getInt(triggerSeq, 1);
@@ -1053,18 +1062,18 @@ public class XMLSurveyActivity extends Activity {
 				seq = Utilities.MAX_TRIGGER_MAP.get(surveyName);
 			}
 
-			
+
 			//for morning survey
         	if(surveyName.equals(Utilities.SV_NAME_MORNING)){
         		scheduleTimeStamp = Utilities.getSP(this, Utilities.SP_BED_TIME).getLong(Utilities.SP_KEY_BED_TIME_LONG, defTime);
         	}
-        	
+
     		//for random survey
         	else if(surveyName.equals(Utilities.SV_NAME_RANDOM)){
 //		        		time = Calendar.getInstance().getTimeInMillis();
         		scheduleTimeStamp = Long.parseLong(Utilities.getSP(this, Utilities.SP_RANDOM_TIME).getString(Utilities.SP_KEY_RANDOM_TIME_SET, ""+scheduleTimeStamp).split(",")[seq-1]);
         	}
-        	
+
     		//for followup survey
         	else{
         		//followup setting time only works for schedule look-up
@@ -1072,7 +1081,7 @@ public class XMLSurveyActivity extends Activity {
         	}
 		}else{
 			if(surveyName.equals(Utilities.SV_NAME_MORNING)){
-				
+
 //				return Utilities.sdf.format(Utilities.getDefaultMorningCal(this).getTimeInMillis());
 				return Utilities.sdf.format(Utilities.getSP(this, Utilities.SP_BED_TIME).getLong(Utilities.SP_KEY_BED_TIME_LONG, defTime));
 			} else {
@@ -1080,8 +1089,8 @@ public class XMLSurveyActivity extends Activity {
 			}
 
 		}
-			
-		
+
+
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(scheduleTimeStamp);
 		return Utilities.sdf.format(c.getTime());
@@ -1101,30 +1110,30 @@ public class XMLSurveyActivity extends Activity {
 		}
 
 	}
-	
+
 	protected void writeSurveyToFile(HashMap<String, List<String>> surveyData) throws IOException{
-		
+
 		Calendar endCal = Calendar.getInstance();
-		
+
 		String userID = Utilities.getSP(this, Utilities.SP_LOGIN).getString(Utilities.SP_KEY_LOGIN_USERID, "0000");
 		int studyDay = Utilities.getStudyDay(this);
 		int type = getSurveyType();
-		
+
 //		long scheduleTimeStamp = getScheduleTimeStamp();
 		String scheduleTS = getScheduleTimeStamp();
-		
+
 		long startTimeStamp = startCal.getTimeInMillis();
 		long endTimeStamp = endCal.getTimeInMillis();
-		
+
 		String startTS = Utilities.sdf.format(startCal.getTime());
 		String endTS = Utilities.sdf.format(endCal.getTime());
-		
 
-		
-		
-		
+
+
+
+
 		StringBuilder sb = new StringBuilder(100);
-		
+
 //		Calendar c = Calendar.getInstance();
 //		c.setTimeInMillis(time);
 		sb.append(endCal.getTime().toString());
@@ -1135,7 +1144,7 @@ public class XMLSurveyActivity extends Activity {
 
 		List<String> sorted = new ArrayList<String>(surveyData.keySet());
 		Collections.sort(sorted);
-		
+
 		for(int i = 0; i < sorted.size(); i++){
 			String key = sorted.get(i);
 			List<String> data = surveyData.get(key);
@@ -1155,7 +1164,7 @@ public class XMLSurveyActivity extends Activity {
 				sb.append(",");
 			}
 		}
-		
+
 		//Ricky 2014/4/1
 		//dealing with the random sequence
 		if (surveyName.equals(Utilities.SV_NAME_RANDOM)) {
@@ -1164,13 +1173,13 @@ public class XMLSurveyActivity extends Activity {
 			sb.append(",seq:"+ (i==0? Utilities.MAX_TRIGGER_MAP.get(surveyName): i));
 		}
 //		sb.append("\n");
-		
-		
-		
+
+
+
 		//file name
 			Calendar c=Calendar.getInstance();
-			SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd"); 
-			String dateObj =curFormater.format(c.getTime()); 		
+			SimpleDateFormat curFormater = new SimpleDateFormat("MMMMM_dd");
+			String dateObj =curFormater.format(c.getTime());
 			String file_name=surveyName+"."+userID+"."+dateObj+".txt";
 
 		StringBuilder prefix_sb = new StringBuilder(Utilities.PREFIX_LEN);
@@ -1182,8 +1191,8 @@ public class XMLSurveyActivity extends Activity {
 		}
 
 		/************************************************************************
-		 * Chen 
-		 * 
+		 * Chen
+		 *
 		 * Data encryption
 		 * Stringbuilder sb -> String ensb
 		 */
@@ -1196,13 +1205,13 @@ public class XMLSurveyActivity extends Activity {
 			} else{
        	 		Utilities.writeToFileEnc(file_name, ensb);
        	 	}
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 		//Ricky 2013/12/09
 		TransmitData transmitData=new TransmitData();
 		transmitData.execute(ensb);
@@ -1212,11 +1221,11 @@ public class XMLSurveyActivity extends Activity {
 		int i = shp.getInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_RANDOM, -1);
 		Utilities.writeToFile("Event.txt",sb.substring(0, sb.indexOf("q"))+
 				(surveyName.equals(Utilities.SV_NAME_RANDOM) ?  "seq:"+(i==0? Utilities.MAX_TRIGGER_MAP.get(surveyName): i) : ""));
-		
+
 	}
 
-	
-	
+
+
 	private class TransmitData extends AsyncTask<String,Void, Boolean>
 	{
 
@@ -1229,7 +1238,7 @@ public class XMLSurveyActivity extends Activity {
 			//	        String dataToSend=strings[1];
 	        if(checkDataConnectivity())
 	 		{
-	        		 
+
 	        Log.d("((((((((((((((((((((((((", ""+Thread.currentThread().getId());
 	         HttpPost request = new HttpPost(Utilities.UPLOAD_ADDRESS);
 	         List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -1240,34 +1249,34 @@ public class XMLSurveyActivity extends Activity {
 				//	         //data
 				//	         params.add(new BasicNameValuePair("data",dataToSend));
 	         try {
-	         	        	
+
 	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
 	             HttpResponse response = new DefaultHttpClient().execute(request);
 	             if(response.getStatusLine().getStatusCode() == 200){
 	                 String result = EntityUtils.toString(response.getEntity());
-	                 Log.d("Sensor Data Point Info",result);                
+	                 Log.d("Sensor Data Point Info",result);
 	                // Log.d("Wrist Sensor Data Point Info","Data Point Successfully Uploaded!");
 	             }
 	             return true;
-	         } 
-	         catch (Exception e) 
-	         {	             
+	         }
+	         catch (Exception e)
+	         {
 	             e.printStackTrace();
 	             return false;
 	         }
 	 	  }
-	     	
-	     else 
+
+	     else
 	     {
 	     	Log.d("Sensor Data Point Info","No Network Connection:Data Point was not uploaded");
 	     	Toast.makeText(XMLSurveyActivity.this, "@#$", Toast.LENGTH_LONG).show();
 	     	return false;
-	      } 
-		    
+	      }
+
 		}
-		
+
 	}
-	
+
 	 public static boolean checkDataConnectivity() {
 	    	ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 			if (connectivity != null) {
@@ -1284,10 +1293,10 @@ public class XMLSurveyActivity extends Activity {
 	}
 
 
-	
+
 //	=========================================================================================================================
 //	=========================================================================================================================
-	
+
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
@@ -1325,44 +1334,44 @@ public class XMLSurveyActivity extends Activity {
 		    }
 		}).create().show();
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		Utilities.Log_sys(TAG, "onDestroy");
-		
+
 		soundp.stop(streamID);
 		soundp.release();
 		t=null;
-		
+
 		pinDialog.dismiss();
 		reDialog.dismiss();
 //		Log.d("ondestory undergooing", "shp "+Utilities.getSP(this, Utilities.SP_SURVEY).getBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, false)+" "+
 //		Utilities.getSP(this, Utilities.SP_SURVEY).getInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, -2));
-		
+
 		//!((max and false)  ||  (max+1 and true))
 //		if(!(
 //				(Utilities.getSP(this, Utilities.SP_SURVEY).getInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, Utilities.MAX_REMINDER) == Utilities.MAX_REMINDER &&
-//						!Utilities.getSP(this, Utilities.SP_SURVEY).getBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, false)) 
-//				|| 
+//						!Utilities.getSP(this, Utilities.SP_SURVEY).getBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, false))
+//				||
 //				(Utilities.getSP(this, Utilities.SP_SURVEY).getInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, Utilities.MAX_REMINDER+1) == Utilities.MAX_REMINDER+1 &&
 //						Utilities.getSP(this, Utilities.SP_SURVEY).getBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, false))
 //			)
 //		){
-			
-			
+
+
 		if(shp.getBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, false)){
 //			shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERGOING, false).commit();
 			shp.edit().putInt(Utilities.SP_KEY_SURVEY_REMINDER_SEQ, Utilities.MAX_REMINDER+2).commit();
-		
+
 	    	//notify broadcast to cancel timeout alarm
 	    	Intent it = new Intent(Utilities.BD_REMINDER_MAP.get(surveyName));
 			it.putExtra(Utilities.SV_NAME, surveyName);
 			sendBroadcast(it);
 		}
 //		}
-		
+
 		else{
 //			shp.edit().putBoolean("undermangoing", false).commit();
 		}
@@ -1406,7 +1415,7 @@ public class XMLSurveyActivity extends Activity {
 		super.onStop();
 		Utilities.Log_sys(TAG, "onStop");
 	}
-	
+
 	//haidong from ricky
 	private class ComplianceSignal extends AsyncTask<String,Void, Boolean>
 	{
@@ -1429,27 +1438,27 @@ public class XMLSurveyActivity extends Activity {
 				//	         params.add(new BasicNameValuePair("Date",Date));
 				//	         params.add(new BasicNameValuePair("RSID",RSID));
 	         try {
-	         	        	
+
 	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
 	             HttpResponse response = new DefaultHttpClient().execute(request);
 	             if(response.getStatusLine().getStatusCode() == 200){
 	                 String result = EntityUtils.toString(response.getEntity());
 	             }
 	             return true;
-	         } 
-	         catch (Exception e) 
-	         {	             
+	         }
+	         catch (Exception e)
+	         {
 	             e.printStackTrace();
 	             return false;
 	         }
 	 	  }
-	     	
-	     else 
+
+	     else
 	     {
 	     	return false;
-	      } 
-		    
+	      }
+
 		}
-		
+
 	}
 }

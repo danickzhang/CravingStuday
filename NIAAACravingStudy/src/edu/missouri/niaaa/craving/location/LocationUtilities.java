@@ -1,69 +1,64 @@
 package edu.missouri.niaaa.craving.location;
 
 import java.io.IOException;
-import java.util.HashMap;
 
-import com.google.android.gms.location.LocationClient;
-
-import edu.missouri.niaaa.craving.Utilities;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.SoundPool;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
+import edu.missouri.niaaa.craving.Utilities;
 
 public class LocationUtilities {
-	
+
 	public final static String TAG = "LocationUtilities";
 	public final static int TIME_ACCURACY_IN_SECOND = 30;//30;
 	public final static int DISTENCE_ACCURACY_IN_METER = 30;//30;
-	
+
 	public final static String BD_ACTION_SCHEDULE_LOCATION = "edu.missouri.niaaa.craving.SCHEDULE_LOCATION";
 	public final static String ACTION_START_LOCATION = "edu.missouri.niaaa.craving.START_LOCATION";
 	public final static String ACTION_STOP_LOCATION = "edu.missouri.niaaa.craving.STOP_LOCATION";
-	
-	
+
+
 	public static Location mCurrentLocation = null;
 //	public static int currentUserActivity = 9;
-	
+
 	static ActivityRecognitionScan activityRecognition;
 
-//	LocationManager locationM = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-	
-	 
+	//	LocationManager locationM = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+
 	public static void startGPS(Context context, LocationManager locationM){
 		activityRecognition = new ActivityRecognitionScan(context);
 		activityRecognition.startActivityRecognitionScan();
-		
+
 		requestLocation(locationM);
 	}
-	
+
 	public static void stopGPS(Context context, LocationManager locationM){
 		activityRecognition.stopActivityRecognitionScan();
-		
+
 		removeLocation(locationM);
 	}
-	
-	
+
+
 	public static void requestLocation(LocationManager locationM){
 		locationM.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_ACCURACY_IN_SECOND*1000, DISTENCE_ACCURACY_IN_METER, locationListenerGps);
 		Log.d(TAG, "request Location Updates");
 	}
-	
+
 	public static void removeLocation(LocationManager locationM){
 		locationM.removeUpdates(locationListenerGps);
 		Log.d(TAG, "remove Location Updates");
 	}
-	
+
 	private static LocationListener locationListenerGps = new LocationListener() {
 		@Override
 		public void onLocationChanged(Location location) {
-			
+
 			if (location != null) {
-				
+
 				Log.d("test gps", "gps location is not null "+location.getLatitude()+","+location.getLongitude()+","+
 						location.getAccuracy()+","+location.getProvider());
 				if(location.getAccuracy() <= 35)
@@ -79,7 +74,7 @@ public class LocationUtilities {
 							e.printStackTrace();
 						}
 					}
-				}	
+				}
 			}
 		}
 
@@ -97,8 +92,8 @@ public class LocationUtilities {
 		public void onStatusChanged(String provider, int status, Bundle extras) {
 		}
 	};
-	
-	
+
+
 	private static boolean isBetterLocation(Location location, Location currentBestLocation) {
 		if (currentBestLocation == null) {
 			// A new location is always better than no location
@@ -151,5 +146,5 @@ public class LocationUtilities {
 		}
 		return provider1.equals(provider2);
 	}
-	
+
 }

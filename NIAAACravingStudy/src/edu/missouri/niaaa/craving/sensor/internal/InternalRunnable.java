@@ -28,11 +28,11 @@ import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.util.Log;
 import edu.missouri.niaaa.craving.Utilities;
-import edu.missouri.niaaa.craving.logger.Logger;
 import edu.missouri.niaaa.craving.services.SensorLocationService;
 
 public class InternalRunnable implements Runnable, SensorEventListener {// haven't been used for now
-	private final Logger log = Logger.getLogger(InternalRunnable.class);
+
+	final static String TAG = "InternalRunnalbe";
 	private SensorManager mSensorManager;
 	private static InternalRunnable _instanceInternal = null;
 	int SensorType;
@@ -42,7 +42,7 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 	String identifier;
 	List<String> dataPoints=new ArrayList<String>();
 	Calendar c=Calendar.getInstance();
-    SimpleDateFormat curFormater;
+	SimpleDateFormat curFormater;
 	private List<Double> AccList = Collections.synchronizedList(new ArrayList<Double>());
     private double avgAcc = 0;
 
@@ -70,37 +70,37 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 		SensorType=sensorType;
 		SamplingRate=samplingRate;
 		identifier=uniqueIdentifier;
-	}	
-	
-	
-	@Override
-	public void run() 
-	{  // TODO Auto-generated method stub
-		Log.d("Sensor Number",String.valueOf(SensorType));
-		setup(SensorType,SamplingRate);		
 	}
 
-	public void setup(int sensorType, int samplingRate) 
+
+	@Override
+	public void run()
+	{  // TODO Auto-generated method stub
+		Log.d("Sensor Number",String.valueOf(SensorType));
+		setup(SensorType,SamplingRate);
+	}
+
+	public void setup(int sensorType, int samplingRate)
 	{
 		// TODO Auto-generated method stub
 		mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(sensorType),samplingRate);
 	}
 
-	
-	
+
+
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	public String getDate()
-	{ 	
+	{
 		curFormater = new SimpleDateFormat("MMMMM_dd");
-   		String dateObj =curFormater.format(c.getTime()); 
+   		String dateObj =curFormater.format(c.getTime());
    		return dateObj;
 	}
-	
+
 	public String getTimeStamp()
 	{
 		Calendar cal=Calendar.getInstance();
@@ -109,17 +109,17 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 	}
 
 	@Override
-	public void onSensorChanged(SensorEvent event) {				
+	public void onSensorChanged(SensorEvent event) {
 		// TODO Auto-generated method stub
 		if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 			// log.d("Type detected: ACC Sensor");
 			double ResultAcc = getOverallAcc(event.values[0], event.values[1],
 					event.values[2]);
 			if (compressAccelerometerData(ResultAcc)) {
-				log.d("get avg Acc data");
+				Log.d(TAG, "get avg Acc data");
 				DecimalFormat df = new DecimalFormat("#0.00000");
 				String avgAccStr = df.format(avgAcc);
-				log.d(avgAccStr);
+				Log.d(TAG, avgAccStr);
 				String Accelerometer_Values = getTimeStamp() + ","
 						+ String.valueOf(avgAccStr);
 				dataPoints.add(Accelerometer_Values + ";");
@@ -137,7 +137,7 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				log.d("dataPoints'size: " + dataPoints.size());
+				Log.d(TAG, "dataPoints'size: " + dataPoints.size());
 				if (dataPoints.size() == 57) {
 
 					StringBuilder prefix_sb = new StringBuilder(Utilities.PREFIX_LEN);
@@ -161,7 +161,7 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 					TransmitData transmitData = new TransmitData();
 					transmitData.execute(enformattedData);
 
-					log.d("Accelerometer Data Point Sent " + enformattedData);
+					Log.d(TAG, "Accelerometer Data Point Sent " + enformattedData);
 					subList.clear();
 					subList = null;
 				}
@@ -173,19 +173,19 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 	        	String file_name="LightSensor."+identifier+"."+getDate()+".txt";
 	            File f = new File(Utilities.PHONE_BASE_PATH,file_name);
 	            /*
-                dataPoints.add(LightIntensity+";");               
+                dataPoints.add(LightIntensity+";");
 	            if(dataPoints.size()==80)
 	            {
 	            	    List<String> subList = dataPoints.subList(0,41);
-	     	            String data=subList.toString();	     	            
+	     	            String data=subList.toString();
 	     	            String formattedData=data.replaceAll("[\\[\\]]","");
 	     	            //Ricky 2013/12/09
 	     	            //sendDatatoServer("LightSensor."+identifier+"."+getDate(),formattedData);
 	     	            TransmitData transmitData=new TransmitData();
 	     	            transmitData.execute("LightSensor."+identifier+"."+getDate(),formattedData);
-	     	            subList.clear();  
-	     	     }	
-	     	     */            
+	     	            subList.clear();
+	     	     }
+	     	     */
 	    		try {
 					writeToFile(f,LightIntensity);
 				} catch (IOException e) {
@@ -199,21 +199,21 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 		return Math.sqrt(xACC * xACC + yACC * yACC + zACC * zACC)
 				- SensorManager.STANDARD_GRAVITY;
 	}
-	
+
 	protected static void writeToFile(File f, String toWrite) throws IOException{
 		FileWriter fw = new FileWriter(f, true);
-		fw.write(toWrite+'\n');		
+		fw.write(toWrite+'\n');
         fw.flush();
 		fw.close();
 	}
-	
-	
-	
-	protected static boolean checkDataConnectivity() {    	
+
+
+
+	protected static boolean checkDataConnectivity() {
 		boolean value=SensorLocationService.checkDataConnectivity();
 		return value;
 	}
-	
+
 	public void stop()
 	{
 		mSensorManager.unregisterListener(this);
@@ -234,7 +234,7 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 			//	         String dataToSend=strings[1];
 	         if(checkDataConnectivity())
 	 		{
-	         HttpPost request = new HttpPost(Utilities.UPLOAD_ADDRESS);	
+	         HttpPost request = new HttpPost(Utilities.UPLOAD_ADDRESS);
 	         List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("data", data));
 
@@ -243,31 +243,31 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 				//	         //data
 				//	         params.add(new BasicNameValuePair("data",dataToSend));
 	         try {
-	         	        	
+
 	             request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
 	             HttpResponse response = new DefaultHttpClient().execute(request);
 	             if(response.getStatusLine().getStatusCode() == 200){
 	                 String result = EntityUtils.toString(response.getEntity());
-	                 Log.d("Sensor Data Point Info",result);                
+	                 Log.d("Sensor Data Point Info",result);
 	                // Log.d("Wrist Sensor Data Point Info","Data Point Successfully Uploaded!");
 	             }
 	             return true;
-	         } 
-	         catch (Exception e) 
-	         {	             
+	         }
+	         catch (Exception e)
+	         {
 	             e.printStackTrace();
 	             return false;
 	         }
 	 	  }
-	     	
-	     else 
+
+	     else
 	     {
 	     	Log.d("Sensor Data Point Info","No Network Connection:Data Point was not uploaded");
 	     	return false;
-	      } 
-		    
+	      }
+
 		}
-		
+
 	}
 
 
@@ -284,7 +284,7 @@ public class InternalRunnable implements Runnable, SensorEventListener {// haven
 			} else {
 			avgAcc = 0;
 			for (int i=0;i<AccList.size();i++){
-				avgAcc +=AccList.get(i); 
+				avgAcc +=AccList.get(i);
 			}
 			avgAcc /= AccList.size();
 			AccList.clear();

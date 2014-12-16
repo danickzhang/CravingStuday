@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/support_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="15dip"
+        android:layout_marginRight="15dip"
+        android:layout_marginTop="10dip"
+        android:text="@string/support_title"
+        android:textSize="20sp" />
+
+    <RadioGroup
+        android:id="@+id/support_set"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="15dip"
+        android:layout_marginRight="15dip"
+        android:layout_marginTop="10dip"
+        android:layout_weight="1" >
+
+        <RadioButton
+            android:id="@+id/support_r_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/support_1" />
+
+        <RadioButton
+            android:id="@+id/support_r_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/support_2" />
+
+        <RadioButton
+            android:id="@+id/support_r_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/support_3" />
+        
+        <RadioButton
+            android:id="@+id/support_r_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/support_4" />
+                
+        <RadioButton
+            android:id="@+id/support_r_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/support_5" />
+        
+        <RadioButton
+            android:id="@+id/support_r_6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/support_6" />
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/support_edit"
+        android:layout_width="match_parent"
+        android:layout_height="150dip"
+        android:layout_marginBottom="30dip"
+        android:layout_marginLeft="15dip"
+        android:layout_marginRight="15dip"
+        android:layout_marginTop="30dip"
+        android:hint="@string/support_hint" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" 
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="15dip"
+        android:layout_marginRight="15dip"
+        android:layout_marginTop="10dip">
+
+        <Button
+            android:id="@+id/support_btn_send"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/support_send" />
+
+        <Button
+            android:id="@+id/support_btn_back"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/support_back" />
+    </LinearLayout>
+
+</LinearLayout>

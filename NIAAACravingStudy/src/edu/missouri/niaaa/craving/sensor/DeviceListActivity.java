@@ -18,7 +18,6 @@ package edu.missouri.niaaa.craving.sensor;
 
 import java.util.Set;
 
-import edu.missouri.niaaa.craving.R;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -27,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -37,6 +35,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import edu.missouri.niaaa.craving.R;
 
 /**
  * This Activity appears as a dialog. It lists any paired devices and
@@ -46,7 +45,7 @@ import android.widget.TextView;
  */
 public class DeviceListActivity extends Activity {
     // Debugging
-    private static final String TAG = "DeviceListActivity";
+	private static final String TAG = "DeviceListActivity";
 
     // Return Intent extra
     public static String EXTRA_DEVICE_ADDRESS = "device_address";
@@ -162,16 +161,16 @@ public class DeviceListActivity extends Activity {
             	if (mBtAdapter.isDiscovering()) {
             		mBtAdapter.cancelDiscovery();
             	}
-                
+
 	            // Get the device MAC address, which is the last 17 chars in the View
 	            String info = ((TextView) v).getText().toString();
 	            String address = info.substring(info.length() - 17);
 	            //Log.d("addTest",address);
-	
+
 	            // Create the result Intent and include the MAC address
 	            Intent intent = new Intent();
 	            intent.putExtra(EXTRA_DEVICE_ADDRESS, address);
-	
+
 	            // Set result and finish this Activity
 	            setResult(Activity.RESULT_OK, intent);
 	            finish();

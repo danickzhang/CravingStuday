@@ -13,6 +13,7 @@
     <string name="menu_dis_bt">Disable Bluetooth</string>
     <string name="menu_management">Management</string>
     <string name="menu_about">About</string>
+    <string name="menu_feedback">Feedback</string>
     
 
     <!-- Contents -->
@@ -23,6 +24,7 @@
     <string name="section_5">Set Wake up Time</string>
     <string name="section_6">Suspension</string>
     <string name="section_62">Break Suspension</string>
+    <string name="section_7">Support</string>
     
     <!-- Bed-time -->
     <string name="bedtime_title">Set Wake up Time Report</string>
@@ -42,6 +44,19 @@
     <string name="suspension_set">Set Suspension Length</string>
     <string name="suspension_end">Suspension has ended</string>
     <string name="suspension_under">Under Suspension</string>
+    
+    <!-- Support -->
+    <string name="support_title">Please select the problem you want to report: </string>
+    <string name="support_alert_title">Please select one item that you want it reported.</string>
+    <string name="support_1">Bluetooth Connection Problem</string>
+    <string name="support_2">Sensor Lost without alert</string>
+    <string name="support_3">There is no alarm in morning</string>
+    <string name="support_4">There is an alarm during suspension</string>
+    <string name="support_5">Did get popups for: </string>
+    <string name="support_6">Others</string>
+    <string name="support_hint">Type your problem here.</string>
+    <string name="support_send">Send</string>
+    <string name="support_back">Back</string>
     
     <!-- Admin  -->
     <string name="admin_set_title">Verify Admin PIN</string>
@@ -137,9 +152,6 @@
 	<string name="input_apin_error">Verify failed. Please try again.</string>
 	<string name="input_apin_return">Return code incorrect. Please try again.</string>
 	<string name="input_apin_net_error">Failed. Please try again, with network connection.</string>
-	
-	<string name="notification_text_alarm">Please notice that SEM sensor has been disconnected. \nPlease reconnect it by using the \"Sensor Connections\" menu.</string>
-	<string name="notification_btn">Don\'t remind later</string>
 
 	
 	
