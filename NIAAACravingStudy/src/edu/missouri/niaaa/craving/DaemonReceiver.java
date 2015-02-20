@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
+import edu.missouri.niaaa.craving.activity.ChargeReminderActivity;
 import edu.missouri.niaaa.craving.location.LocationUtilities;
 import edu.missouri.niaaa.craving.sensor.SensorUtilities;
 
@@ -47,6 +48,12 @@ public class DaemonReceiver extends BroadcastReceiver {
 
 			am.setExact(AlarmManager.RTC_WAKEUP, getProperTime(3, 0), piTrigger3);
 
+			// Ricky 9pm
+			Intent itTrigger4 = new Intent(Utilities.BD_ACTION_DAEMON);
+			itTrigger4.putExtra(Utilities.BD_ACTION_DAEMON_FUNC, 4);// int
+			PendingIntent piTrigger4 = PendingIntent.getBroadcast(context, 4, itTrigger4, Intent.FLAG_ACTIVITY_NEW_TASK);
+
+			am.setExact(AlarmManager.RTC_WAKEUP, getProperTime(21, 0), piTrigger4);
 
 		}
 		else if(fun == 1){//Noon
@@ -153,6 +160,20 @@ public class DaemonReceiver extends BroadcastReceiver {
 //			PendingIntent piTrigger3 = PendingIntent.getBroadcast(context, 3, itTrigger3, Intent.FLAG_ACTIVITY_NEW_TASK);
 //
 //			am.setExact(AlarmManager.RTC_WAKEUP, getProperTime(3, 0)+Utilities.getDayLong(), piTrigger3);
+		}
+		else if (fun == 4) {// 9pm alarm dialog
+			Intent i = new Intent(context.getApplicationContext(), ChargeReminderActivity.class);
+			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			context.startActivity(i);
+
+			Intent itTrigger4 = new Intent(Utilities.BD_ACTION_DAEMON);
+			itTrigger4.putExtra(Utilities.BD_ACTION_DAEMON_FUNC, 4);// int
+			PendingIntent piTrigger4 = PendingIntent.getBroadcast(context, 4, itTrigger4, Intent.FLAG_ACTIVITY_NEW_TASK);
+
+			am.setExact(AlarmManager.RTC_WAKEUP, getProperTime(21, 0), piTrigger4);
+
+			Toast.makeText(context, "Reseting the 9pm reminder for tomorrow", Toast.LENGTH_LONG).show();
+
 		}
 		else{
 

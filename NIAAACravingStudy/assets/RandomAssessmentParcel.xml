@@ -7,6 +7,15 @@
 			<answer id = "1" triggerFile="DrinkingFollowupParcel.xml">Yes</answer>
 			<answer id = "2" skip="q1103">No</answer>
 		</question>
+        <question id= "q1102002" type = "radio">
+            <text>When did you finish your first DRINK?</text>
+            <answer id="1">Just now.</answer>
+            <answer id="2">15 minutes ago.</answer>
+            <answer id="3">30 minutes ago.</answer>
+            <answer id="4">45 minutes ago.</answer>
+            <answer id="5">1 hour ago.</answer>
+            <answer id="6">More than 1 hour ago.</answer>
+        </question>
 		<question id = "q1102" type = "number">
 			<text>HOW MANY DRINKS did you consume SINCE the last survey you answered?</text>
 			<answer id = "item">drink(s)</answer>

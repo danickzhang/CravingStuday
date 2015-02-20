@@ -22,8 +22,10 @@ import org.apache.http.util.EntityUtils;
 import org.xml.sax.InputSource;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -969,7 +971,7 @@ public class XMLSurveyActivity extends Activity {
 					.create().show();
     	}
 
-    	//haidong
+		//haidong // for random survey score
     	if(surveyName.equals(Utilities.SV_NAME_RANDOM)){
 
 			String rsID = String.valueOf(randomSeq);
@@ -991,11 +993,47 @@ public class XMLSurveyActivity extends Activity {
     	}
     	//--
 
-    	//schedule drinking follow-ups if current completion is "initial drinking" or "random survey" with condition
-    	if(surveyName.equals(Utilities.SV_NAME_DRINKING) || hasTrigger){// and followup triggers followup
+		//schedule drinking follow-ups if current completion is "initial drinking" or "random survey" with drinking condition
+		if (surveyName.equals(Utilities.SV_NAME_DRINKING) || (hasTrigger && surveyName.equals(Utilities.SV_NAME_RANDOM))) {// and followup triggers followup
     		Utilities.triggerDrinkingFollowup(this);
 			shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERDRINKING, true).commit();
     	}
+		else if (surveyName.equals(Utilities.SV_NAME_FOLLOWUP)) {
+
+			int curSeq = shp.getInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_FOLLOWUP, -1);
+			Log.d("+++++++++++++++++++++++++_____________________", "seq is " + curSeq);
+
+			if (curSeq != 0) {
+				if (hasTrigger) {
+					shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_TRIGGER_CONT_FOLLOWUP, true).commit();
+				}
+			}
+			else {
+				if (hasTrigger || shp.getBoolean(Utilities.SP_KEY_SURVEY_TRIGGER_CONT_FOLLOWUP, false)) {
+
+					AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+					//handle schedule
+					Intent itSchedule = new Intent(Utilities.BD_TRIGGER_MAP.get(surveyName));
+					itSchedule.putExtra(Utilities.SV_NAME, surveyName);
+					PendingIntent piSchedule = PendingIntent.getBroadcast(context, 0, itSchedule, Intent.FLAG_ACTIVITY_NEW_TASK);
+
+					shp.edit().putInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_FOLLOWUP, 2).commit();
+					long time = Long.MAX_VALUE;
+					time = Calendar.getInstance().getTimeInMillis() + Utilities.FOLLOWUP_IN_SECONDS * 1000 * 2;
+					am.setExact(AlarmManager.RTC_WAKEUP, time, piSchedule);
+
+					shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_TRIGGER_CONT_FOLLOWUP, false).commit();
+				}
+				else {
+
+					shp.edit().putInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_FOLLOWUP, 0).commit();//useless
+					shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERDRINKING, false).commit();
+				}
+			}
+
+
+		}
 
     	//notify broadcast to cancel timeout alarm
 //    	Intent it = new Intent(Utilities.BD_REMINDER_MAP.get(surveyName));

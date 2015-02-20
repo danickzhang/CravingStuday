@@ -179,6 +179,7 @@ public class Utilities {
 	public final static String SP_KEY_SURVEY_TRIGGER_SEQ_MORNING = "SURVEY_TRIGGER_SEQ_MORNING";
 	public final static String SP_KEY_SURVEY_TRIGGER_SEQ_RANDOM = "SURVEY_TRIGGER_SEQ_RANDOM";
 	public final static String SP_KEY_SURVEY_TRIGGER_SEQ_FOLLOWUP = "SURVEY_TRIGGER_SEQ_FOLLOWUP";
+	public final static String SP_KEY_SURVEY_TRIGGER_CONT_FOLLOWUP = "SURVEY_TRIGGER_CONT_FOLLOWUP";
 
 	public final static HashMap<String, String> SP_KEY_TRIGGER_SEQ_MAP = new HashMap<String, String>(){
 		{
@@ -448,6 +449,7 @@ public class Utilities {
 	public static void triggerDrinkingFollowup(Context context){
 
 		Utilities.getSP(context, Utilities.SP_SURVEY).edit().putInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_FOLLOWUP, 0).commit();
+		Utilities.getSP(context, Utilities.SP_SURVEY).edit().putBoolean(Utilities.SP_KEY_SURVEY_TRIGGER_CONT_FOLLOWUP, false).commit();
 
 		Intent scheduleIntent = new Intent(Utilities.BD_ACTION_SCHEDULE_FOLLOWUP);
 		scheduleIntent.putExtra(Utilities.SV_NAME, Utilities.SV_NAME_FOLLOWUP);

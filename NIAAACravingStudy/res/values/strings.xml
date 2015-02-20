@@ -153,6 +153,15 @@
 	<string name="input_apin_return">Return code incorrect. Please try again.</string>
 	<string name="input_apin_net_error">Failed. Please try again, with network connection.</string>
 
-	
-	
+    <!-- support -->
+    <string name="support_phone_num">5732288570</string>
+    <string name="support_phone_str">Someone needs tech support, please login public gmail account to see details. @</string>
+    <string name="title_activity_charge_reminder">ChargeReminderActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- 9pm dialog -->
+    <string name="charge_reminder_alert_title">Charge Reminder</string>
+    <string name="charge_reminder_alert_message">Please remember to charge your phone before you sleep.</string>
+    <string name="charge_reminder_alert_button">OK</string>
 </resources>

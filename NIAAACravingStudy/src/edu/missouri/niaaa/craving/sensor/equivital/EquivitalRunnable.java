@@ -80,6 +80,7 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 	public static EquivitalRunnable getInstance(String address, String name,
 			String ID) {
 		if (_instanceEQ == null) {
+			Log.d(TAG, "EquivitalRunnable is null");
 			_instanceEQ = new EquivitalRunnable(address, name, ID);
 		} else {
 			Log.d(TAG, "EquivitalRunnable is not null");

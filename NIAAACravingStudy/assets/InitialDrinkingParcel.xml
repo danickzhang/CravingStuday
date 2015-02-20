@@ -16,7 +16,7 @@
 		<question id = "q702" type = "number">
 			<text>HOW MANY DRINKS did you consume SINCE THE FIRST DRINK?</text>
 			<answer id = "item">drink(s)</answer>
-			<answer id = "min">0</answer>
+			<answer id = "min">1</answer>
 			<answer id = "max">24</answer>
 		</question>
 	</category>

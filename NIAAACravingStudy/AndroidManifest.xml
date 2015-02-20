@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.missouri.niaaa.craving"
-    android:versionCode="039"
+    android:versionCode="045"
     android:versionName="2.3" >
 
     <uses-sdk
@@ -148,6 +148,11 @@
         <activity
             android:name=".sensor.DeviceListActivity"
             android:screenOrientation="portrait" >
+        </activity>
+        
+        <activity
+            android:name=".activity.ChargeReminderActivity"
+            android:label="@string/title_activity_charge_reminder" >
         </activity>
         
     </application>

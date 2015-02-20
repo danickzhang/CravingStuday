@@ -153,7 +153,7 @@ public class SurveyBroadcast extends BroadcastReceiver {
         	int tri = shp.getInt(triggerSeq, 0);
         	shp.edit().putInt(triggerSeq, ++tri).commit();
         	if(tri < triggerMax){
-        		Utilities.LogB("*****************************", "<"+triggerMax);
+        		Utilities.LogB("*****************************", "<"+triggerMax+" tri is: " + tri);
 
         		long time = Long.MAX_VALUE;
         		//for random survey
@@ -164,20 +164,22 @@ public class SurveyBroadcast extends BroadcastReceiver {
 
         		//for followup survey
         		else if(surveyName.equals(Utilities.SV_NAME_FOLLOWUP)){
-        			time = Calendar.getInstance().getTimeInMillis()+Utilities.FOLLOWUP_IN_SECONDS*1000;
+					int multiplying = (tri == 1 ? 1 : 2);
+					time = Calendar.getInstance().getTimeInMillis() + Utilities.FOLLOWUP_IN_SECONDS * 1000 * multiplying;
         		}
 
             	//set next trigger based on different type of survey
             	am.setExact(AlarmManager.RTC_WAKEUP, time, piSchedule);
-        	}else{
-        		Utilities.LogB("*****************************", "else");
-        		am.cancel(piSchedule);
-        		shp.edit().putInt(triggerSeq, 0).commit();
+			}
+			else {
+				Utilities.LogB("*****************************", "else");
+				am.cancel(piSchedule);
+				shp.edit().putInt(triggerSeq, 0).commit();
 
-				if (surveyName.equals(Utilities.SV_NAME_FOLLOWUP)) {
-					Log.d("sa======================", "set false");
-					shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERDRINKING, false).commit();
-				}
+//				if (surveyName.equals(Utilities.SV_NAME_FOLLOWUP)) {
+//					Log.d("sa======================", "set false");
+//					shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERDRINKING, false).commit();
+//				}
 
         	}
 
