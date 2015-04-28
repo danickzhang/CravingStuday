@@ -112,10 +112,10 @@ public class Utilities {
 	public final static int CODE_SCHEDULE_AUTOMATIC = 11;
 	public final static int CODE_SKIP_BLOCK_SURVEY_RANDOM = 12;
 	public final static int CODE_SKIP_BLOCK_SURVEY_DRINKING = 13;
-	public final static boolean RELEASE = false;
+	public final static boolean RELEASE = true;
 
 
-	public final static HashMap<String, Integer> MAX_TRIGGER_MAP = new HashMap<String, Integer>(){
+	public final static HashMap<String, Integer> MAX_TRIGGER_MAP = new HashMap<String, Integer>() {
 		{
 			put(SV_NAME_MORNING, MAX_TRIGGER_MORNING);
 			put(SV_NAME_RANDOM, MAX_TRIGGER_RANDOM);
@@ -1156,6 +1156,84 @@ public class Utilities {
         //return new String(byteMerger(asymEncsymKey, EncSymbyteArray));
         return Base64.encodeToString(byteMerger(asymEncsymKey, EncSymbyteArray),Base64.DEFAULT);
 
+	}
+
+	/* Nick added this for the monitor section on april 15 2015 for NIMH
+	 * if the user closes the app, then the last encryption would fail because
+	 * the variable publicKey would be null if MainActivity was destroyed.
+	 * To get around that, I send the context to this method, call the
+	 * getPublicKey() method like in MainActivity, when the publicKey is null.
+	 * I have to send the context, because you can only call getResources() in
+	 * an activity unless you have the context. Now package monitor works when the
+	 * app is closed (MainActivity is destroyed). The getPublicKey() method will
+	 * only be called when MainActivity is destroyed or publicKey is null.
+	 */
+	public static String monitorEncryption(String string, Context context) throws Exception {
+
+		//generate symmetric key
+		KeyGenerator keygt = KeyGenerator.getInstance("AES");
+		keygt.init(128);
+		SecretKey symkey =keygt.generateKey();
+
+		//get it encoded
+		byte[] aes_ba = symkey.getEncoded();
+
+		//create cipher
+		SecretKeySpec skeySpec = new SecretKeySpec(aes_ba, "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE,skeySpec);
+
+        //encryption
+        byte [] EncSymbyteArray =cipher.doFinal(string.getBytes());
+
+        //encrypt symKey with PublicKey
+//        Key pubKey = getPublicKey();
+
+
+        if(publicKey == null){
+        	Log.d("Utilities", "publicKey was null!!");
+        	try{
+        		publicKey = getPublicKey(context);
+        	} catch(Exception e){
+        		Log.d("Utilties", "get public key failed for recording receiver to send to server");
+        		e.printStackTrace();
+        	}
+        }
+
+
+        Key pubKey = publicKey;
+
+        //RSA cipher
+        Cipher cipherAsm = Cipher.getInstance("RSA", "BC");
+        cipherAsm.init(Cipher.ENCRYPT_MODE, pubKey);
+
+        //RSA encryption
+        byte [] asymEncsymKey = cipherAsm.doFinal(aes_ba);
+
+//	        File f3 = new File(BASE_PATH,"enc.txt");
+//	        File f3key = new File(BASE_PATH,"enckey.txt");
+//	        File f3file = new File(BASE_PATH,"encfile.txt");
+//	        writeToFile2(f3,f3key,f3file, asymEncsymKey, EncSymbyteArray);
+
+        //byte != new String
+        //return new String(byteMerger(asymEncsymKey, EncSymbyteArray));
+        return Base64.encodeToString(byteMerger(asymEncsymKey, EncSymbyteArray),Base64.DEFAULT);
+
+	}
+	private static PublicKey getPublicKey(Context context) throws Exception {
+		// TODO Auto-generated method stub
+        InputStream is = context.getResources().openRawResource(R.raw.publickey);
+		ObjectInputStream ois = new ObjectInputStream(is);
+
+		BigInteger m = (BigInteger)ois.readObject();
+		BigInteger e = (BigInteger)ois.readObject();
+	    RSAPublicKeySpec keySpec = new RSAPublicKeySpec(m, e);
+
+
+	    KeyFactory fact = KeyFactory.getInstance("RSA", "BC");
+	    PublicKey pubKey = fact.generatePublic(keySpec);
+
+		return pubKey;
 	}
 
 	public static byte[] byteMerger(byte[] byte_1, byte[] byte_2){
