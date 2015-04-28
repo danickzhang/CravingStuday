@@ -172,14 +172,37 @@ public class SurveyBroadcast extends BroadcastReceiver {
             	am.setExact(AlarmManager.RTC_WAKEUP, time, piSchedule);
 			}
 			else {
-				Utilities.LogB("*****************************", "else");
+				Utilities.LogB("*****************************", "else " + shp.getInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_FOLLOWUP, -8) + " " + shp.getBoolean(Utilities.SP_KEY_SURVEY_TRIGGER_CONT_FOLLOWUP, false));
 				am.cancel(piSchedule);
 				shp.edit().putInt(triggerSeq, 0).commit();
 
-//				if (surveyName.equals(Utilities.SV_NAME_FOLLOWUP)) {
-//					Log.d("sa======================", "set false");
-//					shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERDRINKING, false).commit();
-//				}
+				//04/02/2015
+				if (surveyName.equals(Utilities.SV_NAME_FOLLOWUP)) {
+					Log.d("sa======================", "set false " + shp.getInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_FOLLOWUP, -1) + "" + shp.getBoolean(Utilities.SP_KEY_SURVEY_TRIGGER_CONT_FOLLOWUP, false));
+					//					shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERDRINKING, false).commit();
+
+					if (shp.getInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_FOLLOWUP, -1) == 0 && shp.getBoolean(Utilities.SP_KEY_SURVEY_TRIGGER_CONT_FOLLOWUP, false)) {
+						Log.d("sa======================", "set false 3 ");
+						//handle schedule
+						Intent itSchedule_fu = new Intent(Utilities.BD_TRIGGER_MAP.get(surveyName));
+						itSchedule_fu.putExtra(Utilities.SV_NAME, surveyName);
+						PendingIntent piSchedule_fu = PendingIntent.getBroadcast(context, 0, itSchedule_fu, Intent.FLAG_ACTIVITY_NEW_TASK);
+
+						shp.edit().putInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_FOLLOWUP, 3).commit();
+						long time = Long.MAX_VALUE;
+						time = Calendar.getInstance().getTimeInMillis() + Utilities.FOLLOWUP_IN_SECONDS * 1000 * 2;
+						am.setExact(AlarmManager.RTC_WAKEUP, time, piSchedule_fu);
+
+						shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_TRIGGER_CONT_FOLLOWUP, false).commit();
+						//04/02.2015
+						shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERDRINKING, true).commit();
+					}
+					else {
+
+						shp.edit().putInt(Utilities.SP_KEY_SURVEY_TRIGGER_SEQ_FOLLOWUP, 0).commit();//useless
+						shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERDRINKING, false).commit();
+					}
+				}
 
         	}
 
@@ -216,7 +239,7 @@ public class SurveyBroadcast extends BroadcastReceiver {
 
 					Utilities.writeEventToFile(context, (surveyName.equals(Utilities.SV_NAME_RANDOM) ? Utilities.CODE_SKIP_BLOCK_SURVEY_RANDOM : Utilities.CODE_SKIP_BLOCK_SURVEY_DRINKING),
 							"", "", "", "",
-							"", Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
+							Utilities.sdf.format(Calendar.getInstance().getTime()), "" + seq);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -276,7 +299,7 @@ public class SurveyBroadcast extends BroadcastReceiver {
 						}
 						Utilities.writeEventToFile(context, Utilities.CODE_SKIP_BLOCK_SURVEY_RANDOM,
 								"", "", "",	"",
-								"", Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
+								Utilities.sdf.format(Calendar.getInstance().getTime()), "" + seq);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

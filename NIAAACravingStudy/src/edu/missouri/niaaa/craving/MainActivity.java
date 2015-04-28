@@ -731,6 +731,23 @@ public class MainActivity extends Activity {
 	        case INTENT_REQUEST_SUSPENSION:
 	        	if(resultCode == 1){
 	        		section_6.setText(R.string.section_62);
+
+	        		//write suspension start
+
+				//write to server
+				Calendar c = Calendar.getInstance();
+				SharedPreferences sp = getSharedPreferences(Utilities.SP_LOGIN, Context.MODE_PRIVATE);
+				long startTimeStamp = sp.getLong(Utilities.SP_KEY_SUSPENSION_TS, c.getTimeInMillis());
+				c.setTimeInMillis(startTimeStamp);
+
+				try {
+					Utilities.writeEventToFile(MainActivity.this, Utilities.CODE_SUSPENSION, "", "", "", "",
+							Utilities.sdf.format(c.getTime()), "");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 	        	}
 
 	        	break;

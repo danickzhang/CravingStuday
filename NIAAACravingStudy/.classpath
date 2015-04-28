@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Chen/Danick/Dropbox/2014 Fall/lab/backups/JavaMail/JavaMail/activation.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Chen/Danick/Dropbox/2014 Fall/lab/backups/JavaMail/JavaMail/additionnal.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Chen/Danick/Dropbox/2014 Fall/lab/backups/JavaMail/JavaMail/mail.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>

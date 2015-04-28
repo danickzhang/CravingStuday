@@ -1,5 +1,6 @@
 package edu.missouri.niaaa.craving.sensor.equivital;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -156,7 +157,8 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 				arg1.getSummary().getQualityConfidence().getECGQuality(),
 				arg1.getSummary().getQualityConfidence().getImpedanceQuality(),
 				arg1.getSummary().getQualityConfidence().getHeartRateConfidence(),
-				arg1.getSummary().getQualityConfidence().getBreathingRateConfidence());
+				arg1.getSummary().getQualityConfidence().getBreathingRateConfidence(),
+				arg1.getSummary().getTemperature().getSkinTemperature());
 		//Log.d("Chest Acc Info","chest data recorded:");
 	}
 
@@ -164,7 +166,10 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 			double beltSensorRate, double ecgDerivedRate,double impedanceRate,
 			double ecgRate, double beltQuality, double ecgQuality,
 			double impedanceQuality, double heartRateConfidence,
-			double breathingRateConfidence) {
+			double breathingRateConfidence, double skinTemprature) {
+
+			DecimalFormat df = new DecimalFormat("0.00");
+
 		// TODO Auto-generated method stub
 		/*
 		 * 1/22 Ricky Reduce ecgDerivedRate,impedanceRate,impedanceQuality
@@ -187,7 +192,8 @@ public class EquivitalRunnable implements Runnable, ISemDeviceSummaryEvents, ISe
 				+String.valueOf(beltQuality)+","
 				+String.valueOf(ecgQuality)+","
 				+String.valueOf(heartRateConfidence)+","
-				+String.valueOf(breathingRateConfidence);
+				+String.valueOf(breathingRateConfidence) + ","
+				+ String.valueOf(df.format(skinTemprature));
 		 Message msgData=new Message();
 		 msgData.what = CHEST_SENSOR_DATA;
 		 Bundle dataBundle = new Bundle();

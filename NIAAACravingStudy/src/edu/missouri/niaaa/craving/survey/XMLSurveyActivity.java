@@ -166,7 +166,7 @@ public class XMLSurveyActivity extends Activity {
 			prepareSound();
 
 			Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-	        v.vibrate(1000);
+			v.vibrate(5000);
 
 	        //prepare seq title and reminder title
 	        Log.d("!!!!!!!!!!!!!!!!", ""+surveyTitle);
@@ -420,7 +420,7 @@ public class XMLSurveyActivity extends Activity {
 
 					Utilities.writeEventToFile(context, (surName.equals(Utilities.SV_NAME_RANDOM) ? Utilities.CODE_SKIP_BLOCK_SURVEY_RANDOM : Utilities.CODE_SKIP_BLOCK_SURVEY_DRINKING),
 							"", "", "", "",
-							"", Utilities.sdf.format(Calendar.getInstance().getTime()) + seq);
+							Utilities.sdf.format(Calendar.getInstance().getTime()), "" + seq);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -563,7 +563,7 @@ public class XMLSurveyActivity extends Activity {
 		t.schedule(new StartSound(),soundDelay);
 
 		Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(1000);
+		v.vibrate(5000);
 	}
 
 
@@ -1024,6 +1024,8 @@ public class XMLSurveyActivity extends Activity {
 					am.setExact(AlarmManager.RTC_WAKEUP, time, piSchedule);
 
 					shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_TRIGGER_CONT_FOLLOWUP, false).commit();
+					//04/02.2015
+					shp.edit().putBoolean(Utilities.SP_KEY_SURVEY_UNDERDRINKING, true).commit();
 				}
 				else {
 
