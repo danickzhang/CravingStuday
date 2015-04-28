@@ -274,13 +274,15 @@ public class SensorLocationService extends Service {
 		AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 		am.setStreamVolume(AudioManager.STREAM_MUSIC, Utilities.VOLUME, AudioManager.FLAG_PLAY_SOUND);
 
-		soundTimer = new Timer();
-		voiceTimer = new Timer();
-		soundTimer.schedule(new StartSound(),3000);
-		voiceTimer.schedule(new StartVoice(),3000 + 20*1000);
+		if (!Utilities.getSP(SensorLocationService.this, Utilities.SP_SURVEY).getBoolean(Utilities.SP_KEY_SURVEY_SUSPENSION, false)) {
+			soundTimer = new Timer();
+			voiceTimer = new Timer();
+			soundTimer.schedule(new StartSound(),3000);
+			voiceTimer.schedule(new StartVoice(),3000 + 20*1000);
+		}
 
 		Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(1000);
+		v.vibrate(3000);
 	}
 
 	private void stopSound(){
